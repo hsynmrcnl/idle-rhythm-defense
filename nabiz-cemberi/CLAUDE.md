@@ -44,8 +44,9 @@ python -m http.server -d dist   # yerelde oynamak için (örnek sesler file:// i
 - Tıklamalar `data-act` ile `#rack` üzerinde tek dinleyicide; durum `S` içinde, `save()` localStorage'a yazar (`nabiz-cemberi-v3`). `normalizeS()` eski kayıtları taşır: yeni alan eklerken buraya varsayılan koy.
 - Sayısal denge: `recalc()` → `rate()`/`dps()`; nota ve hasar çarpanları `planAvg`, `tourM`, `contrastM` gibi fonksiyonlarda. Değiştirince testlerdeki beklenen değerleri kontrol et.
 - Testler `window.__nb` hata ayıklama arayüzünü kullanır (p7 sonunda). Yeni özellik için oraya getter/fonksiyon ekle ve `tests/` altına bir Playwright testi yaz.
-- Telefon düzeni: `isPhone()` (≤700px) ve canvas'ta `PH()`; her yeni panel iki düzende de denenir (tests/mobile_test.py).
+- Telefon düzeni: `isPhone()` (≤700px) ve canvas'ta `PH()`; her yeni panel iki düzende de denenir (tests/mobile_test.py, tests/mobile_ui_test.py).
+- Telefon arayüzü (v13): Sahne tek ekran, kaydırmasız (canvas kalan yüksekliğe göre küçülür); başlık gizli, sağ üstte Ayarlar dişlisi (`#t-set`, sekme `set`). Altta 5 simgeli dock (`.dk`, `DOCK` eşlemesi): Sahne · Stüdyo|Koleksiyon · Savunma · Albüm|Kitap · Görünüm; ikili gruplarda panelin üstünde `.subnav`. Seçili simge kendi `--nc` renginde parlar, diğerleri aynı soluk renkte. Ritme vur: sahnede boş yere dokunmak. Dil, ses, örnek şarkılar, öğretici ve kayıt Ayarlar'da (`renderSet`). Görünüm ayrı sekme kalır, büyüyecek.
 - Ses: her yeni enstrümanın `v` nesnesi bir GEN üretecini seçer; örnek kaydı varsa `p4b_sf.js` SF_PROG/SF_DRUM'a eşle, ses seviyesi SF_GAIN/SF_DGAIN ile dengelenir.
 
 ## Sürüm notu
-Üst köşedeki etiket `p6_panels.js` içinde (`'v12 · '`); yayınlarken artır.
+Üst köşedeki etiket `p6_panels.js` içinde (`'v13 · '`); yayınlarken artır. Telefonda Ayarlar'ın en altında görünür.

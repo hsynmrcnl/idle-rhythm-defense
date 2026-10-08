@@ -512,7 +512,7 @@ function hitTest(e){
  const sUp=()=>{if(!sDrag)return;sDrag=null;const si=soloView();const so=si>=0&&S.solos[si];if(so){const selN=so.notes[soloSel];so.notes.sort((a,b)=>a.t-b.t);soloSel=selN?so.notes.indexOf(selN):-1}recalc();updUI();renderSoloBox();renderPads()};
  el.addEventListener('pointerup',sUp);el.addEventListener('pointercancel',sUp);
  el.addEventListener('pointerleave',()=>{hover=null;hintFor(null)});
- el.addEventListener('click',e=>{if(soloView()>=0){const hs=soloStageHit(e);if(hs&&hs.core)tap();return}const h=hitTest(e);if(!h)return;if(h.core){tap();return}if(PH()){eSel=h.i}cellClick(h.i,h.s);if(PH())renderPads()});
+ el.addEventListener('click',e=>{if(soloView()>=0){const hs=soloStageHit(e);if(hs&&hs.core)tap();return}const h=hitTest(e);if(!h||h.core){tap();return}if(PH()){eSel=h.i}cellClick(h.i,h.s);if(PH())renderPads()});
  document.addEventListener('pointerdown',()=>{if(ac&&ac.state==='suspended')ac.resume()},{passive:true});
 })();
 let lastF=performance.now();
@@ -534,7 +534,7 @@ function frame(ms){
 }
 
 /* ================= boot ================= */
-recalc();core.hp=hpMax();ensureOrders();applyTheme();setTab(isPhone()?'stage':'studio');hintFor(null);tutShow();if(S.lang==='en'){document.documentElement.lang='en';i18n(document.body);$('langBtn').textContent='TR'}
+recalc();core.hp=hpMax();ensureOrders();applyTheme();setTab(isPhone()?'stage':'studio');hintFor(null);tutShow();if(S.lang==='en'){document.documentElement.lang='en';$('app').lang='en';i18n(document.body);$('langBtn').textContent='TR'}
 const away=Math.min((Date.now()-(S.last||Date.now()))/1000,8*3600);
 if(away>30){const g=rate()*away*0.5;if(g>=1){earn(g);setTimeout(()=>msg('Sen yokken döngün ♪ '+fmt(g)+' kazandırdı · kuşatma seni bekledi'),300)}}
 updUI();
