@@ -229,7 +229,7 @@ function checkBook(){
 /* ---------- tutorial: ten steps, most advance on the player's own action ---------- */
 const TUT=[
  {t:'Hoş geldin',p:'Sessizlik A.Ş. şehri susturmaya geliyor; tek savunma senin döngün. Halkada boş bir hücreye dokun: vuruş ekle.',tab:'stage',cond:()=>placedCount()>=3},
- {t:'Başlat',p:'Başlat’a bas. İbre döndükçe her vuruş hem nota kazandırır hem de yaklaşan susturuculara ateş eder.',tab:'stage',hi:'play',cond:()=>playing},
+ {t:'Başlat',p:'Ortadaki ▶ düğmesine dokun. İbre döndükçe her vuruş hem nota kazandırır hem de yaklaşan susturuculara ateş eder. Durdurmak için ortaya yine dokun.',tab:'stage',hi:'cvwrap',cond:()=>playing},
  {t:'Kuşatma',p:'Düşmanlar kenardan merkeze yürür. Merkeze varırlarsa Nabız düşer; sıfırlanırsa dalga 5 geri gider. İlk susturucuyu düşür.',tab:'stage',cond:()=>S.kills>=1},
  {t:'Seviye',p:'Biriken notayla Stüdyo’dan Davul’u yükselt: her seviye değeri artırır, 10. ve 25. seviyede ikiye katlar.',tab:'studio',hi:'lvb-davul',cond:()=>lvOf('davul')>=2},
  {t:'Nefes',p:'Her enstrümanın ölçü başına bir nefesi var: Davul 4 vuruşa kadar tam güç, fazlası zayıflar. Her hücreyi doldurmak kazandırmaz; es bırak, yerine aksan koy.',tab:'studio',btn:'Anladım'},
@@ -250,11 +250,11 @@ function tutAdvance(){if(!tutActive())return;S.tut.s++;if(S.tut.s>=TUT.length){S
 function tutCheck(){if(!tutActive()){if(tutHiEl)tutHi(null);const el=$('tut');if(el&&!el.hidden)el.hidden=true;return}const st=TUT[S.tut.s];if(st.cond&&st.cond()){tutAdvance();return}tutHi(st.hi||null)}
 let loadArm=false,loadT=0;
 function applyLoaded(d){if(demoMode)exitDemo();S=Object.assign(freshRun(),freshMeta(),d);if(!d.tut)S.tut=null;normalizeS();MI=meterInfo();eSel=0;previewId=null;enemies=[];wave=null;core={hp:hpMax(),sh:0};if(playing)startWave(S.wave,nowT());recalc();renderPanels();applyTheme();syncFx();save();tutShown=-1;tutShow();msg('Kayıt yüklendi · dalga '+S.wave+' · '+S.albums.length+' albüm · '+Object.keys(S.lv).length+' enstrüman')}
-const HINT_C='Hücreye dokun: vuruş ekle. Boş yere dokun ya da boşluk tuşuna bas: ritme vur.';
-const HINT_S='Satırdaki hücreye dokun: vuruş ekle. Sahne alanına dokun ya da boşluk tuşuna bas: ritme vur.';
+const HINT_C='Hücreye dokun: vuruş ekle. Boş yere dokun ya da boşluk tuşuna bas: ritme vur. Ortaya dokun: başlat / durdur.';
+const HINT_S='Satırdaki hücreye dokun: vuruş ekle. Sahne alanına dokun ya da boşluk tuşuna bas: ritme vur. Ortadaki düğme: başlat / durdur.';
 const hintSet=t=>{$('hint').textContent=T(t)};
 function hintFor(h){
- const el=$('hint');if(!h){if(S.edit==='F'){hintSet('Dolgu: vurmalı halkalarının sağ yarısına vuruş koy; sol yarı ve melodikler dolguda çalmaz.');return}if(S.up.sdevir&&S.edit==='S'&&soloEdSlots().length){const x=slotIns(soloEdCur());hintSet('Solo sahnesi · '+(x?x.n:'')+': boş yere bas, nota'+(S.up.suzun?' · halka boyunca sürükle, uzat · bara değdir, birleşir':'')+' · başka halkaya sürükle, perde · merkez: ritme vur');return}hintSet(S.layout==='strip'?HINT_S:HINT_C);return}
+ const el=$('hint');if(!h){if(S.edit==='F'){hintSet('Dolgu: vurmalı halkalarının sağ yarısına vuruş koy; sol yarı ve melodikler dolguda çalmaz.');return}if(S.up.sdevir&&S.edit==='S'&&soloEdSlots().length){const x=slotIns(soloEdCur());hintSet('Solo sahnesi · '+(x?x.n:'')+': boş yere bas, nota'+(S.up.suzun?' · halka boyunca sürükle, uzat · bara değdir, birleşir':'')+' · başka halkaya sürükle, perde · merkez: başlat / durdur');return}hintSet(S.layout==='strip'?HINT_S:HINT_C);return}
  const x=slotIns(h.i);if(!x){hintSet('Yer '+(h.i+1)+' boş · Stüdyo sekmesinden enstrüman koy');return}
  const v=S.pat[S.edit][h.i][h.s];const soloTxt=isSolo(h.i)?' · solo ritmi':'';
  const rn=(RUN[S.edit][h.i]||[])[h.s]||0,nf=NF[S.edit][h.i]||1,sm=supM(S.edit,h.s);hintSet(x.n+soloTxt+' · adım '+(h.s+1)+' · '+(v===0?'ekle ♪ '+fmt(noteCost()):v===1&&S.up.accent?'aksan yap ♪ '+fmt(accCost()):'sil, ♪ '+fmt(Math.round(costAt(placedCount()-1)/2))+' geri')+' · nefes '+rowLoad(S.pat[S.edit],h.i)+'/'+nefesOf(h.i,S.edit)+(nf<1?' (güç ×'+fm(nf)+')':'')+(rn>1?' · '+rn+'. ardışık, alışkanlık ×'+fm(habF(rn)):'')+(sm>1?' · destek ×'+fm(sm):''));

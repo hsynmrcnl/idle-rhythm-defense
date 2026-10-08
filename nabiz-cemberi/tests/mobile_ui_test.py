@@ -38,17 +38,33 @@ with sync_playwright() as pw:
         p.click('#tut [data-act=tutSkip]'); p.wait_for_timeout(150)
         m = p.evaluate("""()=>{const r=q=>document.querySelector(q).getBoundingClientRect();const cv=r('#cv');
           return {scroll:document.scrollingElement.scrollHeight-innerHeight,cvW:cv.width,cvH:cv.height,cvR:cv.right,vw:innerWidth,
-          play:r('#play').bottom,dock:r('#dock').top,gear:r('#t-set').right,top:!!document.querySelector('.top h1').offsetParent,
-          hidden:['#tap','#mute','#demo','#langBtn','.tabs'].every(q=>{const e=document.querySelector(q);return !e.offsetParent||getComputedStyle(e).display==='none'})}}""")
+          cvB:cv.bottom,dock:r('#dock').top,gear:r('#t-set').right,top:!!document.querySelector('.top h1').offsetParent,
+          hidden:['#play','#tap','#mute','#demo','#langBtn','.tabs'].every(q=>{const e=document.querySelector(q);return !e.offsetParent||getComputedStyle(e).display==='none'})}}""")
         check(m['scroll'] <= 0, 'sahne kaydırmasız (fazla %dpx)' % m['scroll'])
         check(abs(m['cvW'] - m['cvH']) < 1 and m['cvR'] <= m['vw'], 'canvas kare ve ekranda (%dx%d)' % (m['cvW'], m['cvH']))
-        check(m['play'] <= m['dock'], 'Başlat dock’un üstünde')
-        check(not m['top'] and m['hidden'], 'başlık, EN, Ritme vur, Ses, Örnek şarkı ve üst sekmeler gizli')
+        check(m['cvB'] <= m['dock'], 'sahne dock’un üstünde')
+        check(not m['top'] and m['hidden'], 'başlık, EN, alttaki Başlat, Ritme vur, Ses, Örnek şarkı ve üst sekmeler gizli')
         check(m['gear'] >= m['vw'] - 20, 'Ayarlar sağ üstte')
         # boş yere dokun → ritme vur (çalmıyorken uyarı verir)
         cv = p.locator('#cv').bounding_box()
         p.mouse.click(cv['x'] + 6, cv['y'] + 6); p.wait_for_timeout(100)
-        check('Önce müziği başlat' in p.inner_text('#msg'), 'boş yere dokunmak ritme vuruyor')
+        check('müziği başlat' in p.inner_text('#msg'), 'boş yere dokunmak ritme vuruyor')
+        # orta düğme: tek dokunuşla başlat / durdur; çalarken boş yer durdurmaz
+        cx, cy = cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2
+        p.mouse.click(cx, cy); p.wait_for_timeout(250)
+        check(p.evaluate("()=>window.__nb.playing"), 'ortadaki ▶ müziği başlatıyor')
+        p.wait_for_timeout(1200)
+        check(abs(p.evaluate("()=>window.__nb.orbK")) < 0.05, 'düğme küçülüp BPM göbeğine oturuyor')
+        p.mouse.click(cv['x'] + 6, cv['y'] + 6); p.wait_for_timeout(100)
+        check(p.evaluate("()=>window.__nb.playing"), 'çalarken boş yere dokunmak durdurmuyor')
+        if w == 390:
+            p.wait_for_timeout(700); p.screenshot(path=os.path.join(OUT, 'v13_playing.png'))
+        p.mouse.click(cx, cy); p.wait_for_timeout(250)
+        check(not p.evaluate("()=>window.__nb.playing"), 'çalarken ortaya dokunmak durduruyor')
+        p.wait_for_timeout(1200)
+        check(abs(p.evaluate("()=>window.__nb.orbK") - 1) < 0.05, 'durunca düğme geri büyüyor')
+        if w == 390:
+            p.wait_for_timeout(700); p.screenshot(path=os.path.join(OUT, 'v13_stopped.png'))
         if w == 390:
             p.screenshot(path=os.path.join(OUT, 'v13_stage.png'))
             # dock: 5 buton, aynı renk; aktif olan kendi neonunda
@@ -104,6 +120,8 @@ with sync_playwright() as pw:
     check(p.evaluate("()=>!document.getElementById('p-set').hidden"), 'masaüstünde dişli Ayarlar’ı açıyor')
     p.click('#t-set'); p.wait_for_timeout(100)
     check(p.evaluate("()=>document.getElementById('app').dataset.tab") == 'studio', 'dişliye tekrar basınca önceki sekmeye dönüyor')
+    cv = p.locator('#cv').bounding_box(); p.mouse.click(cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2); p.wait_for_timeout(200)
+    check(p.evaluate("()=>window.__nb.playing") and p.inner_text('#play') == 'Durdur', 'masaüstünde de ortadaki ▶ başlatıyor, alttaki düğme Durdur oluyor')
     p.screenshot(path=os.path.join(OUT, 'v13_desktop.png'))
     check(not errs, 'sayfa hatası yok ' + ('; '.join(errs) if errs else ''))
     b.close()

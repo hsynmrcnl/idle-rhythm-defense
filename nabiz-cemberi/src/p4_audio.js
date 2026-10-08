@@ -148,7 +148,7 @@ function startStop(){
 }
 let tapFx=null,tapP=0,kickP=0,bassP=0;
 function tap(){
- if(!playing){msg('Önce müziği başlat');return}
+ if(!playing){msg('Önce ortadaki ▶ ile müziği başlat');return}
  const now=ac.currentTime-(ac.outputLatency||ac.baseLatency||0);
  let best=null;for(const b of beats)if(best===null||Math.abs(now-b)<Math.abs(now-best))best=b;
  if(best===null)return;const d=now-best;
