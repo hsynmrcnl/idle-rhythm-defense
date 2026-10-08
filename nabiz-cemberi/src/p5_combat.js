@@ -11,7 +11,7 @@ function startWave(w,now){S.wave=w;if(w>S.bestWave){S.bestWave=w;const nf=nextFa
 function spawn(ty,now,w,lane){const T=ETYPES[ty];const cnt=T.swarm||1;for(let k=0;k<cnt;k++){const hp=4*Math.pow(1.19,w-1)*T.hp;const e={ty,hp,hpMax:hp,d:1+k*0.03,a:(lane!=null?lane:Math.random())+(cnt>1?(Math.random()-0.5)*0.08:0),sp:T.sp*(1+0.004*w),slow:0,slowT:0,stun:0,dot:0,dotT:0,flash:0,w,boss:!!T.boss,lastSp:now,wob:Math.random()*TAU,id:Math.random(),waved:false};e.a=((e.a%1)+1)%1;enemies.push(e);if(e.boss)wave.boss=e}}
 function laneDist(a,b){const d=Math.abs(a-b);return S.layout==='circle'?Math.min(d,1-d):d}
 function bounty(e){const T=ETYPES[e.ty];return(2*Math.pow(1.18,e.w-1)*T.b+rate()*0.4*T.b)*bountyM()}
-function kill(e,k,now){const g=bounty(e);earn(g);S.kills++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
+function kill(e,k,now){const g=bounty(e);earn(g);S.kills++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);if(S.dnum!==false&&pops.length<48)pops.push({e,t:'+♪ '+fmt(g),life:1,k:1});if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
 function leak(e,k,now){const T=ETYPES[e.ty];let dmg=T.dmg*(1+0.03*e.w);if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}core.hp-=dmg;retreatFlash=Math.max(retreatFlash,0.6);if(T.mute){const cands=S.slots.map((id,si)=>id?si:-1).filter(x=>x>=0);if(cands.length){const si=cands[Math.floor(Math.random()*cands.length)];muteUntil[si]=now+barDur();msg(slotIns(si).n+' bir ölçü susturuldu')}}enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;if(core.hp<=0)retreat(now)}
 function retreat(now){retreatCount++;const from=S.wave,to=Math.max(1,Math.floor(S.wave*0.8));enemies=[];core.hp=hpMax();core.sh=0;retreatFlash=1.5;msg('Sessizlik A.Ş. sahneyi bastı. Dalga '+from+' → '+to+'. Nabız tazelendi.');startWave(to,now)}
 function wallHit(e){const k=Math.floor(e.a*WN)%WN;const E=wallE[k];if(E<=0.02)return 0;const b=wallBase(),top=b+Math.min(1,E)*wallSpan();if(e.d>=b&&e.d<=top)return E*wallD[k];return 0}
@@ -37,7 +37,7 @@ function logic(now){
  if(wave.done&&now>=wave.nextAt)startWave(wave.n+1,now);
 }
 function inRange(){const r=range();return enemies.filter(e=>e.d<=r)}
-function hit(e,dmg,col,origin,kind){e.hp-=dmg;e.flash=1;const k=enemies.indexOf(e);if(origin)vfx.push({k:kind||'tracer',o:origin,e,col,life:1});if(e.hp<=0&&k>=0)kill(e,k,lastLogic)}
+function hit(e,dmg,col,origin,kind){e.dnA=(e.dnA||0)+Math.min(dmg,Math.max(0,e.hp));e.hp-=dmg;e.flash=1;const k=enemies.indexOf(e);if(origin)vfx.push({k:kind||'tracer',o:origin,e,col,life:1});if(e.hp<=0&&k>=0)kill(e,k,lastLogic)}
 function applySlow(e,amt,dur){if(ETYPES[e.ty].noSlow)return;e.slow=Math.max(e.slow,amt);e.slowT=Math.max(e.slowT,dur)}
 function pushWall(lane,energy,dmg){const k0=Math.floor(lane*WN)%WN;for(let o=-4;o<=4;o++){const k=(k0+o+WN)%WN,f=Math.exp(-o*o/5);wallE[k]=Math.min(1.6,wallE[k]+energy*f);wallD[k]=Math.max(wallD[k],dmg*f)}}
 function fire(si,s,v,pk,mult,art,raw){
@@ -88,5 +88,5 @@ function onStep(q){
 }
 const globalMDmg=()=>tourM();
 function setWave(n){n=clamp(n,1,Math.max(1,S.bestWave));S.wave=n;enemies=[];core.hp=hpMax();core.sh=0;if(playing)startWave(n,nowT());else wave=null;renderPanels();updUI()}
-function ffSim(sec){let t=lastLogic||0;if(!wave){startWave(S.wave,t);lastLogic=t}const end=t+sec;const nd={2:{nextT:t,step:0},3:{nextT:t,step:0}};while(t<end){if(step>=MI.N){step=0;bar++}onStep({s:step,pk:pkFor(bar),t,b:bar});step++;if(step>=MI.N){step=0;bar++}const sd=60/curBpm(bar)/4;t+=sd;for(let k=2;k<=3;k++){if(!needleOn(k))continue;const n=nd[k],spec=NEEDLES[k-1];while(n.nextT<t){const cell=spec.dir>0?n.step%MI.N:(MI.N-1-n.step%MI.N);onStep({s:cell,pk:pkFor(bar),t:n.nextT,b:bar,k});n.nextT+=sd/spec.speed;n.step++}}logic(t);vfx.length=0;parts.length=0}lastLogic=t}
+function ffSim(sec){let t=lastLogic||0;if(!wave){startWave(S.wave,t);lastLogic=t}const end=t+sec;const nd={2:{nextT:t,step:0},3:{nextT:t,step:0}};while(t<end){if(step>=MI.N){step=0;bar++}onStep({s:step,pk:pkFor(bar),t,b:bar});step++;if(step>=MI.N){step=0;bar++}const sd=60/curBpm(bar)/4;t+=sd;for(let k=2;k<=3;k++){if(!needleOn(k))continue;const n=nd[k],spec=NEEDLES[k-1];while(n.nextT<t){const cell=spec.dir>0?n.step%MI.N:(MI.N-1-n.step%MI.N);onStep({s:cell,pk:pkFor(bar),t:n.nextT,b:bar,k});n.nextT+=sd/spec.speed;n.step++}}logic(t);vfx.length=0;parts.length=0;pops.length=0}lastLogic=t}
 

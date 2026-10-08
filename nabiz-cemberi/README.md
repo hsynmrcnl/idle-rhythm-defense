@@ -29,7 +29,7 @@ pip install playwright
 playwright install chromium
 python build.py && python tests/run_all.py
 ```
-Her takım kendi başına da çalışır: `python tests/v7_test.py`. Ekran görüntüleri `tests/out/` içine düşer.
+Her takım kendi başına da çalışır: `python tests/v16_test.py`. Ekran görüntüleri `tests/out/` içine düşer.
 
 ## Yayınlama
 - **GitHub Pages:** Settings → Pages → Source: *GitHub Actions*. Sonra her `main` push'u otomatik yayınlanır (Actions sekmesinde "Yayınla" işi).

@@ -5,7 +5,7 @@ let scene=gl?document.createElement('canvas'):view;
 let ctx=scene.getContext('2d');
 let L=600,DPR=1,W=600,phase=0,phase2=0,phase3=0,clock=0,dotRot=0,rot=0,dirS=1,hover=null,bgKey='',bgCv=null;
 const flash=Array.from({length:MAXSLOTS},()=>new Float32Array(18));
-const parts=[],waves=[],stars=[];
+const parts=[],waves=[],stars=[],pops=[];
 for(let k=0;k<64;k++)stars.push({x:Math.random()*2.2-1.1,y:Math.random()*2.2-1.1,vx:(Math.random()-0.5)*0.035,vy:(Math.random()-0.5)*0.035});
 const CN=72,HALF=36,peaks=new Float32Array(CN),SK=48,skPeaks=new Float32Array(SK),crownCache={},wv=new Float32Array(201);
 const VS='attribute vec2 p;varying vec2 vUv;void main(){vUv=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}';
@@ -431,6 +431,16 @@ function drawParts(dt,th){
   else{ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,TAU);ctx.fill()}}
  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
 }
+/* hasar sayıları: düşman başına 0,35 sn'lik toplam düşmanın üstünden süzülür; düşen düşman +♪ ödül yazar */
+function drawPops(dt,g,th){if(S.dnum===false){if(pops.length)pops.length=0;return}
+ const fs=Math.max(10,Math.round(0.024*L));
+ for(const e of enemies)if(e.dnA>0&&clock-(e.dnT||0)>0.35){if(e.dnA>=1&&pops.length<48)pops.push({e,t:fmt(e.dnA),life:1,k:0});e.dnA=0;e.dnT=clock}
+ if(!pops.length)return;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
+ for(let k=pops.length-1;k>=0;k--){const p=pops[k];p.life-=dt*(p.k?0.9:1.5);if(p.life<=0){pops.splice(k,1);continue}
+  if(p.x==null){const [x,y]=enemyPos(p.e,g);p.x=x+(Math.random()-0.5)*fs;p.y=y-fs*(p.k?1.4:0.9)}
+  const up=RM?0:(1-p.life)*fs*(p.k?2.2:1.6),sz=p.k?Math.round(fs*1.15):fs;ctx.globalAlpha=Math.min(1,p.life*1.6);
+  ctx.font=(p.k?'700 ':'600 ')+sz+'px '+th.font.m;ctx.lineWidth=3;ctx.strokeStyle=hexA(th.cv.bg,0.85);ctx.strokeText(p.t,p.x,p.y-up);ctx.fillStyle=p.k?th.cv.acc:hexA(th.cv.ink,0.92);ctx.fillText(p.t,p.x,p.y-up)}
+ ctx.globalAlpha=1;ctx.lineJoin='miter'}
 function drawHud(g,th){
  ctx.fillStyle=hexA(th.cv.acc,0.55);ctx.font='600 11px '+th.font.m;ctx.textBaseline='middle';
  ctx.textAlign='left';ctx.fillText('SEQ//NABIZ-03',18,22);ctx.fillText('DÖNGÜ '+String(bar).padStart(4,'0'),18,L-22);
@@ -470,6 +480,7 @@ function drawScene(dt){
  enemies.forEach(e=>drawEnemy(e,th,g));
  drawVfx(dt,g,th);
  drawParts(dt,th);
+ drawPops(dt,g,th);
  orbStep(dt);drawOrb(th);
  if(th.ring==='hud')drawHud(g,th);
  drawOverlay(dt,g,th);
@@ -568,7 +579,7 @@ setInterval(()=>{if(S.orders.some(o=>!o.tpl&&o.ready&&Date.now()>=o.ready)){rend
 setInterval(save,5000);setInterval(()=>{try{autoTick()}catch(e){console.warn(e)}},2000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{bgKey=''});
-window.__nb={get S(){return S},ff:ffSim,rate,dps,recalc,renderPanels,setWave,get enemies(){return enemies},get wave(){return wave},get core(){return core},IDX,INS,get playing(){return playing},get soloNow(){return soloNow},get curBar(){return curBar},soloVoice:(id,row,hold,art)=>{ensureAudio();soloVoice(IDX[id],ac.currentTime+0.01,row,hold,art,1);return true},genSolo,testVoice:(id,s)=>{ensureAudio();const x=IDX[id];SOLO_F=0;GEN[x.v.g](ac.currentTime+0.01,1,x.v,s||0);return true},soloFreq,tickPow,analyzeSolo,artOk,noteSus,soloView:()=>soloView(),sgeom:()=>sgeom(),get soloEdSlot(){return soloEdSlot},set soloEdSlot(v){soloEdSlot=v},get soloSel(){return soloSel},get L(){return L},setEdit(v){S.edit=v;renderPanels();updUI()},renderPads,get lowQ(){return lowQ},parseCode,exportCode,curChord,chordName,kadansAt,contrastM,transM,fillHits,fillBar,cellClick,get crashFlash(){return crashFlash},get transText(){return transText},planAvg,autoTick,autoReset:()=>{autoT=0},sfLoad,SF,sfReady:id=>sfReady(IDX[id]),sfVoice:(id,s)=>{ensureAudio();return sfVoice(IDX[id],ac.currentTime+0.02,1,s||0)},get sfDir(){return SF_DIR},set sfDir(v){SF_DIR=v},get sfVol(){return SF_VOL},set sfVol(v){SF_VOL=v},sfDrum:(id,t,a,s)=>{ensureAudio();return sfDrum(IDX[id],t||ac.currentTime+0.02,a||1,s||0)},sfSolo:(id,t,row,hold,art,a)=>{ensureAudio();return sfSolo(IDX[id],t||ac.currentTime+0.02,row||0,hold||1,art||'none',a||1)},soloVoice:(id,t,row,hold,art,a)=>{ensureAudio();soloVoice(IDX[id],t||ac.currentTime+0.02,row||0,hold||1,art||'none',a||1)},voice:(id,t,v,s)=>{ensureAudio();voice(IDX[id],t||ac.currentTime+0.02,v||1,s||0)},get ac(){return ac},get analyser(){return analyser},get playingNow(){return playing},goTour,tourM,cityOf,albUnl,waveComp,get demoMode(){return demoMode},get demoIdx(){return demoIdx},DEMOS,enterDemo,exitDemo,soloMerge,sAng,get scene(){return scene},get orbK(){return orbK},sfKeyOf:id=>sfProg(id)||null,get dorukFlash(){return dorukFlash}};
+window.__nb={get S(){return S},get pops(){return pops},undo,get undoN(){return undoSt.length},anlRank,anlToggle,get anlOn(){return anlOn},ff:ffSim,rate,dps,recalc,renderPanels,setWave,get enemies(){return enemies},get wave(){return wave},get core(){return core},IDX,INS,get playing(){return playing},get soloNow(){return soloNow},get curBar(){return curBar},soloVoice:(id,row,hold,art)=>{ensureAudio();soloVoice(IDX[id],ac.currentTime+0.01,row,hold,art,1);return true},genSolo,testVoice:(id,s)=>{ensureAudio();const x=IDX[id];SOLO_F=0;GEN[x.v.g](ac.currentTime+0.01,1,x.v,s||0);return true},soloFreq,tickPow,analyzeSolo,artOk,noteSus,soloView:()=>soloView(),sgeom:()=>sgeom(),get soloEdSlot(){return soloEdSlot},set soloEdSlot(v){soloEdSlot=v},get soloSel(){return soloSel},get L(){return L},setEdit(v){S.edit=v;renderPanels();updUI()},renderPads,get lowQ(){return lowQ},parseCode,exportCode,curChord,chordName,kadansAt,contrastM,transM,fillHits,fillBar,cellClick,get crashFlash(){return crashFlash},get transText(){return transText},planAvg,autoTick,autoReset:()=>{autoT=0},sfLoad,SF,sfReady:id=>sfReady(IDX[id]),sfVoice:(id,s)=>{ensureAudio();return sfVoice(IDX[id],ac.currentTime+0.02,1,s||0)},get sfDir(){return SF_DIR},set sfDir(v){SF_DIR=v},get sfVol(){return SF_VOL},set sfVol(v){SF_VOL=v},sfDrum:(id,t,a,s)=>{ensureAudio();return sfDrum(IDX[id],t||ac.currentTime+0.02,a||1,s||0)},sfSolo:(id,t,row,hold,art,a)=>{ensureAudio();return sfSolo(IDX[id],t||ac.currentTime+0.02,row||0,hold||1,art||'none',a||1)},soloVoice:(id,t,row,hold,art,a)=>{ensureAudio();soloVoice(IDX[id],t||ac.currentTime+0.02,row||0,hold||1,art||'none',a||1)},voice:(id,t,v,s)=>{ensureAudio();voice(IDX[id],t||ac.currentTime+0.02,v||1,s||0)},get ac(){return ac},get analyser(){return analyser},get playingNow(){return playing},goTour,tourM,cityOf,albUnl,waveComp,get demoMode(){return demoMode},get demoIdx(){return demoIdx},DEMOS,enterDemo,exitDemo,soloMerge,sAng,get scene(){return scene},get orbK(){return orbK},sfKeyOf:id=>sfProg(id)||null,get dorukFlash(){return dorukFlash}};
 requestAnimationFrame(frame);
 })();
 </script>

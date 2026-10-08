@@ -24,7 +24,7 @@ src/            kaynak parçalar; build.py bunları SIRAYLA tek dosyaya yapışt
   p7_canvas.js  sahne çizimi (çember/şerit), solo sahnesi (drawSoloStage, sürükleme), WebGL son işlem, boot, window.__nb
 sf/             örnek ses paketleri (JSON içinde base64 mp3): FluidR3 (0000.json…, drums.json; tools/build_sf.py) ve CC0 yeni set (c_*.json; tools/build_sf_cc0.py)
 assets/         PWA ikonları
-tests/          Playwright testleri (python tests/run_all.py)
+tests/          Playwright testleri (python tests/run_all.py): mobile_ui_test, sf_cc0_test, v16_test
 tools/          build_sf.py (FluidR3 paketleri), build_sf_cc0.py (CC0 paketleri: kaynak, nota seçimi, oktav düzeltmesi, loop; ayrıntı dosyanın başında)
 build.py        → dist/ (site + PWA) ve build/artifact.html (claude.ai artifact için iskeletsiz sürüm), build/chk.js
 ```
@@ -33,7 +33,7 @@ build.py        → dist/ (site + PWA) ve build/artifact.html (claude.ai artifac
 ```
 python build.py                 # dist/ üretir; her değişiklikten sonra
 node --check build/chk.js       # söz dizimi
-python tests/run_all.py         # pip install playwright && playwright install chromium (bir kez)
+python tests/run_all.py         # tests/*_test.py hepsi; pip install playwright && playwright install chromium (bir kez)
 python -m http.server -d dist   # yerelde oynamak için (örnek sesler file:// ile yüklenmez)
 ```
 `main`e push → repo kökündeki `.github/workflows/pages.yml` derler ve Pages'e yayınlar: https://hsynmrcnl.github.io/idle-rhythm-defense/
@@ -44,12 +44,13 @@ python -m http.server -d dist   # yerelde oynamak için (örnek sesler file:// i
 - Tıklamalar `data-act` ile `#rack` üzerinde tek dinleyicide; durum `S` içinde, `save()` localStorage'a yazar (`nabiz-cemberi-v3`). `normalizeS()` eski kayıtları taşır: yeni alan eklerken buraya varsayılan koy.
 - Sayısal denge: `recalc()` → `rate()`/`dps()`; nota ve hasar çarpanları `planAvg`, `tourM`, `contrastM` gibi fonksiyonlarda. Değiştirince testlerdeki beklenen değerleri kontrol et.
 - Testler `window.__nb` hata ayıklama arayüzünü kullanır (p7 sonunda). Yeni özellik için oraya getter/fonksiyon ekle ve `tests/` altına bir Playwright testi yaz.
-- Telefon düzeni: `isPhone()` (≤700px) ve canvas'ta `PH()`; her yeni panel iki düzende de denenir (tests/mobile_test.py, tests/mobile_ui_test.py).
+- Telefon düzeni: `isPhone()` (≤700px) ve canvas'ta `PH()`; her yeni panel iki düzende de denenir (tests/mobile_ui_test.py, tests/v16_test.py).
 - Telefon arayüzü (v13): Sahne tek ekran, kaydırmasız (canvas kalan yüksekliğe göre küçülür); başlık gizli, sağ üstte Ayarlar dişlisi (`#t-set`, sekme `set`). Altta 5 simgeli dock (`.dk`, `DOCK` eşlemesi): Sahne · Stüdyo|Koleksiyon · Savunma · Albüm|Kitap · Görünüm; ikili gruplarda panelin üstünde `.subnav`. Seçili simge kendi `--nc` renginde parlar, diğerleri aynı soluk renkte. Başlat/durdur: halkanın ortasındaki düğme, tek dokunuş (`orbHit`, `drawOrb`, yay `orbK`; durgunken içi arka plan renginde neon ▶, dokununca yaylanarak BPM göbeğine küçülür); telefonda alttaki Başlat yok. Ritme vur: sahnede boş yere dokunmak. Dil, ses, örnek şarkılar, öğretici ve kayıt Ayarlar'da (`renderSet`). Görünüm ayrı sekme kalır, büyüyecek.
 - Kartlar (v14): Stüdyo, Koleksiyon ve Savunma bölümleri `section.block.card[data-sec]`; başlıkta `.ht` + ⓘ (`data-act="info"`), açıklama `.info` içinde gizli. Yeni bölüm metni yazarken uzun açıklamayı karta değil ⓘ'ya koy.
 - Stüdyo açılma sırası: `GATES`/`SEC_GATE` (p6). Sahne baştan; Uyum+Groove 2. enstrümanla; Ritim stüdyosu en iyi dalga 3; Desen/ölçü/gam dalga 5; Şarkı planı `S.up.sef`; Solo `S.up.solo`. Açılanlar `S.open`'da kalıcı (albüm ve turne `keep` listelerinde), yükleme ve açılışta `secCheck(true)` sessiz açar, oyunda açılınca "Yeni" etiketi + Stüdyo noktası.
 - Telefonda sayfa gövdesi kaymaz; sekmeler `#rack` içinde kayar, konumu `scrollMem`'de. Savunma 390×844'te kaydırmasız sığacak şekilde tasarlandı (testte ölçülüyor).
+- v16 araçları (p6): **Analiz** — istatistik çubuğu (`#stats`) dokununca `#anl` açılır; `anlRank` her aday satın almayı (`anlCands`: seviye, RUP, solo dalı, tempo, savunma) uygular, `recalc` ile ölçer, geri alır; gelirde en kısa geri ödeme, savunmada ♪ başına en çok hasar/sn. Yeni bir satın alma türü eklersen `anlCands`'a da ekle. Çarpan dökümü `globalM` parçalarıyla aynı sırada; yeni çarpan eklersen `anlMultRows`'a ekle. **Geri al** — `undoKey` alanları (pat, plan, prog, prate, dolu solos, solo, needle, meter, scale); olay başında yakalama, sonda kabarcık; nota farkı Δnota−Δtotal (gelir sayılmaz). `S`'yi baştan kuran her yol (albüm, turne, demo, yükleme, sıfırlama, menajerin enstrüman koyması) `undoReset()` çağırır. Satın almalar yığına girmez. **İnce tempo** — `tempoFine` ±1, yalnız `bmax`'a kadar. **Hasar sayıları** — `hit` düşmanda `e.dnA` biriktirir, `drawPops` 0,35 sn'de bir yazar, `kill` +♪ yazar; `S.dnum` (Görünüm → Efekt laboratuvarı).
 - Ses: her yeni enstrümanın `v` nesnesi bir GEN üretecini seçer; örnek kaydı varsa `p4b_sf.js` SF_PROG/SF_NEW/SF_DRUM'a eşle, ses seviyesi SF_GAIN/SF_DGAIN ile dengelenir. Paket bölgelerinin `rms`'i ilk 0,5 sn'nin RMS'i, oyun ona göre normalize eder. Yeni örnek kaynağı yalnız CC0/kamu malı (ücretli kütüphanelerin deneme sürümleri dağıtılamaz); ney, zurna, tabla, gamelan, taiko için uygun kaynak bulunamadı, jRhodes3 BY-NC olduğu için alınmadı. Karşılaştırma laboratuvarı: https://claude.ai/artifact/AqBsuXhtymkUvY37UDKST6
 
 ## Sürüm notu
-Üst köşedeki etiket `p6_panels.js` içinde (`'v15 · '`); yayınlarken artır. Telefonda Ayarlar'ın en altında görünür.
+Üst köşedeki etiket `p6_panels.js` içinde (`'v16 · '`); yayınlarken artır. Telefonda Ayarlar'ın en altında görünür.
