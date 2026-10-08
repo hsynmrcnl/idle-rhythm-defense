@@ -16,6 +16,7 @@ Oyun değerlendirmesinden çıkan liste. Paylaşma, sıralama ve başkalarının
 - [ ] Basit mikser: enstrüman başına ses + pan (ses yolu değişir) — orta-büyük
 
 ## 3. grup: müzik içeriği (önce laboratuvar sayfasında dinle)
+Dinleme ve karar sayfası: https://claude.ai/artifact/MtAYigjhjf6d3dwahYaAKh (kararlar sayfanın `deney` koleksiyonunda)
 - [ ] Komalı Hicaz/Kürdi akordu (53-TET) — küçük-orta
 - [ ] Zengin armoni: 7'li, sus, çevrim, yürüyen bas — orta
 - [ ] 12/8 shuffle ölçüsü — küçük
