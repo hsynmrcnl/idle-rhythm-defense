@@ -36,7 +36,7 @@ node --check build/chk.js       # söz dizimi
 python tests/run_all.py         # pip install playwright && playwright install chromium (bir kez)
 python -m http.server -d dist   # yerelde oynamak için (örnek sesler file:// ile yüklenmez)
 ```
-GitHub'a push → `.github/workflows/pages.yml` derler ve Pages'e yayınlar.
+`main`e push → repo kökündeki `.github/workflows/pages.yml` derler ve Pages'e yayınlar: https://hsynmrcnl.github.io/idle-rhythm-defense/
 
 ## Kod gelenekleri
 - Tek kapalı fonksiyon, `'use strict'`; parçalar birbirinin fonksiyonlarını doğrudan kullanır (hoisting). Yeni parça eklersen `build.py` PARTS sırasına koy.

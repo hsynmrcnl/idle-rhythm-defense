@@ -2,7 +2,7 @@
 
 Idle rhythm defense: 8 yerlik bir ritim sıralayıcıda kendi müziğini kur; döngüdeki her vuruş hem nota kazandırır hem de sahneye yaklaşan Sessizlik A.Ş. düşmanlarına ateş eder. 42 enstrüman, akor yürüyüşü, dolgu, sahne devri soloları (teknikler, düet, seyir), albüm ve dünya turnesi, altı tema, Türkçe/İngilizce. Tek sayfa HTML + CSS + JS, kütüphane yok; gerçek enstrüman kayıtları (FluidR3 GM) `sf/` içinde.
 
-**Oyna:** https://KULLANICI-ADIN.github.io/nabiz-cemberi/ (GitHub Pages açılınca bu adres çalışır)
+**Oyna:** https://hsynmrcnl.github.io/idle-rhythm-defense/ (GitHub Pages açılınca bu adres çalışır)
 
 ## Klasörler
 | Yol | Ne |
@@ -13,7 +13,7 @@ Idle rhythm defense: 8 yerlik bir ritim sıralayıcıda kendi müziğini kur; d�
 | `tests/` | Playwright testleri (`python tests/run_all.py`) |
 | `tools/build_sf.py` | örnek sesleri yeniden paketleme (normalde gerekmez) |
 | `docs/` | tasarım notları |
-| `.github/workflows/pages.yml` | her push'ta derleyip GitHub Pages'e yayınlar |
+| `../.github/workflows/pages.yml` | (repo kökünde) her `main` push'unda derleyip GitHub Pages'e yayınlar |
 | `CLAUDE.md` | Claude (Cowork / Claude Code) için proje notları ve çalışma kuralları |
 
 ## Yerelde çalıştırma

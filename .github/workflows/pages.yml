@@ -1,0 +1,37 @@
+# Nabız Çemberi: her main push'unda nabiz-cemberi/ derlenir ve GitHub Pages'e yayınlanır.
+# Bir kez: Settings → Pages → Source: GitHub Actions.  Adres: https://hsynmrcnl.github.io/idle-rhythm-defense/
+name: Yayınla
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nabiz-cemberi
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 build.py
+      - run: node --check build/chk.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: nabiz-cemberi/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
