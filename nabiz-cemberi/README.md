@@ -38,7 +38,7 @@ Her takım kendi başına da çalışır: `python tests/v7_test.py`. Ekran gör�
 - **claude.ai artifact:** `build/artifact.html` iskeletsiz sürümdür; `sf/` klasörü artifact dosyası olarak yanında yayınlanır.
 
 ## Kayıt
-Kayıt tarayıcıda `localStorage` içinde durur (`nabiz-cemberi-v3`). Albüm sekmesindeki "Kodu üret ve kopyala" ile başka cihaza taşınır.
+Kayıt tarayıcıda `localStorage` içinde durur (`nabiz-cemberi-v3`). Ayarlar'daki (sağ üstteki dişli) "Kodu üret ve kopyala" ile başka cihaza taşınır.
 
 ## Lisanslar
 Üçüncü taraf bileşenler `LICENSES.md` içinde (FluidR3 GM ve WebAudioFont: MIT; yazı tipleri: OFL). Oyunun kendi lisansı için kök dizine `LICENSE` ekle.

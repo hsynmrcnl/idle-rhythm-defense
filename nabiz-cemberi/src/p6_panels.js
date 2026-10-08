@@ -1,8 +1,21 @@
 /* ================= panels ================= */
 let tab='studio',soloSel=-1,soloEdSlot=-1,soloDrag=null,bookNew=false,eSel=0,eK=4,eRot=0,eGhost=0,resetArm=false,resetT=0;
-const TABS=['studio','coll','def','book','look','album'];
+const TABS=['studio','coll','def','book','look','album','set'];
+/* telefon dock'u: 5 bölüm; Stüdyo|Koleksiyon ve Albüm|Kitap bir düğmeyi paylaşır, dişli (t-set) Ayarlar'ı açar */
+const DOCK={stage:'stage',studio:'studio',coll:'studio',def:'def',album:'album',book:'album',look:'look'};
+const dockLast={studio:'studio',album:'album'};let prevTab='stage';
 const isPhone=()=>window.matchMedia('(max-width:700px)').matches;
-function setTab(t){if(t==='stage'&&!isPhone())t='studio';tab=t;TABS.forEach(k=>{$('p-'+k).hidden=k!==t;$('t-'+k).setAttribute('aria-selected',String(k===t))});$('t-stage').setAttribute('aria-selected',String(t==='stage'));$('app').dataset.tab=t;if(t==='book'){bookNew=false;$('bookBadge').hidden=true}if(t==='def')$('defBadge').hidden=true;if(t==='coll')$('collBadge').hidden=true;const tb=$('t-'+t);if(tb&&tb.scrollIntoView){try{tb.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}if(t==='stage'){window.scrollTo(0,0);renderPads()}if(typeof tutPlace==='function')tutPlace()}
+function setTab(t){if(t==='stage'&&!isPhone())t='studio';if(tab!=='set')prevTab=tab;tab=t;const g=DOCK[t];if(g&&dockLast[g])dockLast[g]=t;TABS.forEach(k=>{$('p-'+k).hidden=k!==t;$('t-'+k).setAttribute('aria-selected',String(k===t))});$('t-stage').setAttribute('aria-selected',String(t==='stage'));$('app').dataset.tab=t;if(t==='book'){bookNew=false;$('bookBadge').hidden=true}if(t==='def')$('defBadge').hidden=true;if(t==='coll')$('collBadge').hidden=true;const tb=$('t-'+t);if(tb&&tb.scrollIntoView){try{tb.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}if(t==='stage'){window.scrollTo(0,0);renderPads()}if(t==='set')renderSet();placeMsg();syncDock();if(typeof tutPlace==='function')tutPlace()}
+/* telefon: mesaj satırı sahnenin altında yüzer, canvas zıplamaz; masaüstü: düğmelerin altında */
+function placeMsg(){const m=$('msg'),cw=$('cvwrap');if(!m||!cw)return;if(isPhone()){if(m.parentNode!==cw)cw.appendChild(m)}else{const st=cw.closest('.stage');if(st&&m.parentNode!==st)st.appendChild(m)}}
+function syncDock(){const g=DOCK[tab];document.querySelectorAll('.dk').forEach(b=>{const on=b.dataset.tab===g;if(on!==(b.getAttribute('aria-current')==='page')){if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')}});
+ const bd={studio:!$('collBadge').hidden,def:!$('defBadge').hidden,album:!$('bookBadge').hidden};Object.keys(bd).forEach(k=>{const d=$('d-'+k);const dot=d&&d.querySelector('.dot');if(dot&&dot.hidden===bd[k])dot.hidden=!bd[k]});
+ document.querySelectorAll('.subnav [data-bd]').forEach(b=>b.classList.toggle('has',!$(b.dataset.bd+'Badge').hidden));const dc=$('demoChip');if(dc&&dc.hidden===demoMode)dc.hidden=!demoMode}
+/* Ayarlar: dil, ses, örnek şarkılar, sürüm */
+function renderSet(){const box=$('setBox');if(!box)return;const en=S.lang==='en';
+ box.innerHTML='<div class="prow"><span class="pl">'+(en?'Language':'Dil')+'</span><span class="seg"><button data-act="lang" data-v="tr" aria-pressed="'+!en+'">Türkçe</button><button data-act="lang" data-v="en" aria-pressed="'+en+'">English</button></span></div><div class="prow"><span class="pl">'+(en?'Sound':'Ses')+'</span><span class="seg"><button data-act="mute" data-v="0" aria-pressed="'+!S.muted+'">'+T('Açık')+'</button><button data-act="mute" data-v="1" aria-pressed="'+!!S.muted+'">'+T('Kapalı')+'</button></span></div>';
+ $('demoBox').innerHTML=DEMOS.map((D,k)=>'<button class="btn'+(demoMode&&demoIdx===k?' ready':'')+'" data-act="demoGo" data-k="'+k+'">'+T('Örnek şarkı')+' '+(k+1)+' · '+D.name+'</button>').join('')+(demoMode?'<button class="btn primary" data-act="demoExit">'+T('Kendi oyununa dön')+'</button>':'');
+ $('verTag').textContent=$('tag').textContent;syncDock()}
 /* phone pad editor: the selected ring's steps as finger-sized buttons */
 let soloRowSel=0;
 function renderSoloPads(el,th){const si=soloEdSlot,x=slotIns(si),col=insColor(x,th),R=soloRows(),T=soloSteps();soloRowSel=clamp(soloRowSel,0,R-1);const so=S.solos[si]||(S.solos[si]={notes:[],style:'hendrix'});
@@ -107,7 +120,8 @@ function renderPanels(){
  $('albumBox').innerHTML='<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p><div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v12 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v13 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ renderSet();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'));i18n($('tut'))}
  updUI();
 }
@@ -181,7 +195,7 @@ function renderDef(){
  $('enemyLegend').innerHTML=Object.entries(ETYPES).map(([k,T])=>'<span><b>'+T.n+'</b> · '+T.d+'</span>').join('');
 }
 function updUI(){
- tutCheck();
+ tutCheck();syncDock();
  $('sNota').textContent='♪ '+fmt(S.nota);const mp=$('mPlay');if(mp){mp.textContent=$('play').textContent;$('mNota').textContent='♪ '+fmt(S.nota)}
  if(isPhone()&&tab==='stage'){const pe=$('pads');if(pe&&!pe.hidden){if(pe.querySelector('[data-act=spad]')){let cur=-1;if(playing&&soloNow===soloEdSlot){const pa=planAt(curBar);cur=(pa.barIn%2)*MI.N+Math.floor(phase*MI.N)}pe.querySelectorAll('.pad').forEach(e=>e.classList.toggle('cur',+e.dataset.t===cur))}else{const k=needleOf(eSel),cur=playing?Math.floor((k===2?phase2:k===3?phase3:phase)*MI.N)%MI.N:-1;pe.querySelectorAll('.pad').forEach(e=>e.classList.toggle('cur',+e.dataset.s===cur))}}}
  const r=rate();$('sRate').textContent=r.toLocaleString('tr-TR',{maximumFractionDigits:r<100?1:0});
@@ -215,19 +229,19 @@ function checkBook(){
 /* ---------- tutorial: ten steps, most advance on the player's own action ---------- */
 const TUT=[
  {t:'Hoş geldin',p:'Sessizlik A.Ş. şehri susturmaya geliyor; tek savunma senin döngün. Halkada boş bir hücreye dokun: vuruş ekle.',tab:'stage',cond:()=>placedCount()>=3},
- {t:'Başlat',p:'Başlat’a bas. İbre döndükçe her vuruş hem nota kazandırır hem de yaklaşan susturuculara ateş eder.',tab:'stage',hi:'play',cond:()=>playing},
+ {t:'Başlat',p:'Ortadaki ▶ düğmesine dokun. İbre döndükçe her vuruş hem nota kazandırır hem de yaklaşan susturuculara ateş eder. Durdurmak için ortaya yine dokun.',tab:'stage',hi:'cvwrap',cond:()=>playing},
  {t:'Kuşatma',p:'Düşmanlar kenardan merkeze yürür. Merkeze varırlarsa Nabız düşer; sıfırlanırsa dalga 5 geri gider. İlk susturucuyu düşür.',tab:'stage',cond:()=>S.kills>=1},
  {t:'Seviye',p:'Biriken notayla Stüdyo’dan Davul’u yükselt: her seviye değeri artırır, 10. ve 25. seviyede ikiye katlar.',tab:'studio',hi:'lvb-davul',cond:()=>lvOf('davul')>=2},
  {t:'Nefes',p:'Her enstrümanın ölçü başına bir nefesi var: Davul 4 vuruşa kadar tam güç, fazlası zayıflar. Her hücreyi doldurmak kazandırmaz; es bırak, yerine aksan koy.',tab:'studio',btn:'Anladım'},
  {t:'Koleksiyon',p:'Koleksiyon sekmesinden ikinci bir vurmalı aç (trampet ya da alkış). Alkış trampetin üstüne biner, hi-hat araları doldurur: uyumlar çarpan verir. Diğer aileler dalga ilerledikçe açılır.',tab:'coll',hi:'t-coll',cond:()=>INS.some(x=>x.id!=='davul'&&lvOf(x.id)>0)},
  {t:'İkinci halka',p:'Yeni enstrüman 2. yere kondu. Onun halkasına da en az iki vuruş ekle; birbirine cevap veren desenler Uyum kazandırır.',tab:'stage',cond:()=>!!S.slots[1]&&STEPS(S.pat.A,1).length>=2},
- {t:'Ritme vur',p:'İbre bir vuruşun üstündeyken Ritme vur’a (ya da boşluk tuşuna) bas: seri bonusu. Üç kez üst üste tuttur.',tab:'stage',hi:'tap',cond:()=>S.seri>=3,btn:'Geç'},
+ {t:'Ritme vur',p:'İbre bir vuruşun üstündeyken sahnede boş bir yere dokun (ya da boşluk tuşuna bas): seri bonusu. Üç kez üst üste tuttur.',tab:'stage',hi:'cvwrap',cond:()=>S.seri>=3,btn:'Geç'},
  {t:'Savunma',p:'Savunma sekmesinde Nabız, hasar ve menzil geliştirmeleri var; Siparişler ekstra ödül verir. Dalga ilerledikçe patronlar gelir.',tab:'def',hi:'t-def',btn:'Anladım'},
  {t:'Albüm',p:'Dönemde yeterince nota kazanınca Albüm çıkar: hayran kazanırsın, döngü sıfırlanır ama hayranlar kalıcı çarpan verir. Kitap kalıpları, temalar ve solo dalı seni bekliyor.',tab:'album',hi:'t-album',btn:'Bitir'}
 ];
 let tutShown=-1,tutHiEl=null;
 const tutActive=()=>!!(S.tut&&!S.tut.done&&!demoMode&&S.tut.s<TUT.length);
-function tutHi(id){if(tutHiEl&&tutHiEl.id!==id){tutHiEl.classList.remove('tut-hi');tutHiEl=null}if(!id)return;const el=$(id);if(el&&!el.classList.contains('tut-hi')){el.classList.add('tut-hi');tutHiEl=el}}
+function tutHi(id){if(id&&isPhone()&&/^t-/.test(id)){const g=DOCK[id.slice(2)];if(g)id='d-'+g}if(tutHiEl&&tutHiEl.id!==id){tutHiEl.classList.remove('tut-hi');tutHiEl=null}if(!id)return;const el=$(id);if(el&&!el.classList.contains('tut-hi')){el.classList.add('tut-hi');tutHiEl=el}}
 /* the card lives in the page flow: above the ring on phones, at the top of the open panel on other tabs, under the stage controls on desktop */
 function tutPlace(){const el=$('tut');if(!el||el.hidden)return;if(isPhone()){if(tab==='stage'){const cw=$('cvwrap');if(cw&&el.nextElementSibling!==cw)cw.before(el)}else{const host=$('p-'+tab);if(host&&host.firstElementChild!==el)host.prepend(el)}}else{const rk=$('rack');if(rk&&rk.firstElementChild!==el)rk.prepend(el)}}
 function tutShow(){const el=$('tut');if(!el)return;if(!tutActive()){el.hidden=true;tutHi(null);return}const i=S.tut.s,st=TUT[i];el.hidden=false;$('tutN').textContent='Öğretici '+(i+1)+' / '+TUT.length;$('tutT').textContent=st.t;$('tutP').textContent=st.p;$('tutNext').hidden=!st.btn;$('tutNext').textContent=st.btn||'İleri';$('tutWait').hidden=!!st.btn;$('tutBar').hidden=!st.btn&&isPhone();
@@ -236,11 +250,11 @@ function tutAdvance(){if(!tutActive())return;S.tut.s++;if(S.tut.s>=TUT.length){S
 function tutCheck(){if(!tutActive()){if(tutHiEl)tutHi(null);const el=$('tut');if(el&&!el.hidden)el.hidden=true;return}const st=TUT[S.tut.s];if(st.cond&&st.cond()){tutAdvance();return}tutHi(st.hi||null)}
 let loadArm=false,loadT=0;
 function applyLoaded(d){if(demoMode)exitDemo();S=Object.assign(freshRun(),freshMeta(),d);if(!d.tut)S.tut=null;normalizeS();MI=meterInfo();eSel=0;previewId=null;enemies=[];wave=null;core={hp:hpMax(),sh:0};if(playing)startWave(S.wave,nowT());recalc();renderPanels();applyTheme();syncFx();save();tutShown=-1;tutShow();msg('Kayıt yüklendi · dalga '+S.wave+' · '+S.albums.length+' albüm · '+Object.keys(S.lv).length+' enstrüman')}
-const HINT_C='Hücreye dokun: vuruş ekle. Merkeze dokun ya da boşluk tuşuna bas: ritme vur.';
-const HINT_S='Satırdaki hücreye dokun: vuruş ekle. Sahne alanına dokun ya da boşluk tuşuna bas: ritme vur.';
+const HINT_C='Hücreye dokun: vuruş ekle. Boş yere dokun ya da boşluk tuşuna bas: ritme vur. Ortaya dokun: başlat / durdur.';
+const HINT_S='Satırdaki hücreye dokun: vuruş ekle. Sahne alanına dokun ya da boşluk tuşuna bas: ritme vur. Ortadaki düğme: başlat / durdur.';
 const hintSet=t=>{$('hint').textContent=T(t)};
 function hintFor(h){
- const el=$('hint');if(!h){if(S.edit==='F'){hintSet('Dolgu: vurmalı halkalarının sağ yarısına vuruş koy; sol yarı ve melodikler dolguda çalmaz.');return}if(S.up.sdevir&&S.edit==='S'&&soloEdSlots().length){const x=slotIns(soloEdCur());hintSet('Solo sahnesi · '+(x?x.n:'')+': boş yere bas, nota'+(S.up.suzun?' · halka boyunca sürükle, uzat · bara değdir, birleşir':'')+' · başka halkaya sürükle, perde · merkez: ritme vur');return}hintSet(S.layout==='strip'?HINT_S:HINT_C);return}
+ const el=$('hint');if(!h){if(S.edit==='F'){hintSet('Dolgu: vurmalı halkalarının sağ yarısına vuruş koy; sol yarı ve melodikler dolguda çalmaz.');return}if(S.up.sdevir&&S.edit==='S'&&soloEdSlots().length){const x=slotIns(soloEdCur());hintSet('Solo sahnesi · '+(x?x.n:'')+': boş yere bas, nota'+(S.up.suzun?' · halka boyunca sürükle, uzat · bara değdir, birleşir':'')+' · başka halkaya sürükle, perde · merkez: başlat / durdur');return}hintSet(S.layout==='strip'?HINT_S:HINT_C);return}
  const x=slotIns(h.i);if(!x){hintSet('Yer '+(h.i+1)+' boş · Stüdyo sekmesinden enstrüman koy');return}
  const v=S.pat[S.edit][h.i][h.s];const soloTxt=isSolo(h.i)?' · solo ritmi':'';
  const rn=(RUN[S.edit][h.i]||[])[h.s]||0,nf=NF[S.edit][h.i]||1,sm=supM(S.edit,h.s);hintSet(x.n+soloTxt+' · adım '+(h.s+1)+' · '+(v===0?'ekle ♪ '+fmt(noteCost()):v===1&&S.up.accent?'aksan yap ♪ '+fmt(accCost()):'sil, ♪ '+fmt(Math.round(costAt(placedCount()-1)/2))+' geri')+' · nefes '+rowLoad(S.pat[S.edit],h.i)+'/'+nefesOf(h.i,S.edit)+(nf<1?' (güç ×'+fm(nf)+')':'')+(rn>1?' · '+rn+'. ardışık, alışkanlık ×'+fm(habF(rn)):'')+(sm>1?' · destek ×'+fm(sm):''));
@@ -249,7 +263,7 @@ function applyTheme(){
  const th=dispTheme(),r=document.documentElement;
  Object.entries(th.css).forEach(([k,v])=>r.style.setProperty('--'+k,v));
  r.style.setProperty('--f-d',th.font.d);r.style.setProperty('--f-b',th.font.b);r.style.setProperty('--f-m',th.font.m);
- r.style.colorScheme=th.light?'light':'dark';
+ r.style.colorScheme=th.light?'light':'dark';r.dataset.light=th.light?'1':'0';
  bgKey='';syncFx();renderPanels();
 }
 function soloAct(act,b){const so=S.solos[soloEdSlot]||(S.solos[soloEdSlot]={notes:[],style:'hendrix'}),x=slotIns(soloEdSlot);
@@ -265,6 +279,10 @@ $('rack').addEventListener('click',e=>{
  const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const act=b.dataset.act;
  const pay=c=>{if(S.nota<c){msg('Yeterli nota yok · ♪ '+fmt(c)+' gerekli');return false}S.nota-=c;return true};
  if(act==='tab'){setTab(b.dataset.tab);return}
+ if(act==='lang'){if(S.lang!==b.dataset.v){S.lang=b.dataset.v;save();location.reload()}return}
+ if(act==='mute'){S.muted=b.dataset.v==='1';syncFx();$('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');renderSet();msg(S.muted?'Ses kapalı, döngü yine de kazandırıyor ve savunuyor':'Ses açık');return}
+ if(act==='demoGo'){enterDemo(+b.dataset.k);if(isPhone())setTab('stage');return}
+ if(act==='demoExit'){exitDemo();return}
  if(act==='buy'){S.buy=+b.dataset.v}
  else if(act==='lv'){const x=IDX[b.dataset.id];if(!x)return;const q=lvQuote(x);if(q.unlock){if(!famOpen(x.fam)){msg(FAM[x.fam].n+' ailesi kapalı: Koleksiyon sekmesindeki kapıya bak');return}if(pay(q.c)){S.lv[x.id]=1;const empty=S.slots.indexOf(null);if(empty>=0){S.slots[empty]=x.id;msg(x.n+' açıldı ve '+(empty+1)+'. yere kondu. Vuruş eklemeyi unutma.')}else msg(x.n+' açıldı, yedekte bekliyor. Bir yeri boşalt ya da yer ekle.')}}else if(pay(q.c)){const was=lvOf(x.id);S.lv[x.id]+=q.n;const ms=MS.find(m=>was<m&&S.lv[x.id]>=m);if(ms)msg(x.n+' '+ms+'. seviye · nota ve hasar ×2'+(ms===25?' · ses zenginleşti':''))}}
  else if(act==='openFam'){const f=b.dataset.f;if(!famCanOpen(f)){msg('Kapı için koşullar tamamlanmadı');return}const c=famCond(f).cost||0;if(c&&!pay(c))return;S.famOpen[f]=1;msg(FAM[f].n+' ailesi açıldı');save()}
@@ -305,7 +323,7 @@ $('rack').addEventListener('click',e=>{
  else if(act==='mnTog'){S.auto[b.dataset.id]=b.dataset.v==='1';save();renderMn();return}
  else if(act==='tour'){if(demoMode){msg('Önce kendi oyununa dön');return}if(!canTour()){msg('Turne için '+TOUR_AL+' albüm gerekir');return}if(!tourArm){tourArm=true;b.textContent='Emin misin? Albümler ve hayranlar sıfırlanır · tekrar bas';tourT=setTimeout(()=>{tourArm=false;b.textContent='Turneye çık'},4000);return}tourArm=false;clearTimeout(tourT);goTour();return}
  else if(act==='tutRestart'){S.tut={s:0,done:false};tutShown=-1;save();tutShow();msg('Öğretici başladı');return}
- else if(act==='saveCode'){const ta=$('saveCode');exportCode().then(code=>{ta.value=code;$('saveInfo').textContent=Math.round(code.length/1024*10)/10+' KB';const done=()=>msg('Kayıt kodu kopyalandı · başka cihazda Albüm → Kayıt → yapıştır → Koddan yükle');const fb=()=>{ta.focus();ta.select();msg('Kod üretildi · seçili metni kopyala')};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done,fb);else fb()});return}
+ else if(act==='saveCode'){const ta=$('saveCode');exportCode().then(code=>{ta.value=code;$('saveInfo').textContent=Math.round(code.length/1024*10)/10+' KB';const done=()=>msg('Kayıt kodu kopyalandı · başka cihazda Ayarlar → Kayıt → yapıştır → Koddan yükle');const fb=()=>{ta.focus();ta.select();msg('Kod üretildi · seçili metni kopyala')};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done,fb);else fb()});return}
  else if(act==='loadCode'){const code=($('saveCode').value||'').trim();if(!code){msg('Önce kayıt kodunu yapıştır');return}if(!loadArm){loadArm=true;b.textContent='Emin misin? Buradaki kayıt silinir · tekrar bas';loadT=setTimeout(()=>{loadArm=false;b.textContent='Koddan yükle'},4000);return}loadArm=false;clearTimeout(loadT);b.textContent='Koddan yükle';parseCode(code).then(d=>{applyLoaded(d)},err=>msg('Yüklenemedi: '+(err&&err.message||'kod okunamadı')));return}
  else if(act==='tutNext'||act==='tutSkip'){return}
  else if(act==='reset'){
@@ -350,8 +368,11 @@ $('langBtn').addEventListener('click',()=>{S.lang=S.lang==='en'?'tr':'en';save()
 $('ledeBtn').addEventListener('click',()=>{const o=$('top').classList.toggle('open');$('ledeBtn').setAttribute('aria-expanded',String(o))});
 $('pads').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const act=b.dataset.act;if(act==='pad'){cellClick(eSel,+b.dataset.s);renderPads()}else if(act==='padPrev'){eSel=(eSel-1+S.slots.length)%S.slots.length;renderPads()}else if(act==='padNext'){eSel=(eSel+1)%S.slots.length;renderPads()}else if(soloAct(act,b)){recalc();updUI();renderSoloBox();renderPads()}});
 $('mini').addEventListener('click',e=>{const b=e.target.closest('[data-act=tab]');if(b)setTab(b.dataset.tab)});
-$('tut').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;if(b.dataset.act==='tutNext')tutAdvance();else if(b.dataset.act==='tutSkip'){S.tut.done=true;save();tutShow();msg('Öğretici kapatıldı · Albüm sekmesinden yeniden başlatabilirsin')}});
-window.addEventListener('resize',()=>{if(!isPhone()&&tab==='stage')setTab('studio');renderPads();drawSoloEd()});
+$('tut').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;if(b.dataset.act==='tutNext')tutAdvance();else if(b.dataset.act==='tutSkip'){S.tut.done=true;save();tutShow();msg('Öğretici kapatıldı · Ayarlar’dan yeniden başlatabilirsin')}});
+window.addEventListener('resize',()=>{if(!isPhone()&&tab==='stage')setTab('studio');placeMsg();renderPads();drawSoloEd()});
+$('dock').addEventListener('click',e=>{const b=e.target.closest('.dk');if(!b)return;const g=b.dataset.tab;setTab(dockLast[g]||g);b.blur()});
+$('t-set').addEventListener('click',()=>{setTab(tab==='set'?prevTab:'set');$('t-set').blur()});
+$('demoChip').addEventListener('click',()=>{exitDemo();$('demoChip').blur()});
 $('tap').addEventListener('click',()=>{tap();$('tap').blur()});
 $('mute').addEventListener('click',()=>{S.muted=!S.muted;syncFx();$('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');msg(S.muted?'Ses kapalı, döngü yine de kazandırıyor ve savunuyor':'Ses açık')});
 const isField=el=>el&&/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
