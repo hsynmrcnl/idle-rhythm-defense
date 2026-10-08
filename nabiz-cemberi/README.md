@@ -1,6 +1,6 @@
 # Nabız Çemberi
 
-Idle rhythm defense: 8 yerlik bir ritim sıralayıcıda kendi müziğini kur; döngüdeki her vuruş hem nota kazandırır hem de sahneye yaklaşan Sessizlik A.Ş. düşmanlarına ateş eder. 42 enstrüman, akor yürüyüşü, dolgu, sahne devri soloları (teknikler, düet, seyir), albüm ve dünya turnesi, altı tema, Türkçe/İngilizce. Tek sayfa HTML + CSS + JS, kütüphane yok; gerçek enstrüman kayıtları (FluidR3 GM) `sf/` içinde.
+Idle rhythm defense: 8 yerlik bir ritim sıralayıcıda kendi müziğini kur; döngüdeki her vuruş hem nota kazandırır hem de sahneye yaklaşan Sessizlik A.Ş. düşmanlarına ateş eder. 42 enstrüman, akor yürüyüşü, dolgu, sahne devri soloları (teknikler, düet, seyir), albüm ve dünya turnesi, altı tema, Türkçe/İngilizce. Tek sayfa HTML + CSS + JS, kütüphane yok; gerçek enstrüman kayıtları `sf/` içinde: yeni set CC0 kütüphanelerden (VSCO 2 CE, VCSL, Karoryfer), klasik set FluidR3 GM.
 
 **Oyna:** https://hsynmrcnl.github.io/idle-rhythm-defense/ (GitHub Pages açılınca bu adres çalışır)
 

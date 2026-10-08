@@ -18,14 +18,14 @@ src/            kaynak parçalar; build.py bunları SIRAYLA tek dosyaya yapışt
   p2b_i18n.js   EN sözlüğü + T() / i18n(): her yeni Türkçe metnin İngilizcesi buraya eklenir
   p3_state.js   durum (S), kayıt/yükleme, hesaplar (recalc, rate, dps), plan, akor, dolgu, solo geni (tickPow, analyzeSolo, soloMerge)
   p4_audio.js   Web Audio sentez: initAudio, GEN üreteçleri, soloVoice/soloPlay, zamanlayıcı (sched), startStop
-  p4b_sf.js     örnek ses katmanı: sf/*.json paketleri (FluidR3 GM), sfVoice/sfSolo/sfDrum; yüklenemezse sentez
+  p4b_sf.js     örnek ses katmanı: sf/*.json paketleri, sfVoice/sfSolo/sfDrum; yüklenemezse sentez. İki set: Yeni (varsayılan, CC0: sf/c_*.json, SF_NEW, c_drums) ve Klasik (FluidR3 GM: SF_PROG, drums); S.sfset, Görünüm → Efekt laboratuvarı
   p5_combat.js  düşmanlar, dalgalar, onStep (vuruş → nota + hasar), dolgu/geçiş/doruk
   p6_panels.js  paneller (renderPanels), sekmeler, telefon pedleri, öğretici, menajer, turne, demo, tıklama işleyicileri (data-act)
   p7_canvas.js  sahne çizimi (çember/şerit), solo sahnesi (drawSoloStage, sürükleme), WebGL son işlem, boot, window.__nb
-sf/             örnek ses paketleri (JSON içinde base64 mp3); tools/build_sf.py üretir
+sf/             örnek ses paketleri (JSON içinde base64 mp3): FluidR3 (0000.json…, drums.json; tools/build_sf.py) ve CC0 yeni set (c_*.json; tools/build_sf_cc0.py)
 assets/         PWA ikonları
 tests/          Playwright testleri (python tests/run_all.py)
-tools/          build_sf.py (örnek sesleri yeniden paketleme)
+tools/          build_sf.py (FluidR3 paketleri), build_sf_cc0.py (CC0 paketleri: kaynak, nota seçimi, oktav düzeltmesi, loop; ayrıntı dosyanın başında)
 build.py        → dist/ (site + PWA) ve build/artifact.html (claude.ai artifact için iskeletsiz sürüm), build/chk.js
 ```
 
@@ -49,7 +49,7 @@ python -m http.server -d dist   # yerelde oynamak için (örnek sesler file:// i
 - Kartlar (v14): Stüdyo, Koleksiyon ve Savunma bölümleri `section.block.card[data-sec]`; başlıkta `.ht` + ⓘ (`data-act="info"`), açıklama `.info` içinde gizli. Yeni bölüm metni yazarken uzun açıklamayı karta değil ⓘ'ya koy.
 - Stüdyo açılma sırası: `GATES`/`SEC_GATE` (p6). Sahne baştan; Uyum+Groove 2. enstrümanla; Ritim stüdyosu en iyi dalga 3; Desen/ölçü/gam dalga 5; Şarkı planı `S.up.sef`; Solo `S.up.solo`. Açılanlar `S.open`'da kalıcı (albüm ve turne `keep` listelerinde), yükleme ve açılışta `secCheck(true)` sessiz açar, oyunda açılınca "Yeni" etiketi + Stüdyo noktası.
 - Telefonda sayfa gövdesi kaymaz; sekmeler `#rack` içinde kayar, konumu `scrollMem`'de. Savunma 390×844'te kaydırmasız sığacak şekilde tasarlandı (testte ölçülüyor).
-- Ses: her yeni enstrümanın `v` nesnesi bir GEN üretecini seçer; örnek kaydı varsa `p4b_sf.js` SF_PROG/SF_DRUM'a eşle, ses seviyesi SF_GAIN/SF_DGAIN ile dengelenir.
+- Ses: her yeni enstrümanın `v` nesnesi bir GEN üretecini seçer; örnek kaydı varsa `p4b_sf.js` SF_PROG/SF_NEW/SF_DRUM'a eşle, ses seviyesi SF_GAIN/SF_DGAIN ile dengelenir. Paket bölgelerinin `rms`'i ilk 0,5 sn'nin RMS'i, oyun ona göre normalize eder. Yeni örnek kaynağı yalnız CC0/kamu malı (ücretli kütüphanelerin deneme sürümleri dağıtılamaz); ney, zurna, tabla, gamelan, taiko için uygun kaynak bulunamadı, jRhodes3 BY-NC olduğu için alınmadı. Karşılaştırma laboratuvarı: https://claude.ai/artifact/AqBsuXhtymkUvY37UDKST6
 
 ## Sürüm notu
-Üst köşedeki etiket `p6_panels.js` içinde (`'v14 · '`); yayınlarken artır. Telefonda Ayarlar'ın en altında görünür.
+Üst köşedeki etiket `p6_panels.js` içinde (`'v15 · '`); yayınlarken artır. Telefonda Ayarlar'ın en altında görünür.

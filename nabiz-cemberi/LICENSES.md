@@ -15,6 +15,19 @@ MIT lisansı: yazılımın kopyalanması, değiştirilmesi, satılması serbestt
     The above copyright notice and this permission notice shall be included in all copies or substantial portions
     of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
+## Yeni kayıt seti (sf/c_*.json) — CC0 / kamu malı
+`tools/build_sf_cc0.py` bu kütüphanelerden seçilen notaları kırpıp küçük paketlere dönüştürür. Hepsi CC0 1.0 (kamu malı adanması) ya da Unlicense: kaynak göstermek gerekmez, yine de teşekkür olarak burada duruyor.
+
+| Paket | Kaynak | Lisans |
+|---|---|---|
+| c_keman, c_harp, c_trompet, c_tuba, c_flut | VSCO 2 Community Edition — Versilian Studios (https://github.com/sgossner/VSCO-2-CE) | CC0 1.0 |
+| c_piyano, c_klavsen, c_kalimba, c_didger; c_drums içinde el çırpma, shaker, klave, darbuka, çerçeve davul, gong | Versilian Community Sample Library — Versilian Studios (https://github.com/sgossner/VCSL) | CC0 1.0 |
+| c_drums: kick, trampet, hi-hat, tomlar, crash | Virtuosity Drums — Versilian Studios × Karoryfer Samples (https://github.com/sfzinstruments/virtuosity_drums) | CC0 1.0 |
+| c_bas | Black And Blue Basses — Karoryfer Samples (https://github.com/sfzinstruments/karoryfer.black-and-blue-basses) | CC0 1.0 |
+| c_cello | Karoryfer Samples × Bigcat Instruments Cello (https://github.com/sfzinstruments/karoryfer-bigcat.cello) | CC0 1.0 |
+| c_sakso | Weresax — Karoryfer Samples (https://github.com/sfzinstruments/karoryfer.weresax) | CC0 1.0 |
+| c_steel | Steel Drum — Jeff Learman (https://github.com/sfzinstruments/jlearman.SteelDrum) | Unlicense |
+
 ## Yazı tipleri
 Google Fonts üzerinden yüklenir (Unbounded, Instrument Sans, JetBrains Mono, Chakra Petch, Rubik Dirt, Courier Prime, Fraunces, Monoton, Righteous) — hepsi SIL Open Font License.
 
