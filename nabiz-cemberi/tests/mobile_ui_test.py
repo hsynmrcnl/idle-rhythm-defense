@@ -80,6 +80,23 @@ with sync_playwright() as pw:
                     p.click('#d-stage'); p.click('#d-' + k); p.wait_for_timeout(80)
                     check(p.evaluate("()=>document.getElementById('app').dataset.tab") == sub, 'dock son alt sekmeyi hatırlıyor (%s)' % sub)
                     p.screenshot(path=os.path.join(OUT, 'v13_%s.png' % sub))
+            # sayfa kaymaz, sekme kendi alanında kayar; her sekme kendi konumunu hatırlar
+            for k in ['studio', 'def', 'album', 'look']:
+                p.click('#d-' + k); p.wait_for_timeout(80)
+                check(p.evaluate("()=>document.scrollingElement.scrollHeight<=innerHeight"), 'sayfa gövdesi kaymıyor (%s)' % k)
+            p.click('#d-studio'); p.evaluate("()=>{document.getElementById('rack').scrollTop=800}"); p.click('#d-def'); p.wait_for_timeout(80)
+            st0 = p.evaluate("()=>document.getElementById('rack').scrollTop")
+            p.click('#d-studio'); p.wait_for_timeout(80)
+            st1 = p.evaluate("()=>document.getElementById('rack').scrollTop")
+            check(st0 == 0 and abs(st1 - 800) < 2, 'sekme değişince üstten açılır, Stüdyo konumunu hatırlar (%d, %d)' % (st0, st1))
+            # durdur / başlat: şarkı kaldığı yerden devam eder
+            p.click('#d-stage'); p.wait_for_timeout(100)
+            p.mouse.click(cx, cy); p.wait_for_timeout(6000)
+            b0 = p.evaluate("()=>window.__nb.curBar"); p.mouse.click(cx, cy); p.wait_for_timeout(400)
+            p.mouse.click(cx, cy); p.wait_for_timeout(500)
+            b1 = p.evaluate("()=>window.__nb.curBar")
+            check(b0 >= 2 and b1 >= b0, 'durdurup başlatınca şarkı başa dönmüyor (ölçü %d → %d)' % (b0, b1))
+            p.mouse.click(cx, cy); p.wait_for_timeout(200)
             # Ayarlar: dişli aç/kapa, örnek şarkı sahneye götürür, çip ile çıkılır
             def open_set():
                 if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'set': p.click('#t-set')

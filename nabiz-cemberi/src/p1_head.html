@@ -249,7 +249,13 @@ input[type=range]{width:100%;accent-color:var(--acc)}
  .tabs,.hint{display:none}
  .stats{margin-right:48px}
  .controls{display:none}
- .app:not([data-tab="stage"]){padding-bottom:calc(var(--dockh) + 64px)}
+ /* sayfa kaymaz; her sekme kendi alanında kayar (iOS/Android adres çubuğu oynamaz, kısa sayfa hiç kaymaz) */
+ html,body{overflow:hidden;overscroll-behavior:none}
+ .app,.dock,.mini{touch-action:manipulation}
+ select,input,textarea{font-size:16px}
+ .app:not([data-tab="stage"]){height:calc(100dvh - 8px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));padding-bottom:calc(var(--dockh) + 62px);display:flex;flex-direction:column;overflow:hidden}
+ .app:not([data-tab="stage"]) .grid{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding-top:0}
+ .app:not([data-tab="stage"]) .rack{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
  .mini{bottom:calc(var(--dockh) + env(safe-area-inset-bottom,0px));padding-bottom:8px;border-bottom:1px solid var(--line)}
  .subnav{display:inline-flex;margin:4px 0 4px}
  /* sahne: her şey bir ekrana sığar, canvas kalan yüksekliği alır */
