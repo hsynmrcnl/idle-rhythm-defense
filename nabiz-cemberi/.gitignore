@@ -1,0 +1,5 @@
+dist/
+build/
+nabiz-cemberi-site.zip
+tests/out/
+__pycache__/
