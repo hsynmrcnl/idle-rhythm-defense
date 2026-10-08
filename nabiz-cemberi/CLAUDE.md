@@ -46,7 +46,10 @@ python -m http.server -d dist   # yerelde oynamak için (örnek sesler file:// i
 - Testler `window.__nb` hata ayıklama arayüzünü kullanır (p7 sonunda). Yeni özellik için oraya getter/fonksiyon ekle ve `tests/` altına bir Playwright testi yaz.
 - Telefon düzeni: `isPhone()` (≤700px) ve canvas'ta `PH()`; her yeni panel iki düzende de denenir (tests/mobile_test.py, tests/mobile_ui_test.py).
 - Telefon arayüzü (v13): Sahne tek ekran, kaydırmasız (canvas kalan yüksekliğe göre küçülür); başlık gizli, sağ üstte Ayarlar dişlisi (`#t-set`, sekme `set`). Altta 5 simgeli dock (`.dk`, `DOCK` eşlemesi): Sahne · Stüdyo|Koleksiyon · Savunma · Albüm|Kitap · Görünüm; ikili gruplarda panelin üstünde `.subnav`. Seçili simge kendi `--nc` renginde parlar, diğerleri aynı soluk renkte. Başlat/durdur: halkanın ortasındaki düğme, tek dokunuş (`orbHit`, `drawOrb`, yay `orbK`; durgunken içi arka plan renginde neon ▶, dokununca yaylanarak BPM göbeğine küçülür); telefonda alttaki Başlat yok. Ritme vur: sahnede boş yere dokunmak. Dil, ses, örnek şarkılar, öğretici ve kayıt Ayarlar'da (`renderSet`). Görünüm ayrı sekme kalır, büyüyecek.
+- Kartlar (v14): Stüdyo, Koleksiyon ve Savunma bölümleri `section.block.card[data-sec]`; başlıkta `.ht` + ⓘ (`data-act="info"`), açıklama `.info` içinde gizli. Yeni bölüm metni yazarken uzun açıklamayı karta değil ⓘ'ya koy.
+- Stüdyo açılma sırası: `GATES`/`SEC_GATE` (p6). Sahne baştan; Uyum+Groove 2. enstrümanla; Ritim stüdyosu en iyi dalga 3; Desen/ölçü/gam dalga 5; Şarkı planı `S.up.sef`; Solo `S.up.solo`. Açılanlar `S.open`'da kalıcı (albüm ve turne `keep` listelerinde), yükleme ve açılışta `secCheck(true)` sessiz açar, oyunda açılınca "Yeni" etiketi + Stüdyo noktası.
+- Telefonda sayfa gövdesi kaymaz; sekmeler `#rack` içinde kayar, konumu `scrollMem`'de. Savunma 390×844'te kaydırmasız sığacak şekilde tasarlandı (testte ölçülüyor).
 - Ses: her yeni enstrümanın `v` nesnesi bir GEN üretecini seçer; örnek kaydı varsa `p4b_sf.js` SF_PROG/SF_DRUM'a eşle, ses seviyesi SF_GAIN/SF_DGAIN ile dengelenir.
 
 ## Sürüm notu
-Üst köşedeki etiket `p6_panels.js` içinde (`'v13 · '`); yayınlarken artır. Telefonda Ayarlar'ın en altında görünür.
+Üst köşedeki etiket `p6_panels.js` içinde (`'v14 · '`); yayınlarken artır. Telefonda Ayarlar'ın en altında görünür.

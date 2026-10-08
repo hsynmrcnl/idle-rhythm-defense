@@ -163,6 +163,56 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .dock,.subnav,.demochip{display:none}
 #verTag{display:block;margin-top:14px}
 #setBox .seg{justify-self:start}
+/* v14 kartlar: her bölüm ayrı kart, açıklama ⓘ'da; Ritim stüdyosu ve Savunma kutucuklu */
+.rack .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px 14px;margin:0 0 12px}
+.rack .card:last-child{border-bottom:1px solid var(--line)}
+.rack .card>h2{margin:0 0 10px;min-height:28px}
+.card.isnew{border-color:var(--hot);box-shadow:0 0 18px -8px var(--hot)}
+.ht{display:inline-flex;align-items:center;gap:8px}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);font:600 12px/1 var(--f-m);text-transform:none;letter-spacing:0;cursor:pointer;flex:0 0 auto}
+.ib:hover{color:var(--fg);border-color:var(--muted)}
+.ib[aria-expanded="true"]{color:var(--acc);border-color:var(--acc)}
+.ib:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.info{margin:0 0 12px;padding:8px 10px;font-size:12.5px;line-height:1.45;color:var(--muted);background:var(--panel2);border-left:2px solid var(--acc);border-radius:6px}
+.info p{margin:0 0 6px}.info p:last-child{margin:0}
+.info .legend{margin-top:6px}
+.newtag{font-family:var(--f-m);font-size:10px;letter-spacing:.06em;color:#fff;background:var(--hot);border-radius:8px;padding:2px 7px}
+.chip[data-act]{cursor:pointer}
+.chip small{display:none}.chip.open small{display:block}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}
+.tile{display:flex;flex-direction:column;gap:6px;min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+.tile .nm{font-size:13.5px}
+.tile .ds{font-size:12px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tile .btn,.tile .own{align-self:flex-start;margin-top:auto}
+.tile.got{opacity:.6}
+.dstat.d4{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.dstat.d4 div{padding:5px 7px}
+.dstat.d4 b{font-size:15px}
+.dstat.d4 small{font-size:9.5px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.dline{display:block;white-space:normal}
+.dfoot{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;margin-top:4px}
+.dfoot .cnt{white-space:normal;line-height:1.35}
+.dfoot .seg button{min-width:42px}
+#p-def .hpbar{margin:6px 0 4px}
+#p-def .dstat{margin-bottom:0}
+.dgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.dtile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;padding:7px 8px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.dtile:hover{border-color:var(--acc)}
+.dtile .nm{font-size:12.5px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.dtile .nm .lvl{margin-left:2px;font-weight:500}
+.dtile .ds{font-size:11px;color:var(--muted);line-height:1.2}
+.dtile .cnt{font-size:11px;color:var(--acc);margin-top:1px}
+.dtile.poor{opacity:.5}.dtile.poor .cnt{color:var(--muted)}
+.dtile.max{opacity:.55;cursor:default}
+.orders.olist{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.olist .ord{padding:8px 10px}
+.ord .orow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:10px;cursor:pointer}
+.ord .orow .nm{font-size:13.5px;font-weight:500;min-width:0}
+.ord .orow .nm small{display:block;font-family:var(--f-m);font-size:11px;color:var(--muted);font-weight:400}
+.ord .orow .oc{font-family:var(--f-m);font-size:12px;color:var(--muted)}
+.ord.ok .orow .oc{color:var(--acc)}
+.ord ul[hidden]{display:none}
+.ord ul{margin:8px 0 0}
 .mob{display:none}
 .pads{display:none}
 .mini{display:none}
@@ -257,7 +307,12 @@ input[type=range]{width:100%;accent-color:var(--acc)}
  .app:not([data-tab="stage"]) .grid{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding-top:0}
  .app:not([data-tab="stage"]) .rack{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
  .mini{bottom:calc(var(--dockh) + env(safe-area-inset-bottom,0px));padding-bottom:8px;border-bottom:1px solid var(--line)}
- .subnav{display:inline-flex;margin:4px 0 4px}
+ .subnav{display:inline-flex;margin:4px 0 10px}
+ .rack .card{padding:10px 12px 12px;margin-bottom:10px}
+ .rack .card>h2{margin-bottom:8px}
+ .dgrid .dtile{min-height:0}
+ .dgrid .dtile{padding:8px}
+ .rack [role=tabpanel]>.card:first-child>h2{padding-right:46px}
  /* sahne: her şey bir ekrana sığar, canvas kalan yüksekliği alır */
  .app[data-tab="stage"]{height:calc(100dvh - 8px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));padding-bottom:calc(var(--dockh) + 6px);display:flex;flex-direction:column;overflow:hidden}
  .app[data-tab="stage"] .grid{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding-top:4px}
@@ -367,7 +422,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
     <aside class="rack" id="rack" aria-label="Stüdyo">
       <div class="tabs" role="tablist">
         <button class="tab mob" role="tab" id="t-stage" aria-selected="false" data-act="tab" data-tab="stage">Sahne</button>
-        <button class="tab" role="tab" id="t-studio" aria-selected="true" data-act="tab" data-tab="studio">Stüdyo</button>
+        <button class="tab" role="tab" id="t-studio" aria-selected="true" data-act="tab" data-tab="studio">Stüdyo<span class="bd" id="studBadge" hidden>yeni</span></button>
         <button class="tab" role="tab" id="t-coll" aria-selected="false" data-act="tab" data-tab="coll">Koleksiyon<span class="bd" id="collBadge" hidden>!</span></button>
         <button class="tab" role="tab" id="t-def" aria-selected="false" data-act="tab" data-tab="def">Savunma<span class="bd" id="defBadge" hidden>!</span></button>
         <button class="tab" role="tab" id="t-book" aria-selected="false" data-act="tab" data-tab="book">Kitap<span class="bd" id="bookBadge" hidden>yeni</span></button>
@@ -377,25 +432,24 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 
       <div id="p-studio" role="tabpanel">
         <div class="subnav seg" role="group"><button data-act="tab" data-tab="studio" aria-pressed="true">Stüdyo</button><button data-act="tab" data-tab="coll" aria-pressed="false" data-bd="coll">Koleksiyon</button></div>
-        <section class="block"><h2>Sahne <span class="seg" id="buyMode"></span></h2><p class="note">Her sahne yerinde bir enstrüman durur; desen yere aittir, seviye enstrümana. Her enstrümanın ölçü başına bir <b>nefesi</b> vardır: o kadar vuruşa kadar tam güç, fazlası her vuruşu zayıflatır; aksan iki nefes harcar. Düşmanlar art arda gelen aynı sese <b>alışır</b>: her ardışık vuruşta hasar ×0,85, bir es sıfırlar.</p><div id="slotList"></div><div id="slotAdd"></div></section>
-        <section class="block"><h2>Desen, ölçü ve gam</h2><div id="patBox"></div></section>
-        <section class="block"><h2>Şarkı planı</h2><div id="planBox"></div></section>
-        <section class="block"><h2>Solo editörü</h2><div id="soloBox"></div></section>
-        <section class="block"><h2>Solo dalı</h2><div id="soloTree"></div></section>
-        <section class="block"><h2>Ritim stüdyosu</h2><div id="rhyList"></div><div id="euclidBox"></div></section>
-        <section class="block"><h2>Uyum</h2><p class="note">Enstrümanlar arası ilişkiler. Tutan her uyum, içindeki halkaların notasını ve hasarını çarpar. Kurallar gerçek groove mantığından alındı: bas kick ile kilitlenir, alkış trampetin üstüne biner, hi-hat araları doldurur, melodiler birbirine cevap verir.</p><div class="chips" id="synChips"></div></section>
-        <section class="block"><h2>Groove</h2><p class="note">Bonuslar toplanır ve hem notayı hem hasarı çarpar. Bir adıma 6+ vuruş yığmak cezalıdır.</p><div class="chips" id="combos"></div></section>
+        <section class="block card" data-sec="sahne"><h2><span class="ht">Sahne<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span><span class="seg" id="buyMode"></span></h2><div class="info" hidden>Her sahne yerinde bir enstrüman durur; desen yere aittir, seviye enstrümana. Her enstrümanın ölçü başına bir <b>nefesi</b> vardır: o kadar vuruşa kadar tam güç, fazlası her vuruşu zayıflatır; aksan iki nefes harcar. Düşmanlar art arda gelen aynı sese <b>alışır</b>: her ardışık vuruşta hasar ×0,85, bir es sıfırlar.</div><div id="slotList"></div><div id="slotAdd"></div></section>
+        <section class="block card" data-sec="rhy"><h2><span class="ht">Ritim stüdyosu<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden>Tempo ve ritim geliştirmeleri. Her biri bir kez alınır ve albüme kadar kalır. Temanın sevdiği tempoda çalmak gelir ×1,25 verir.</div><div id="rhyList"></div><div id="euclidBox"></div></section>
+        <section class="block card" data-sec="pat"><h2><span class="ht">Desen, ölçü ve gam<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden>Hangi deseni düzenlediğini, ölçüyü ve gamı seçersin. Aksak ölçüler ve makamlar albümlerle açılır, çalınca bonus verir.</div><div id="patBox"></div></section>
+        <section class="block card" data-sec="plan"><h2><span class="ht">Şarkı planı<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" id="inf-plan" hidden></div><div id="planBox"></div></section>
+        <section class="block card" data-sec="solo"><h2><span class="ht">Solo editörü<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden>Soloya ayrılmış yerlerin melodisini yazarsın; solo bölümünde ×3 güçle çalar.</div><div id="soloBox"></div></section>
+        <section class="block card" data-sec="tree"><h2><span class="ht">Solo dalı<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden>Sahneyi büyüten, aileye özel teknik veren ve iyi soloyu ödüllendiren geliştirme ağacı.</div><div id="soloTree"></div></section>
+        <section class="block card" data-sec="syn"><h2><span class="ht">Uyum<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden>Enstrümanlar arası ilişkiler. Tutan her uyum, içindeki halkaların notasını ve hasarını çarpar. Kurallar gerçek groove mantığından alındı: bas kick ile kilitlenir, alkış trampetin üstüne biner, hi-hat araları doldurur, melodiler birbirine cevap verir.</div><div class="chips" id="synChips"></div></section>
+        <section class="block card" data-sec="groove"><h2><span class="ht">Groove<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden>Bonuslar toplanır ve hem notayı hem hasarı çarpar. Bir adıma 6+ vuruş yığmak cezalıdır.</div><div class="chips" id="combos"></div></section>
       </div>
       <div id="p-coll" role="tabpanel" hidden>
         <div class="subnav seg" role="group"><button data-act="tab" data-tab="studio" aria-pressed="false">Stüdyo</button><button data-act="tab" data-tab="coll" aria-pressed="true" data-bd="coll">Koleksiyon</button></div>
-        <section class="block"><h2>Koleksiyon</h2><p class="note">Her enstrümanın bir nota değeri ve bir rolü vardır. Silah rolleri ateş eder; Titreşim ses duvarını iter, Destek aynı adımdaki silahları güçlendirir, Gelir yalnız nota kazandırır, Kalkan sahneyi korur.</p><div id="collList"></div></section>
-        <section class="block"><h2>Sıradaki aile</h2><div id="capBox"></div></section>
+        <section class="block card" data-sec="coll"><h2><span class="ht">Koleksiyon<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden>Her enstrümanın bir nota değeri ve bir rolü vardır. Silah rolleri ateş eder; Titreşim ses duvarını iter, Destek aynı adımdaki silahları güçlendirir, Gelir yalnız nota kazandırır, Kalkan sahneyi korur.</div><div id="collList"></div></section>
+        <section class="block card" data-sec="cap"><h2><span class="ht">Sıradaki aile<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden>Yeni enstrüman aileleri dalga, albüm ve hayran koşullarıyla açılır.</div><div id="capBox"></div></section>
       </div>
       <div id="p-def" role="tabpanel" hidden>
-        <section class="block"><h2>Kuşatma</h2><div id="defStatus"></div></section>
-        <section class="block"><h2>Savunma geliştirmeleri</h2><div id="defList"></div></section>
-        <section class="block"><h2>Siparişler</h2><p class="note">Şehirden gelen müzik istekleri. Koşulları sağlayıp teslim et; ödül şu anki gelirine göre hesaplanır.</p><div class="orders" id="orderList"></div></section>
-        <section class="block"><h2>Sessizlik A.Ş. kadrosu</h2><div class="legend" id="enemyLegend"></div></section>
+        <section class="block card" data-sec="siege"><h2><span class="ht">Kuşatma<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden><p>Sessizlik A.Ş. kenardan merkeze yürür; merkeze varan düşman Nabız’ı düşürür, Nabız sıfırlanırsa dalga 5 geri gider. Patronlar her 10, 25 ve 50. dalgada gelir.</p><div class="legend" id="enemyLegend"></div></div><div id="defStatus"></div></section>
+        <section class="block card" data-sec="dup"><h2><span class="ht">Geliştirmeler<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" id="inf-dup" hidden></div><div class="dgrid" id="defList"></div></section>
+        <section class="block card" data-sec="ord"><h2><span class="ht">Siparişler<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span></h2><div class="info" hidden>Şehirden gelen müzik istekleri. Koşulları sağlayıp teslim et; ödül şu anki gelirine göre hesaplanır.</div><div class="orders olist" id="orderList"></div></section>
       </div>
       <div id="p-book" role="tabpanel" hidden>
         <div class="subnav seg" role="group"><button data-act="tab" data-tab="album" aria-pressed="false">Albüm</button><button data-act="tab" data-tab="book" aria-pressed="true" data-bd="book">Kitap</button></div>

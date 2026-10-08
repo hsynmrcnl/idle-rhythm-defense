@@ -265,13 +265,13 @@ const SUP=[
  {id:'stars',n:'Takımyıldız',d:'Menzil +%10, ağdaki tüm düşmanlar %10 yavaş',c:1e10}
 ];
 const DUP=[
- {id:'nabiz',n:'Nabız',d:'Sahne dayanıklılığı +60',c:400,g:1.7},
- {id:'hasar',n:'Hasar',d:'Tüm vuruşlar +%12',c:1500,g:1.8},
- {id:'menzil',n:'Menzil',d:'Düşmanlar daha uzaktan hedeflenir',c:4000,g:4,max:5},
- {id:'kalkan',n:'Kalkan kapasitesi',d:'Kalkan üst sınırı +50',c:2500,g:1.9},
- {id:'tamir',n:'Tamir',d:'Saniyede +1 nabız yenilenir',c:6000,g:2.2},
- {id:'ganimet',n:'Ganimet',d:'Düşman ödülü +%25',c:8000,g:2.4},
- {id:'yavas',n:'Yavaşlatma gücü',d:'Yavaşlatıcı etkisi +%10',c:1e4,g:2.6,max:4}
+ {id:'nabiz',n:'Nabız',s:'+60 nabız',d:'Sahne dayanıklılığı +60',c:400,g:1.7},
+ {id:'hasar',n:'Hasar',s:'+%12 vuruş',d:'Tüm vuruşlar +%12',c:1500,g:1.8},
+ {id:'menzil',n:'Menzil',s:'uzak hedef',d:'Düşmanlar daha uzaktan hedeflenir',c:4000,g:4,max:5},
+ {id:'kalkan',n:'Kalkan',s:'+50 sınır',d:'Kalkan üst sınırı +50',c:2500,g:1.9},
+ {id:'tamir',n:'Tamir',s:'+1 / sn',d:'Saniyede +1 nabız yenilenir',c:6000,g:2.2},
+ {id:'ganimet',n:'Ganimet',s:'+%25 ödül',d:'Düşman ödülü +%25',c:8000,g:2.4},
+ {id:'yavas',n:'Yavaşlat',s:'+%10 etki',d:'Yavaşlatıcı etkisi +%10',c:1e4,g:2.6,max:4}
 ];
 const ETYPES={
  memur:{n:'Memur',hp:1,sp:0.045,dmg:10,b:1,r:1,shape:'circle',d:'Yürür, dosya taşır'},

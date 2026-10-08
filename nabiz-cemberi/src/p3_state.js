@@ -2,12 +2,12 @@
 /* ================= state ================= */
 const mkPat=()=>Array.from({length:MAXSLOTS},()=>Array(18).fill(0));
 const freshRun=()=>{const A=mkPat();A[0][0]=1;A[0][8]=1;return{nota:25,slots:['davul',null,null,null],lv:{davul:1},pat:{A,B:mkPat(),S:mkPat(),F:mkPat()},edit:'A',bpm:90,bmax:90,seri:0,up:{},def:{},solo:{},solos:{},plan:null,needle:{},wave:1,runEarned:0,meter:'m44',scale:'minor',prog:Array(8).fill('pop'),prate:'beat'}};
-const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr'});
+const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{}});
 const KEY='nabiz-cemberi-v3';
 let S=Object.assign(freshRun(),freshMeta());
 try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.v===3&&d.pat&&Array.isArray(d.pat.A)&&Array.isArray(d.slots)){S=Object.assign(S,d);if(!d.tut)S.tut=null}}}catch(e){}
 function normalizeS(){
-['up','def','found','stage','fxo','lv','themes','famOpen','solo','needle','solos'].forEach(k=>{if(!S[k]||typeof S[k]!=='object')S[k]={}});
+['up','def','found','stage','fxo','lv','themes','famOpen','solo','needle','solos','open'].forEach(k=>{if(!S[k]||typeof S[k]!=='object')S[k]={}});
 if(!Array.isArray(S.orders))S.orders=[];
 while(S.pat.A.length<MAXSLOTS)S.pat.A.push(Array(18).fill(0));
 while(S.pat.B.length<MAXSLOTS)S.pat.B.push(Array(18).fill(0));if(!Array.isArray(S.pat.S))S.pat.S=mkPat();while(S.pat.S.length<MAXSLOTS)S.pat.S.push(Array(18).fill(0));if(S.edit==='S'&&!S.up.solo)S.edit='A';
