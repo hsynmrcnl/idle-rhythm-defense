@@ -559,7 +559,7 @@ function frame(ms){
 }
 
 /* ================= boot ================= */
-recalc();core.hp=hpMax();ensureOrders();applyTheme();setTab(isPhone()?'stage':'studio');hintFor(null);tutShow();if(S.lang==='en'){document.documentElement.lang='en';$('app').lang='en';i18n(document.body);$('langBtn').textContent='TR'}
+recalc();core.hp=hpMax();ensureOrders();secCheck(true);applyTheme();setTab(isPhone()?'stage':'studio');hintFor(null);tutShow();if(S.lang==='en'){document.documentElement.lang='en';$('app').lang='en';i18n(document.body);$('langBtn').textContent='TR'}
 const away=Math.min((Date.now()-(S.last||Date.now()))/1000,8*3600);
 if(away>30){const g=rate()*away*0.5;if(g>=1){earn(g);setTimeout(()=>msg('Sen yokken döngün ♪ '+fmt(g)+' kazandırdı · kuşatma seni bekledi'),300)}}
 updUI();
