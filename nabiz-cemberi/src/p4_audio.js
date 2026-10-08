@@ -139,10 +139,12 @@ function sched(){
   while(nd.nextT<now+0.12){const sdk=60/curBpm(bar)/4/spec.speed;const cell=spec.dir>0?nd.step%MI.N:(MI.N-1-nd.step%MI.N);const pk=pkFor(bar);playStep(cell,pk,nd.nextT,bar,k);queue.push({s:cell,pk,t:nd.nextT,b:bar,k});nd.grid.push({s:cell,t:nd.nextT,sd:sdk,N:MI.N,dir:spec.dir});nd.nextT+=sdk;nd.step++}}
  logic(now);
 }
+/* şarkıyı başa sar: örnek şarkı, albüm, turne, kayıt yükleme ve sıfırlamada */
+function songRewind(){step=0;bar=0;NS[1].step=0;NS[2].step=0}
 function startStop(){
  ensureAudio();
  if(playing){playing=false;clearInterval(timer);queue=[];msg('Ateşkes: kuşatma durdu, döngü sustu')}
- else{playing=true;const now=ac.currentTime;nextT=now+0.06;step=0;bar=0;queue=[];grid=[];beats=[];lastLogic=now;NS[1].nextT=now+0.06;NS[1].step=0;NS[1].grid=[];NS[2].nextT=now+0.06;NS[2].step=0;NS[2].grid=[];if(!wave||wave.n!==S.wave||wave.stale)startWave(S.wave,now);else{const pa=wave.pausedAt||now,sh=now-pa;wave.startT+=sh;if(wave.done)wave.nextAt+=sh;enemies.forEach(e=>{if(e.lastSp)e.lastSp+=sh})}timer=setInterval(sched,25);sched()}
+ else{playing=true;const now=ac.currentTime;nextT=now+0.06;step=step%MI.N;queue=[];grid=[];beats=[];lastLogic=now;NS[1].nextT=now+0.06;NS[1].grid=[];NS[2].nextT=now+0.06;NS[2].grid=[];if(!wave||wave.n!==S.wave||wave.stale)startWave(S.wave,now);else{const pa=wave.pausedAt||now,sh=now-pa;wave.startT+=sh;if(wave.done)wave.nextAt+=sh;enemies.forEach(e=>{if(e.lastSp)e.lastSp+=sh})}timer=setInterval(sched,25);sched()}
  if(!playing&&wave){wave.pausedAt=ac.currentTime}
  $('play').textContent=T(playing?'Durdur':'Başlat');
 }

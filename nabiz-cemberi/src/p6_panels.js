@@ -3,9 +3,9 @@ let tab='studio',soloSel=-1,soloEdSlot=-1,soloDrag=null,bookNew=false,eSel=0,eK=
 const TABS=['studio','coll','def','book','look','album','set'];
 /* telefon dock'u: 5 bölüm; Stüdyo|Koleksiyon ve Albüm|Kitap bir düğmeyi paylaşır, dişli (t-set) Ayarlar'ı açar */
 const DOCK={stage:'stage',studio:'studio',coll:'studio',def:'def',album:'album',book:'album',look:'look'};
-const dockLast={studio:'studio',album:'album'};let prevTab='stage';
+const dockLast={studio:'studio',album:'album'};let prevTab='stage';const scrollMem={};
 const isPhone=()=>window.matchMedia('(max-width:700px)').matches;
-function setTab(t){if(t==='stage'&&!isPhone())t='studio';if(tab!=='set')prevTab=tab;tab=t;const g=DOCK[t];if(g&&dockLast[g])dockLast[g]=t;TABS.forEach(k=>{$('p-'+k).hidden=k!==t;$('t-'+k).setAttribute('aria-selected',String(k===t))});$('t-stage').setAttribute('aria-selected',String(t==='stage'));$('app').dataset.tab=t;if(t==='book'){bookNew=false;$('bookBadge').hidden=true}if(t==='def')$('defBadge').hidden=true;if(t==='coll')$('collBadge').hidden=true;const tb=$('t-'+t);if(tb&&tb.scrollIntoView){try{tb.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}if(t==='stage'){window.scrollTo(0,0);renderPads()}if(t==='set')renderSet();placeMsg();syncDock();if(typeof tutPlace==='function')tutPlace()}
+function setTab(t){if(t==='stage'&&!isPhone())t='studio';const rk=$('rack');if(rk)scrollMem[tab]=rk.scrollTop;if(tab!=='set')prevTab=tab;tab=t;const g=DOCK[t];if(g&&dockLast[g])dockLast[g]=t;TABS.forEach(k=>{$('p-'+k).hidden=k!==t;$('t-'+k).setAttribute('aria-selected',String(k===t))});$('t-stage').setAttribute('aria-selected',String(t==='stage'));$('app').dataset.tab=t;if(t==='book'){bookNew=false;$('bookBadge').hidden=true}if(t==='def')$('defBadge').hidden=true;if(t==='coll')$('collBadge').hidden=true;const tb=$('t-'+t);if(tb&&tb.scrollIntoView){try{tb.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}if(t==='stage'){window.scrollTo(0,0);renderPads()}if(t==='set')renderSet();if(rk)rk.scrollTop=scrollMem[t]||0;placeMsg();syncDock();if(typeof tutPlace==='function')tutPlace()}
 /* telefon: mesaj satırı sahnenin altında yüzer, canvas zıplamaz; masaüstü: düğmelerin altında */
 function placeMsg(){const m=$('msg'),cw=$('cvwrap');if(!m||!cw)return;if(isPhone()){if(m.parentNode!==cw)cw.appendChild(m)}else{const st=cw.closest('.stage');if(st&&m.parentNode!==st)st.appendChild(m)}}
 function syncDock(){const g=DOCK[tab];document.querySelectorAll('.dk').forEach(b=>{const on=b.dataset.tab===g;if(on!==(b.getAttribute('aria-current')==='page')){if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')}});
@@ -50,7 +50,7 @@ function releaseAlbum(){
  const th=albumTh();if(S.runEarned<th){msg('Albüm için bu dönem ♪ '+fmt(th)+' kazanmalısın');return}
  const f=fansFor(),n=ALB[albumsN()%ALB.length]+(albumsN()>=ALB.length?' II':'');
  const keep={v:3,hayran:S.hayran+f,albums:[{n,f,b:S.bpm,w:S.wave}].concat(S.albums),found:S.found,theme:S.theme,themes:S.themes,famOpen:S.famOpen,layout:S.layout,stage:S.stage,fxo:S.fxo,orders:S.orders,bestWave:S.bestWave,kills:S.kills,total:S.total,muted:S.muted,buy:S.buy,last:Date.now(),tut:S.tut,mn:S.mn,auto:S.auto,efsane:S.efsane,cities:S.cities,tours:S.tours,city:S.city,albMax:Math.max(S.albMax||0,S.albums.length+1),sfx:S.sfx,lang:S.lang};
- S=Object.assign(freshRun(),keep);MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};if(playing)startWave(1,nowT());
+ S=Object.assign(freshRun(),keep);songRewind();MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};if(playing)startWave(1,nowT());
  const un=LADDER.find(x=>x.a===albumsN());msg('“'+n+'” çıktı · +'+f+' hayran'+(un?' · Açıldı: '+un.t:''));
  changed();applyTheme();save();
 }
@@ -177,7 +177,7 @@ function renderTour(){const el=$('tourBox');if(!el)return;const c=cityOf(),nx=CI
 let tourArm=false,tourT=0;
 function goTour(){if(!canTour()||demoMode)return;const gain=tourGain(),c=cityOf();S.cities[c.id]=1;
  const keep={v:3,hayran:0,albums:[],found:S.found,theme:S.theme,themes:S.themes,famOpen:S.famOpen,layout:S.layout,stage:S.stage,fxo:S.fxo,orders:[],bestWave:S.bestWave,kills:S.kills,total:S.total,muted:S.muted,buy:S.buy,last:Date.now(),tut:S.tut,mn:S.mn,auto:S.auto,efsane:S.efsane+gain,cities:S.cities,tours:S.tours+1,city:(S.city+1)%CITIES.length,albMax:Math.max(S.albMax||0,S.albums.length),sfx:S.sfx,lang:S.lang};
- S=Object.assign(freshRun(),keep);MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};ensureOrders();if(playing)startWave(1,nowT());msg(c.n+' turnesi bitti · +'+gain+' Efsane · sıradaki şehir '+cityOf().n);changed();applyTheme();save()}
+ S=Object.assign(freshRun(),keep);songRewind();MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};ensureOrders();if(playing)startWave(1,nowT());msg(c.n+' turnesi bitti · +'+gain+' Efsane · sıradaki şehir '+cityOf().n);changed();applyTheme();save()}
 /* manager: runs every 2 s while the page is open */
 let autoT=0;
 function autoTick(){if(demoMode||!S.mn)return;const now=Date.now();let ch=false;
@@ -249,7 +249,7 @@ function tutShow(){const el=$('tut');if(!el)return;if(!tutActive()){el.hidden=tr
 function tutAdvance(){if(!tutActive())return;S.tut.s++;if(S.tut.s>=TUT.length){S.tut.done=true;msg('Öğretici bitti. İyi çalışmalar!')}save();tutShow()}
 function tutCheck(){if(!tutActive()){if(tutHiEl)tutHi(null);const el=$('tut');if(el&&!el.hidden)el.hidden=true;return}const st=TUT[S.tut.s];if(st.cond&&st.cond()){tutAdvance();return}tutHi(st.hi||null)}
 let loadArm=false,loadT=0;
-function applyLoaded(d){if(demoMode)exitDemo();S=Object.assign(freshRun(),freshMeta(),d);if(!d.tut)S.tut=null;normalizeS();MI=meterInfo();eSel=0;previewId=null;enemies=[];wave=null;core={hp:hpMax(),sh:0};if(playing)startWave(S.wave,nowT());recalc();renderPanels();applyTheme();syncFx();save();tutShown=-1;tutShow();msg('Kayıt yüklendi · dalga '+S.wave+' · '+S.albums.length+' albüm · '+Object.keys(S.lv).length+' enstrüman')}
+function applyLoaded(d){if(demoMode)exitDemo();S=Object.assign(freshRun(),freshMeta(),d);songRewind();if(!d.tut)S.tut=null;normalizeS();MI=meterInfo();eSel=0;previewId=null;enemies=[];wave=null;core={hp:hpMax(),sh:0};if(playing)startWave(S.wave,nowT());recalc();renderPanels();applyTheme();syncFx();save();tutShown=-1;tutShow();msg('Kayıt yüklendi · dalga '+S.wave+' · '+S.albums.length+' albüm · '+Object.keys(S.lv).length+' enstrüman')}
 const HINT_C='Hücreye dokun: vuruş ekle. Boş yere dokun ya da boşluk tuşuna bas: ritme vur. Ortaya dokun: başlat / durdur.';
 const HINT_S='Satırdaki hücreye dokun: vuruş ekle. Sahne alanına dokun ya da boşluk tuşuna bas: ritme vur. Ortadaki düğme: başlat / durdur.';
 const hintSet=t=>{$('hint').textContent=T(t)};
@@ -328,7 +328,7 @@ $('rack').addEventListener('click',e=>{
  else if(act==='tutNext'||act==='tutSkip'){return}
  else if(act==='reset'){
   if(demoMode){msg('Önce kendi oyununa dön');return}
-  if(resetArm){resetArm=false;clearTimeout(resetT);S=Object.assign(freshRun(),freshMeta());MI=meterInfo();eSel=0;previewId=null;enemies=[];wave=null;core={hp:hpMax(),sh:0};try{localStorage.removeItem(KEY)}catch(err){}b.textContent='Kaydı sıfırla';msg('Kayıt sıfırlandı');changed();applyTheme();return}
+  if(resetArm){resetArm=false;clearTimeout(resetT);S=Object.assign(freshRun(),freshMeta());songRewind();MI=meterInfo();eSel=0;previewId=null;enemies=[];wave=null;core={hp:hpMax(),sh:0};try{localStorage.removeItem(KEY)}catch(err){}b.textContent='Kaydı sıfırla';msg('Kayıt sıfırlandı');changed();applyTheme();return}
   resetArm=true;b.textContent='Emin misin? Tekrar bas';resetT=setTimeout(()=>{resetArm=false;b.textContent='Kaydı sıfırla'},3000);return
  }
  changed();
@@ -354,12 +354,12 @@ let demoIdx=0;
 function enterDemo(k){k=DEMOS[k]?k:0;if(demoMode){if(k===demoIdx)return;S=JSON.parse(demoSnap);demoMode=false}demoIdx=k;demoSnap=JSON.stringify(S);const keep={v:3,hayran:S.hayran,albums:S.albums,found:S.found,theme:S.theme,themes:S.themes,famOpen:S.famOpen,layout:S.layout,fxo:S.fxo,orders:S.orders,bestWave:S.bestWave,kills:S.kills,total:S.total,muted:S.muted,buy:S.buy,last:S.last,tut:S.tut,mn:S.mn,auto:S.auto,efsane:S.efsane,cities:S.cities,tours:S.tours,city:S.city,albMax:S.albMax,sfx:S.sfx,lang:S.lang};
  const D=JSON.parse(JSON.stringify(DEMOS[k]));S=Object.assign(freshRun(),keep,{slots:D.slots,lv:D.lv,bpm:D.bpm,bmax:D.bpm,meter:D.meter,scale:D.scale,solo:D.solo,needle:D.needle,plan:D.plan,up:D.up,stage:D.stage,nota:0,prog:D.prog||Array(8).fill('pop'),prate:D.prate||'beat'});
  ['A','B','S','F'].forEach(k=>{S.pat[k]=mkPat();Object.entries(D[k]||{}).forEach(([si,arr])=>arr.forEach(([s,v])=>S.pat[k][si][s]=v))});
- demoMode=true;MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};soloSel=-1;soloEdSlot=-1;if(S.edit==='S')S.edit='A';
+ demoMode=true;songRewind();MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};soloSel=-1;soloEdSlot=-1;if(S.edit==='S')S.edit='A';
  /* solo notaları: elle yazılmışsa (D.solos) aynen, yoksa her solo yeri için stilden üretilir */
  S.solos={};Object.keys(D.solo||{}).forEach(si=>{const h=D.solos&&D.solos[si];const st=(h&&h.style)||D.soloStyle||'taksim';S.solos[si]=h&&Array.isArray(h.notes)?{notes:h.notes,style:st,seed:4242}:{notes:genSolo(+si,st,4242),style:st,seed:4242}});
  recalc();renderPanels();syncFx();if(!playing)startStop();else startWave(1,nowT());
  $('demo').textContent='Kendi oyununa dön';const d2=$('demo2');if(d2){d2.hidden=DEMOS.length<2;d2.textContent=T('Diğer örnek şarkı')+' · '+DEMOS[(k+1)%DEMOS.length].name}tutShow();msg('Örnek şarkı '+(k+1)+': '+D.name+' · '+D.msg);}
-function exitDemo(){if(!demoMode)return;S=JSON.parse(demoSnap);demoMode=false;MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};soloSel=-1;soloEdSlot=-1;recalc();renderPanels();syncFx();if(playing)startWave(S.wave,nowT());$('demo').textContent='Örnek şarkıyı dinle';const d2=$('demo2');if(d2)d2.hidden=true;tutShown=-1;tutShow();msg('Kendi oyununa döndün')}
+function exitDemo(){if(!demoMode)return;S=JSON.parse(demoSnap);demoMode=false;songRewind();MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};soloSel=-1;soloEdSlot=-1;recalc();renderPanels();syncFx();if(playing)startWave(S.wave,nowT());$('demo').textContent='Örnek şarkıyı dinle';const d2=$('demo2');if(d2)d2.hidden=true;tutShown=-1;tutShow();msg('Kendi oyununa döndün')}
 $('demo').addEventListener('click',()=>{if(demoMode)exitDemo();else enterDemo(demoIdx);$('demo').blur()});
 $('demo2').addEventListener('click',()=>{if(demoMode)enterDemo((demoIdx+1)%DEMOS.length);$('demo2').blur()});
 $('play').addEventListener('click',()=>{startStop();$('play').blur()});
