@@ -36,7 +36,7 @@ with sync_playwright() as pw:
         check(v is True, '%s yeni setle çalıyor' % k)
     check(p.evaluate("()=>window.__nb.sfKeyOf('keman')") == 'c_keman' and p.evaluate("()=>window.__nb.sfKeyOf('timbal')") == '0470', 'eşleme: keman → c_keman, timbal klasikte (0470)')
     # Görünüm → Klasik
-    p.evaluate("()=>{document.querySelector('[data-act=tab][data-tab=look]').click()}"); p.wait_for_timeout(100)
+    p.evaluate("()=>{window.__nb.S.ui='detay';window.__nb.renderPanels();document.querySelector('[data-act=tab][data-tab=look]').click()}"); p.wait_for_timeout(100)
     p.click('[data-act=sfset][data-v=klasik]'); p.wait_for_timeout(100)
     check(p.evaluate("()=>window.__nb.S.sfset") == 'klasik' and p.evaluate("()=>window.__nb.sfKeyOf('keman')") == '0400' and p.evaluate("()=>window.__nb.sfKeyOf('didger')") is None,
           'Klasik seçilince FluidR3 paketine dönüyor, didgeridoo sentez')

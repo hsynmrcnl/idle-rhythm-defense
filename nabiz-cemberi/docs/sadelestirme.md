@@ -24,13 +24,13 @@ Hedef: ortalama müzik bilgisiyle (enstrüman, hızlı/yavaş, neşeli/hüzünl�
 | Görünüm | Düzen, tema, katmanlar, efekt sürgüleri, kayıt seti, armoni | Düzen ve tema | Efekt sürgüleri, kayıt seti, armoni, hasar sayıları |
 
 ## Sıra
-1. **Faz 1, arayüz (v18, küçük-orta):** Kolay/Detaylı anahtarı ve kart başına Detay; sade adlar (ruh hâli, ritim tipi, rol etiketleri, geliştirme adları); Uyum özeti; önerilen 2 geliştirme; Görünüm sadeleşmesi.
+1. ✅ **Faz 1, arayüz (v18, küçük-orta):** Kolay/Detaylı anahtarı ve kart başına Detay; sade adlar (ruh hâli, ritim tipi, rol etiketleri, geliştirme adları); Uyum özeti; önerilen 2 geliştirme; Görünüm sadeleşmesi.
 2. **Faz 2, otomatik müzik (v19, orta-büyük):** Akıllı desen (Sade/Hareketli/Yoğun, Hepsini düzenle), otomatik B deseni, ruh hâline göre akor, hazır şarkı yapısı, otomatik dolgu, otomatik solo. Her vuruşun bedeli yine ödenir; nota yetmezse yetebildiği kadarı yazılır.
 3. **Faz 3, otomatik oyun (v20, küçük):** Baştan otomatik geliştir, savunma önerisi vurgusu.
 
 Her faz ayrı sürüm ve test. Telefonda kaydırmasız Sahne ve Savunma korunur.
 
-## Karar bekleyen
-1. Varsayılan Kolay mı olsun? Mevcut kayıtlar Detaylı'da mı kalsın?
-2. Otomatik, elle kurulana göre ne kadar kazandırsın? (Öneri: %85–90.)
-3. Önce telefonda tıklanabilir bir Kolay Stüdyo taslağı (laboratuvar sayfası) mı, yoksa doğrudan Faz 1 mi?
+## Kararlar
+1. Herkes Kolay'da başlar (eski kayıtlar da).
+2. Otomatik, elle kurulanın %85–90'ı kadar kazandırır.
+3. Taslak yok, doğrudan uygulama.

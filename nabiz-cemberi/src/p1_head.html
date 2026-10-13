@@ -319,6 +319,26 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .btn.undo{min-width:36px;min-height:32px;padding:4px 8px;display:inline-flex;align-items:center;justify-content:center}
 .btn.undo svg{width:17px;height:17px}
 .h2r{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+/* ---- v18: Kolay görünüm (S.ui) ---- */
+.ezrow{display:grid;gap:6px;margin:4px 0 12px}
+.ezrow>.pl{font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ezopts{display:flex;flex-wrap:wrap;gap:6px}
+.ezopts button{flex:1 1 0;min-width:72px;min-height:44px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);font:inherit;font-size:13.5px;line-height:1.15;cursor:pointer;display:grid;gap:2px;justify-items:center;text-align:center}
+.ezopts button small{font-family:var(--f-m);font-size:10.5px;color:var(--muted)}
+.ezopts button[aria-pressed="true"]{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 16%,var(--panel2))}
+.ezopts button[aria-pressed="true"] small{color:var(--acc)}
+.ezopts button:disabled{opacity:.45;cursor:not-allowed}
+.ezopts button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.nb{display:inline-block;width:42px;height:6px;border-radius:3px;background:var(--line);vertical-align:1px;overflow:hidden;margin-right:4px}
+.nb i{display:block;height:100%;background:var(--acc)}
+.nb.over i{background:var(--hot)}
+.dl{display:block;margin:8px 0 0 auto;border:0;background:none;color:var(--acc);font:inherit;font-size:13px;cursor:pointer;padding:6px 2px;min-height:36px}
+.dl:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+.tip{border:1px dashed var(--line);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--muted);margin-top:8px}
+.tip b{color:var(--fg);font-weight:500}
+.bpmr{width:100%;accent-color:var(--acc);min-height:32px}
+.ezt{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ezt .nm b{color:var(--acc);font-weight:500}
 /* ---- telefon v13: tek ekran sahne, 5 simgeli dock, sağ üstte Ayarlar dişlisi ---- */
 @media (max-width:700px){
  body{padding-bottom:0}
@@ -490,7 +510,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         <section class="block"><h2>Düzen</h2><p class="note">Çember: halkalar ve dönen ibre, düşmanlar her yönden gelir. Şerit: satırlar ve kayan çubuk, önünde ekolayzer silüeti, düşmanlar yukarıdan iner.</p><div id="layoutBox"></div></section>
         <section class="block"><h2>Temalar</h2><p class="note">Tema görüntüyü, ses rengini ve düşman çizimini değiştirir. Temanın sevdiği tempoda çalarsan gelir ×1,25.</p><div class="themes" id="themeList"></div></section>
         <section class="block"><h2>Sahne katmanları</h2><p class="note">Albümden sonra da kalır, her biri gelire ×1,1 ekler ve her düzende farklı çizilir.</p><div id="stageList"></div></section>
-        <section class="block"><h2>Efekt laboratuvarı</h2><div id="fxBox"></div></section>
+        <section class="block" data-sec="fx"><h2>Efekt laboratuvarı</h2><div id="fxBox"></div></section>
       </div>
       <div id="p-album" role="tabpanel" hidden>
         <div class="subnav seg" role="group"><button data-act="tab" data-tab="album" aria-pressed="true">Albüm</button><button data-act="tab" data-tab="book" aria-pressed="false" data-bd="book">Kitap</button></div>
