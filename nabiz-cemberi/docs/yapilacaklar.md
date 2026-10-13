@@ -3,7 +3,8 @@
 Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra önerilen sıradır.
 
 ## 1. Hemen (Hüseyin)
-- [ ] **Telefonda dene:** Kolay görünüm, Sade/Hareketli/Yoğun, Hepsini düzenle, Uygula, Otomatik geliştir (menajerle), zengin armoni
+- [ ] **Telefonda dene (v24):** tam ekran sahne, üstteki nabız çubuğu, Solodan çık, nota araçları simgesi, Stüdyo bölüm düğmeleri, aile simgeleri, Otomatik bölümü, Başka öneri, kısa Kuşatma
+- [ ] Karar: Stüdyo bölüm düğmelerinde küçük yazı kalsın mı (Koleksiyon'daki gibi yalnız simge de olabilir)
 
 ## 2. Kararlar (v21'de uygulandı)
 - [x] Otomatik geliştir menajerle gelir: "Menajer: otomatik geliştir" (1. albüm), Sahne kartından açılıp kapanır
@@ -40,4 +41,6 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v20: Otomatik geliştir, Kolay'da savunma önerisi
 - v21: otomatik geliştir menajere bağlandı, sahne katmanı ×1,1, bir dalga geri
 - v22: küçük temizlik (Kolay öğretici, Uygula, ped seviye düğmeleri, terimler)
+- v23: telefonda Sahne aşağı kayıyordu, düzeldi
+- v24: tam ekran sahne, sade üst bilgi + nabız çubuğu, Solodan çık, nota araçları neon simgesi, Stüdyo/Koleksiyon sabit üst bar (bölüm düğmeleri, aile simgeleri, sıkı satırlar), iki satırlık Kuşatma, tek Otomatik bölümü (neyin otomatik olacağını oyuncu seçer, menajere tür ve harcama sınırı), Başka öneri
 - Dinlenip vazgeçilenler: komalı Hicaz/Kürdi (fark duyulmadı), 12/8 shuffle, hayalet nota

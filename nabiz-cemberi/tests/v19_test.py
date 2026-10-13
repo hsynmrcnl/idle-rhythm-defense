@@ -101,11 +101,12 @@ with sync_playwright() as pw:
     p.click('#collList [data-act=lv][data-id=clap]'); p.wait_for_timeout(80)
     si = p.evaluate("()=>window.__nb.S.slots.indexOf('clap')")
     check(si == 3 and row(p, 'A', 3).count('1') >= 1, 'Kolay: el çırpma sahneye ritmiyle geldi (%s)' % (row(p, 'A', 3) if si == 3 else si))
-    p.evaluate("()=>{const S=window.__nb.S;S.ui='detay';S.slots[3]=null;window.__nb.renderPanels()}")
+    # v24: yeni enstrüman ritmi Otomatik bölümünden kapatılır (Kolay/Detaylı'dan bağımsız)
+    p.evaluate("()=>{const S=window.__nb.S;S.ui='detay';S.am.yeni=false;S.slots[3]=null;window.__nb.renderPanels()}")
     p.click('#collList [data-act=place][data-id=clap]'); p.wait_for_timeout(50)
     p.evaluate("()=>{const S=window.__nb.S;S.pat.A[3]=S.pat.A[3].map(()=>0);S.slots[3]=null;S.lv.shaker=1;window.__nb.renderPanels()}")
     p.click('#collList [data-act=place][data-id=shaker]'); p.wait_for_timeout(50)
-    check(row(p, 'A', 3).count('1') == 0, 'Detaylı: sahneye giren enstrüman boş gelir')
+    check(row(p, 'A', 3).count('1') == 0, 'Yeni enstrüman ritmi kapalıyken sahneye giren enstrüman boş gelir')
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
 
     # telefon: satır düğmeleri sığıyor

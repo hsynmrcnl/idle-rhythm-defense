@@ -1,4 +1,5 @@
 """v20: Otomatik geliştir (Analiz'in gelir önerisi, notanın yarısını aşmadan) ve Kolay'da savunma önerisi.
+v24: açma/kapama Stüdyo → Otomatik bölümündeki anahtarda (amTog mn_lv).
 
     python build.py && python tests/v20_test.py
 """
@@ -25,18 +26,18 @@ with sync_playwright() as pw:
     p = b.new_page(viewport={'width': 1280, 'height': 800}); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto('http://127.0.0.1:%d/' % PORT); p.wait_for_timeout(400); p.evaluate(SEED)
-    check(p.locator('[data-act=autoUp]').count() == 0 and 'Menajerle gelir' in p.text_content('#slotAdd'), 'menajer yokken Otomatik geliştir kilitli, nasıl açılacağı yazıyor')
+    check(p.locator('[data-act=amTog][data-k=mn_lv]').count() == 0 and 'Menajer 1. albümden sonra' in p.text_content('#autoBox'), 'menajer yokken Otomatik geliştir kilitli, nasıl açılacağı yazıyor')
     p.evaluate("()=>{const S=window.__nb.S;S.mn.lv=1;S.auto.lv=false;window.__nb.renderPanels()}")
-    check(p.evaluate("()=>document.querySelector('[data-act=autoUp][data-v=\"0\"]').getAttribute('aria-pressed')") == 'true', 'menajerle gelince düğmeler görünüyor')
+    check(p.evaluate("()=>document.querySelector('[data-act=amTog][data-k=mn_lv]').getAttribute('aria-checked')") == 'false', 'menajerle gelince anahtar görünüyor (kapalı)')
     st0 = p.evaluate("()=>JSON.stringify([window.__nb.S.lv,window.__nb.S.up])")
     n0 = p.evaluate("()=>window.__nb.S.nota")
-    p.click('[data-act=autoUp][data-v="1"]')
+    p.click('[data-act=amTog][data-k=mn_lv]')
     p.wait_for_timeout(2600)
     st1 = p.evaluate("()=>JSON.stringify([window.__nb.S.lv,window.__nb.S.up])")
     n1 = p.evaluate("()=>window.__nb.S.nota")
     check(st1 != st0 and n0 - n1 <= n0 * 0.5 + 1, 'açınca en verimli geliştirmeyi aldı, notanın yarısını aşmadı (♪ %d harcandı)' % (n0 - n1))
     check('Menajer:' in p.text_content('#msg') or st1 != st0, 'mesaj gösterildi')
-    p.click('[data-act=autoUp][data-v="0"]'); p.wait_for_timeout(50)
+    p.click('[data-act=amTog][data-k=mn_lv]'); p.wait_for_timeout(50)
     check(p.evaluate("()=>window.__nb.S.auto.lv") is False, 'kapatılabiliyor')
     # savunma önerisi
     p.click('[data-act=tab][data-tab=def]'); p.wait_for_timeout(50)

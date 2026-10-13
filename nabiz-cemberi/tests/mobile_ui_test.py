@@ -41,7 +41,9 @@ with sync_playwright() as pw:
           cvB:cv.bottom,dock:r('#dock').top,gear:r('#t-set').right,top:!!document.querySelector('.top h1').offsetParent,
           hidden:['#play','#tap','#mute','#demo','#langBtn','.tabs'].every(q=>{const e=document.querySelector(q);return !e.offsetParent||getComputedStyle(e).display==='none'})}}""")
         check(m['scroll'] <= 0, 'sahne kaydırmasız (fazla %dpx)' % m['scroll'])
-        check(abs(m['cvW'] - m['cvH']) < 1 and m['cvR'] <= m['vw'], 'canvas kare ve ekranda (%dx%d)' % (m['cvW'], m['cvH']))
+        # v24: tuval sahne alanını kenardan kenara doldurur, oyun karesi (L) ortada
+        sq = p.evaluate("()=>window.__nb.L")
+        check(abs(m['cvW'] - m['vw']) < 1 and m['cvR'] <= m['vw'] and abs(sq - min(m['cvW'], m['cvH'])) < 1, 'tuval ekranı enine dolduruyor, oyun karesi sığıyor (%dx%d, kare %d)' % (m['cvW'], m['cvH'], sq))
         check(m['cvB'] <= m['dock'], 'sahne dock’un üstünde')
         # v22 düzeltmesi: sahne yapışkan konumun top değeriyle aşağı kaymasın (çentikli telefonda alt ped sırası kayboluyordu)
         pd = p.evaluate("""()=>{const pads=[...document.querySelectorAll('#pads .pad')],g=document.querySelector('.grid'),st=document.querySelector('.stage');
@@ -89,27 +91,27 @@ with sync_playwright() as pw:
             for k in ['studio', 'def', 'album', 'look']:
                 p.click('#d-' + k); p.wait_for_timeout(80)
                 check(p.evaluate("()=>document.scrollingElement.scrollHeight<=innerHeight"), 'sayfa gövdesi kaymıyor (%s)' % k)
-            p.click('#d-studio'); p.evaluate("()=>{document.getElementById('rack').scrollTop=800}"); p.click('#d-def'); p.wait_for_timeout(80)
+            p.click('#d-studio'); want = p.evaluate("()=>{const r=document.getElementById('rack');r.scrollTop=Math.min(800,r.scrollHeight-r.clientHeight);return r.scrollTop}"); p.click('#d-def'); p.wait_for_timeout(80)
             st0 = p.evaluate("()=>document.getElementById('rack').scrollTop")
             p.click('#d-studio'); p.wait_for_timeout(80)
             st1 = p.evaluate("()=>document.getElementById('rack').scrollTop")
-            check(st0 == 0 and abs(st1 - 800) < 2, 'sekme değişince üstten açılır, Stüdyo konumunu hatırlar (%d, %d)' % (st0, st1))
+            check(st0 == 0 and want > 0 and abs(st1 - want) < 2, 'sekme değişince üstten açılır, Stüdyo konumunu hatırlar (%d, %d / %d)' % (st0, st1, want))
             # v14 Stüdyo: yeni oyunda yalnız Sahne; koşullar sağlanınca bölümler sırayla açılır
             def go_studio():
                 p.click('#d-studio'); p.wait_for_timeout(80)
                 if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'studio': p.click('#p-coll .subnav [data-tab=studio]'); p.wait_for_timeout(80)
             go_studio()
             vis = lambda: p.evaluate("()=>[...document.querySelectorAll('#p-studio [data-sec]')].filter(e=>!e.hidden).map(e=>e.dataset.sec)")
-            check(vis() == ['sahne'], 'yeni oyunda Stüdyo’da yalnız Sahne var (%s)' % vis())
+            check(vis() == ['sahne', 'auto'], 'yeni oyunda Stüdyo’da yalnız Sahne ve Otomatik var (%s)' % vis())
             p.click('#p-studio [data-sec=sahne] .ib'); p.wait_for_timeout(80)
             check(p.evaluate("()=>!document.querySelector('#p-studio [data-sec=sahne] .info').hidden"), 'ⓘ açıklamayı açıyor')
             p.click('#d-def'); p.wait_for_timeout(80)
             p.evaluate("()=>{const S=window.__nb.S;S.lv.trampet=1;S.slots[1]='trampet';window.__nb.renderPanels()}"); p.wait_for_timeout(400)
             check(p.evaluate("()=>!document.querySelector('#d-studio .dot').hidden"), 'yeni bölüm açılınca Stüdyo simgesinde nokta')
             go_studio()
-            check(vis() == ['sahne', 'syn'] and p.locator('#p-studio .card.isnew .newtag').count() == 1, '2. enstrümanla Uyum (Kolay’da Groove ile tek kart) “Yeni” etiketiyle açılıyor (%s)' % vis())
+            check(vis() == ['sahne', 'auto', 'syn'] and p.locator('#p-studio .card.isnew .newtag').count() == 1, '2. enstrümanla Uyum (Kolay’da Groove ile tek kart) “Yeni” etiketiyle açılıyor (%s)' % vis())
             p.evaluate("()=>{const S=window.__nb.S;S.bestWave=5;S.up.sef=1;window.__nb.renderPanels()}"); p.wait_for_timeout(400)
-            check(vis() == ['sahne', 'rhy', 'pat', 'plan', 'syn'], 'dalga 5 ve Şef ile Ritim stüdyosu, Desen ve Şarkı planı açık (%s)' % vis())
+            check(vis() == ['sahne', 'auto', 'rhy', 'pat', 'plan', 'syn'], 'dalga 5 ve Şef ile Ritim stüdyosu, Desen ve Şarkı planı açık (%s)' % vis())
             p.click('#d-def'); p.wait_for_timeout(100)
             check(p.locator('#p-studio .card.isnew').count() == 0, 'Stüdyo’dan çıkınca “Yeni” etiketleri kalkıyor')
             fit = p.evaluate("()=>{const r=document.getElementById('rack');return r.scrollHeight-r.clientHeight}")
