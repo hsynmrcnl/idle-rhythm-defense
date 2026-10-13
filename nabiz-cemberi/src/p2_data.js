@@ -138,6 +138,13 @@ const THEMES={
   blurb:'Kilim desenli halkalar, nazar çekirdeği, kaleydoskop.'}
 };
 const THEME_ORDER=['neon','cyber','punk','lofi','synth','anadolu'];
+/* v27 3D sahne: normalde Görünüm'de ♪ D3_COST ile açılan geliştirme; D3_TEST açıkken (deneme süresi) herkeste alınmış gelir */
+const D3_TEST=true,D3_COST=5e5;
+const CORES=[{id:'kristal',n:'Kristal',d:'Temanın renklerinde dönen altıgen kristal; şarj oldukça içi ışır.',c:0},{id:'kure',n:'Küre',d:'Parlak bir ışık küresi, davulla nabız gibi atar.',c:5e6},{id:'gunes',n:'Güneş',d:'Çizgili synthwave güneşi, merkezde süzülür.',c:5e7},{id:'plak',n:'Plak',d:'Zeminde dönen plak, etiketi temanın renginde.',c:5e8}];
+/* şarj: vurgulu adım +CH_ACC, Alan rolü +CH_ALAN; ölçü başına en çok CH_BAR (en az 12 ölçüde bir patlama). Patlama: BLAST_S sn'lik hasar, patrona yarısı */
+const CH_ACC=0.02,CH_ALAN=0.05,CH_BAR=1/12,BLAST_S=10;
+const GOLD={neon:'#ffd166',cyber:'#fcee0a',punk:'#2b59ff',lofi:'#e9c46a',synth:'#ffd166',anadolu:'#ffd166'};
+const goldOf=th=>GOLD[th.id]||th.cv.warn;
 const FXK=[
  ['bloom','Bloom','Parlak alanlar ışık saçar',0,1.6],
  ['ca','RGB kayması','Renk kanalları kenara doğru ayrılır',0,1.5],
