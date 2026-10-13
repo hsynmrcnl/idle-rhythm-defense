@@ -25,7 +25,7 @@ Hedef: ortalama müzik bilgisiyle (enstrüman, hızlı/yavaş, neşeli/hüzünl�
 
 ## Sıra
 1. ✅ **Faz 1, arayüz (v18, küçük-orta):** Kolay/Detaylı anahtarı ve kart başına Detay; sade adlar (ruh hâli, ritim tipi, rol etiketleri, geliştirme adları); Uyum özeti; önerilen 2 geliştirme; Görünüm sadeleşmesi.
-2. **Faz 2, otomatik müzik (v19, orta-büyük):** Akıllı desen (Sade/Hareketli/Yoğun, Hepsini düzenle), otomatik B deseni, ruh hâline göre akor, hazır şarkı yapısı, otomatik dolgu, otomatik solo. Her vuruşun bedeli yine ödenir; nota yetmezse yetebildiği kadarı yazılır.
+2. ✅ **Faz 2, otomatik müzik (v19, orta-büyük):** Akıllı desen (Sade/Hareketli/Yoğun, Hepsini düzenle), otomatik B deseni, ruh hâline göre akor, hazır şarkı yapısı, otomatik dolgu, otomatik solo. Her vuruşun bedeli yine ödenir; nota yetmezse yetebildiği kadarı yazılır.
 3. **Faz 3, otomatik oyun (v20, küçük):** Baştan otomatik geliştir, savunma önerisi vurgusu.
 
 Her faz ayrı sürüm ve test. Telefonda kaydırmasız Sahne ve Savunma korunur.

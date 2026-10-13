@@ -47,6 +47,7 @@ function cellClick(si,s){
  if(S.edit==='F'){if(!isFillRow(si)){msg('Dolgu yalnız vurmalı satırlarda çalınır');return}if(!fillZone(s)){msg('Dolgu ölçünün son yarısında çalar: vuruşu sağ yarıya koy');return}}
  const p=S.pat[S.edit],v=p[si][s];
  if(S.edit==='F'&&v===0){let n=0;for(let k=0;k<MI.N;k++)if(fillZone(k)&&p[si][k])n++;if(n>=8){msg('Satır başına en çok 8 dolgu vuruşu');return}}
+ S.rowm[S.edit+si]='m';
  if(v===0){const k=noteCost();if(S.nota<k){msg('Yeterli nota yok · ♪ '+fmt(k)+' gerekli');return}S.nota-=k;p[si][s]=1}
  else if(v===1&&S.up.accent){const k=accCost();if(S.nota<k){msg('Aksan için ♪ '+fmt(k)+' gerekli');return}S.nota-=k;p[si][s]=2}
  else{const pc=placedCount();p[si][s]=0;S.nota+=Math.round(costAt(pc-1)/2)}
@@ -82,7 +83,7 @@ function renderPanels(){
  const th=dispTheme(),p=S.pat[S.edit];
  $('buyMode').innerHTML=[[1,'×1'],[10,'×10'],[0,'Maks']].map(([v,l])=>'<button data-act="buy" data-v="'+v+'" aria-pressed="'+(S.buy===v)+'">'+l+'</button>').join('');$('undoBox').innerHTML=undoBtn();
  $('slotList').innerHTML=S.slots.map((id,si)=>easy('sahne')?slotRowEasy(si,th):slotRowHtml(si,th)).join('');renderPads();if(ac)sfLoadStage();
- $('slotAdd').innerHTML='<div class="arow" style="padding-top:10px"><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" data-act="clear">'+(S.edit==='S'?'Solo desenini':'Desen '+S.edit+'’yı')+' temizle</button>'+(hasB()?'<button class="btn ghost" data-act="clearBoth">İkisini de temizle</button>':'')+'</span>'+(S.slots.length<MAXSLOTS?'<button class="btn" data-act="addslot" data-cost="'+slotCost()+'">Sahne yeri ekle · '+S.slots.length+'/'+MAXSLOTS+' · ♪ '+fmt(slotCost())+'</button>':'<span class="cnt">Sahne dolu: 10 yer</span>')+'</div>';
+ $('slotAdd').innerHTML=(easy('sahne')?'<div class="arow" style="padding-top:10px"><button class="btn primary" data-act="autoAll">Hepsini düzenle</button></div><p class="note" style="margin:6px 0 0">Bütün grubun ritmini oyun yazar; elle düzenlediğin satırlara dokunmaz</p>':'')+'<div class="arow" style="padding-top:10px"><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" data-act="clear">'+(S.edit==='S'?'Solo desenini':'Desen '+S.edit+'’yı')+' temizle</button>'+(hasB()?'<button class="btn ghost" data-act="clearBoth">İkisini de temizle</button>':'')+'</span>'+(S.slots.length<MAXSLOTS?'<button class="btn" data-act="addslot" data-cost="'+slotCost()+'">Sahne yeri ekle · '+S.slots.length+'/'+MAXSLOTS+' · ♪ '+fmt(slotCost())+'</button>':'<span class="cnt">Sahne dolu: 10 yer</span>')+'</div>';
  let ch='';FAMS.forEach(([f,fn])=>{if(!famOpen(f))return;ch+='<h3 class="fam">'+fn+'<span class="cnt">'+INS.filter(x=>x.fam===f&&lvOf(x.id)>0).length+' / '+INS.filter(x=>x.fam===f).length+' açık</span></h3>';INS.filter(x=>x.fam===f).forEach(x=>{ch+=easy('coll')?insRowEasy(x,th):insRowHtml(x,th)})});
  $('collList').innerHTML=ch;
  const nf=nextFam();
@@ -129,7 +130,7 @@ function renderPanels(){
  $('albumBox').innerHTML='<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p><div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v18 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v19 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'));i18n($('tut'))}
  updUI();
@@ -302,9 +303,9 @@ function rackAct(b){const act=b.dataset.act;
  if(act==='demoGo'){enterDemo(+b.dataset.k);if(isPhone())setTab('stage');return}
  if(act==='demoExit'){exitDemo();return}
  if(act==='buy'){S.buy=+b.dataset.v}
- else if(act==='lv'){const x=IDX[b.dataset.id];if(!x)return;const q=b.dataset.one&&lvOf(x.id)?{n:1,c:Math.round(x.lb*Math.pow(GROW,lvOf(x.id)))}:lvQuote(x);if(q.unlock){if(!famOpen(x.fam)){msg(FAM[x.fam].n+' ailesi kapalı: Koleksiyon sekmesindeki kapıya bak');return}if(pay(q.c)){S.lv[x.id]=1;const empty=S.slots.indexOf(null);if(empty>=0){S.slots[empty]=x.id;msg(x.n+' açıldı ve '+(empty+1)+'. yere kondu. Vuruş eklemeyi unutma.')}else msg(x.n+' açıldı, yedekte bekliyor. Bir yeri boşalt ya da yer ekle.')}}else if(pay(q.c)){const was=lvOf(x.id);S.lv[x.id]+=q.n;const ms=MS.find(m=>was<m&&S.lv[x.id]>=m);if(ms)msg(x.n+' '+ms+'. seviye · nota ve hasar ×2'+(ms===25?' · ses zenginleşti':''))}}
+ else if(act==='lv'){const x=IDX[b.dataset.id];if(!x)return;const q=b.dataset.one&&lvOf(x.id)?{n:1,c:Math.round(x.lb*Math.pow(GROW,lvOf(x.id)))}:lvQuote(x);if(q.unlock){if(!famOpen(x.fam)){msg(FAM[x.fam].n+' ailesi kapalı: Koleksiyon sekmesindeki kapıya bak');return}if(pay(q.c)){S.lv[x.id]=1;const empty=S.slots.indexOf(null);if(empty>=0){S.slots[empty]=x.id;msg(x.n+' açıldı ve '+(empty+1)+'. yere kondu. Vuruş eklemeyi unutma.');ezPlaced(empty)}else msg(x.n+' açıldı, yedekte bekliyor. Bir yeri boşalt ya da yer ekle.')}}else if(pay(q.c)){const was=lvOf(x.id);S.lv[x.id]+=q.n;const ms=MS.find(m=>was<m&&S.lv[x.id]>=m);if(ms)msg(x.n+' '+ms+'. seviye · nota ve hasar ×2'+(ms===25?' · ses zenginleşti':''))}}
  else if(act==='openFam'){const f=b.dataset.f;if(!famCanOpen(f)){msg('Kapı için koşullar tamamlanmadı');return}const c=famCond(f).cost||0;if(c&&!pay(c))return;S.famOpen[f]=1;msg(FAM[f].n+' ailesi açıldı');save()}
- else if(act==='place'){const x=IDX[b.dataset.id],empty=S.slots.indexOf(null);if(x&&empty>=0){S.slots[empty]=x.id;msg(x.n+' '+(empty+1)+'. yere kondu')}}
+ else if(act==='place'){const x=IDX[b.dataset.id],empty=S.slots.indexOf(null);if(x&&empty>=0){S.slots[empty]=x.id;msg(x.n+' '+(empty+1)+'. yere kondu');ezPlaced(empty)}}
  else if(act==='addslot'){if(S.slots.length<MAXSLOTS&&pay(slotCost())){S.slots.push(null);msg('Yeni sahne yeri açıldı: '+S.slots.length)}}
  else if(act==='solo'){const si=+b.dataset.i;if(!S.up.solo)return;if(S.solo[si])delete S.solo[si];else{S.solo[si]=1;soloAuto(si)}msg(S.solo[si]?(slotIns(si)||{n:'Yer'}).n+' soloya ayrıldı: solo bölümünde Solo desenini çalar. Şimdi “Solo deseni”ni seçip ritmini çiz.':(slotIns(si)||{n:'Yer'}).n+' artık solo almıyor')}
  else if(act==='needle'){const si=+b.dataset.i,k=+b.dataset.k;S.needle[si]=k;msg((slotIns(si)||{n:'Yer'}).n+' → '+NEEDLES[k-1].n+(k===2?' (¾ hız)':k===3?' (yarı hız, ters yön)':''))}
@@ -320,6 +321,9 @@ function rackAct(b){const act=b.dataset.act;
  else if(act==='tempo'){if(S.bpm<180){if(S.bpm<S.bmax)S.bpm=Math.min(S.bpm+10,S.bmax);else if(pay(tempoCost())){S.bmax=Math.min(180,S.bmax+10);S.bpm=S.bmax}else return;syncFx();msg('Tempo '+S.bpm+' BPM')}}
  else if(act==='tempoMax'){if(S.bmax<180&&pay(tempoCost())){S.bmax=Math.min(180,S.bmax+10);msg('Tempo sınırı '+S.bmax+' BPM')}else return}
  else if(act==='scale'){if(setScale(b.dataset.v))return}
+ else if(act==='alvl'){autoRows([+b.dataset.i],+b.dataset.v);return}
+ else if(act==='autoAll'){autoRows(null,0);return}
+ else if(act==='fillAuto'){fillAuto(b.dataset.v==='1');return}
  else if(act==='meter'){if(setMeter(b.dataset.v))return}
  else if(act==='tempoDown'){if(S.bpm>70){S.bpm=Math.max(70,S.bpm-10);syncFx();msg('Tempo '+S.bpm+' BPM · geri çıkmak ücretsiz')}}
  /* ince tempo: satın alınan üst sınır (bmax) içinde 1'er BPM */
@@ -334,7 +338,7 @@ function rackAct(b){const act=b.dataset.act;
  else if(act==='fillGen'){const k=$('fillType')?$('fillType').value:'eighth';const tpl=FILLS[k];if(!tpl)return;const z0=Math.floor(MI.N/2),zl=MI.N-z0;const rows={};S.slots.forEach((id,si)=>{if(isFillRow(si))rows[si]=Array(18).fill(0)});if(!Object.keys(rows).length){msg('Sahnede vurmalı yok');return}
   const pick=part=>{for(const id of FILL_PARTS[part]){const si=S.slots.indexOf(id);if(si>=0)return si}return S.slots.findIndex((id,si)=>isFillRow(si))};
   tpl.h.forEach(([off,part,v])=>{const si=pick(part);if(si<0)return;const s=Math.min(MI.N-1,z0+Math.round(off*zl/8));rows[si][s]=Math.max(rows[si][s],v)});applyRows('F',rows,tpl.n+' dolgusu yerleştirildi');return}
- else if(act==='euclid'){applyRows(S.edit,eucRows(),(slotIns(eSel)||{n:'Yer'}).n+' yerine '+eK+' vuruş dağıtıldı');return}
+ else if(act==='euclid'){S.rowm[S.edit+eSel]='m';applyRows(S.edit,eucRows(),(slotIns(eSel)||{n:'Yer'}).n+' yerine '+eK+' vuruş dağıtıldı');return}
  else if(act==='album'){if(demoMode){msg('Örnek şarkıdayken albüm çıkmaz. Önce kendi oyununa dön.');return}releaseAlbum();return}
  else if(act==='fxreset'){delete S.fxo[dispTheme().id];renderPanels();return}
  else if(act==='waveBack'){setWave(S.wave-5);msg('Dalga '+S.wave+' · geri çekilmek ücretsiz');return}
@@ -364,13 +368,13 @@ $('rack').addEventListener('change',e=>{
  if(t.id==='selMeter'){setMeter(t.value)}
  else if(t.id==='selScale'){setScale(t.value)}
  else if(t.id==='bpmR'){S.bpm=clamp(+t.value,70,S.bmax);syncFx();msg('Tempo '+S.bpm+' BPM');changed()}
- else if(t.id==='selProgAll'){if(!t.value)return;for(let i=0;i<8;i++)S.prog[i]=t.value;msg('Akor yürüyüşü: '+(PROGS[S.scale][t.value]||{n:t.value}).n);changed()}
+ else if(t.id==='selProgAll'){if(!t.value)return;if(t.value==='auto'){S.progAuto=true;msg('Akorlar otomatik: kıta ile nakarat farklı, geçişler kadansla');changed();return}S.progAuto=false;for(let i=0;i<8;i++)S.prog[i]=t.value;msg('Akor yürüyüşü: '+(PROGS[S.scale][t.value]||{n:t.value}).n);changed()}
  else if(t.id==='soloSlotSel'){soloEdSlot=+t.value;soloSel=-1;renderSoloBox();return}
  else if(t.id==='soloStyle'){const so=S.solos[soloEdSlot]||(S.solos[soloEdSlot]={notes:[],style:'hendrix'});so.style=t.value;renderSoloBox();return}
  else if(t.dataset.plan!=null){const pl=planArr().slice();pl[+t.dataset.plan]=t.value;S.plan=pl;msg((+t.dataset.plan+1)+'. bölüm: '+SECTS[t.value].n);changed()}
- else if(t.dataset.prog!=null){S.prog[+t.dataset.prog]=t.value;msg((+t.dataset.prog+1)+'. bölüm: '+(PROGS[S.scale][t.value]||{n:t.value}).n);changed()}
+ else if(t.dataset.prog!=null){S.progAuto=false;S.prog[+t.dataset.prog]=t.value;msg((+t.dataset.prog+1)+'. bölüm: '+(PROGS[S.scale][t.value]||{n:t.value}).n);changed()}
  else if(t.id==='selRate'){S.prate=t.value;msg(t.value==='bar'?'Akor ölçü başına değişir':'Akor vuruş başına değişir');changed()}
- else if(t.dataset.slot!=null){const si=+t.dataset.slot,id=t.value||null;if(id&&S.slots.includes(id)&&S.slots[si]!==id){msg('Bu enstrüman zaten sahnede');renderPanels();return}S.slots[si]=id;changed()}
+ else if(t.dataset.slot!=null){const si=+t.dataset.slot,id=t.value||null;if(id&&S.slots.includes(id)&&S.slots[si]!==id){msg('Bu enstrüman zaten sahnede');renderPanels();return}S.slots[si]=id;delete S.rowm['A'+si];delete S.rowm['B'+si];if(id)ezPlaced(si);changed()}
 });
 $('rack').addEventListener('input',e=>{
  const t=e.target;
@@ -391,7 +395,7 @@ const ezRole=r=>EZ_ROLE[r]||'Saldırı';
 function breathBar(si){const p=S.pat[S.edit],n=rowLoad(p,si),nf=nefesOf(si,S.edit);if(!n)return '';const over=n>nf;return '<span class="nb'+(over?' over':'')+'" title="nefes '+n+' / '+nf+'"><i style="width:'+Math.min(100,Math.round(n/nf*100))+'%"></i></span>'+(over?'<span style="color:var(--hot)">taşmış</span>':n===nf?'dolu':'')}
 function slotRowEasy(si,th){const x=slotIns(si);if(!x)return slotRowHtml(si,th);const col=insColor(x,th),bench=INS.filter(y=>lvOf(y.id)>0&&!S.slots.includes(y.id)),m=ROWM[S.edit][si]||1;
  const sel='<select data-slot="'+si+'" aria-label="Sahne yeri '+(si+1)+'"><option value="">— boş —</option><option value="'+x.id+'" selected>'+x.n+'</option>'+bench.map(y=>'<option value="'+y.id+'">'+y.n+'</option>').join('')+'</select>';
- return '<div class="slot"><span class="dot" style="--c:'+col+'"></span><span>'+sel+'<span class="ds"><span class="role">'+ezRole(x.role)+'</span> <span class="lvl">Sv '+lvOf(x.id)+'</span> '+breathBar(si)+(m>1.001?' <span style="color:var(--acc)">uyum ×'+fm(m)+'</span>':'')+(isSolo(si)?' · <span style="color:var(--hot)">solo</span>':'')+'</span></span><span class="act">'+(S.up.solo?'<button class="btn'+(isSolo(si)?' ready':' ghost')+'" data-act="solo" data-i="'+si+'" aria-pressed="'+isSolo(si)+'">Solo</button>':'')+'<button class="btn" id="lvb-'+x.id+'" data-act="lv" data-id="'+x.id+'" data-cost="0"></button></span></div>'}
+ return '<div class="slot"><span class="dot" style="--c:'+col+'"></span><span>'+sel+'<span class="ds"><span class="role">'+ezRole(x.role)+'</span> <span class="lvl">Sv '+lvOf(x.id)+'</span> '+breathBar(si)+(m>1.001?' <span style="color:var(--acc)">uyum ×'+fm(m)+'</span>':'')+(isSolo(si)?' · <span style="color:var(--hot)">solo</span>':'')+'</span>'+lvlBtns(si)+'</span><span class="act">'+(S.up.solo?'<button class="btn'+(isSolo(si)?' ready':' ghost')+'" data-act="solo" data-i="'+si+'" aria-pressed="'+isSolo(si)+'">Solo</button>':'')+'<button class="btn" id="lvb-'+x.id+'" data-act="lv" data-id="'+x.id+'" data-cost="0"></button></span></div>'}
 function insRowEasy(x,th){const L=lvOf(x.id),col=insColor(x,th),on=S.slots.includes(x.id);
  if(!L)return '<div class="row locked"><span class="dot" style="--c:'+col+'"></span><span><span class="nm">'+x.n+'</span><span class="ds"><span class="role">'+ezRole(x.role)+'</span> '+x.d+'</span></span><button class="btn" data-act="lv" data-id="'+x.id+'" data-cost="'+x.u+'">'+(x.u?'Aç · ♪ '+fmt(x.u):'Aç')+'</button></div>';
  return '<div class="row"><span class="dot" style="--c:'+col+'"></span><span><span class="nm">'+x.n+'<span class="lvl">Sv '+L+'</span></span><span class="ds"><span class="role">'+ezRole(x.role)+'</span> '+x.d+'</span></span>'+(on?'<span class="own">Sahnede</span>':(S.slots.includes(null)?'<button class="btn" data-act="place" data-id="'+x.id+'">Sahneye koy</button>':'<span class="cnt">Yedekte</span>'))+'</div>'}
@@ -414,7 +418,8 @@ function patEasy(){const ed=[['A','Kıta'],['B','Nakarat']].filter(([k])=>k==='A
  (ed.length>1?'<div class="ezrow"><span class="pl">Düzenlenen desen</span><span class="ezopts">'+ed.map(([k,l])=>'<button data-act="ab" data-v="'+k+'" aria-pressed="'+(S.edit===k)+'">'+l+'</button>').join('')+'</span>'+(hasB()?'<button class="btn ghost" data-act="copy">Kıtayı nakarata kopyala</button>':'')+'</div>':'')}
 function planEasy(pl,pa){const same=k=>PLANS[k].every((t,i)=>t===pl[i]);let h='<div class="chips" id="planChips">'+pl.map((t,i)=>'<span class="chip'+(i===pa.idx?' on':'')+'" id="pc'+i+'">'+(i+1)+'. '+SECTS[t].n+'</span>').join('')+'</div>';
  if(S.up.sef)h+='<div class="ezrow" style="margin-top:10px"><span class="pl">Şarkı yapısı</span><span class="ezopts">'+Object.keys(PLANS).map(k=>'<button data-act="preset" data-v="'+k+'" aria-pressed="'+same(k)+'">'+PLAN_NAMES[k]+'</button>').join('')+'</span></div>';
- if(S.up.akor){const ps=PROGS[S.scale]||PROGS.minor,all=S.prog.every(p=>p===S.prog[0])?S.prog[0]:'';h+='<div class="ezrow"><label class="pl" for="selProgAll">Akorlar</label><select id="selProgAll">'+(all?'':'<option value="" selected>Bölüme göre karışık</option>')+Object.entries(ps).map(([k,v])=>'<option value="'+k+'"'+(all===k?' selected':'')+'>'+v.n+'</option>').join('')+'</select></div>'}
+ if(S.up.akor){const ps=PROGS[S.scale]||PROGS.minor,all=!S.progAuto&&S.prog.every(p=>p===S.prog[0])?S.prog[0]:'';h+='<div class="ezrow"><label class="pl" for="selProgAll">Akorlar</label><select id="selProgAll"><option value="auto"'+(S.progAuto?' selected':'')+'>Otomatik (önerilen)</option>'+(all||S.progAuto?'':'<option value="" selected>Bölüme göre karışık</option>')+Object.entries(ps).map(([k,v])=>'<option value="'+k+'"'+(all===k?' selected':'')+'>'+v.n+'</option>').join('')+'</select></div>'}
+ if(S.up.dolgu){const on=fillHits()>0;h+='<div class="ezrow"><span class="pl">Geçiş dolgusu</span><span class="ezopts"><button data-act="fillAuto" data-v="0" aria-pressed="'+!on+'">Kapalı</button><button data-act="fillAuto" data-v="1" aria-pressed="'+on+'">Otomatik</button></span></div>'}
  return h}
 /* solo: stil ve Üret; notalar Detay'daki editörde */
 function soloStyleFor(x){const f=x.v.solo||'lead';return f==='bass'?'wooten':(f==='saz'||x.fam==='dun'||f==='wind')?'taksim':(f==='lead'||x.fam==='ele')?'synth':'hendrix'}
@@ -444,6 +449,57 @@ function synTips(){const p=S.pat[S.edit],t=[],en=S.lang==='en',add=(v,ok,tr,eng,
 function synEasy(){const p=S.pat[S.edit],on=SYN.filter(y=>SYNON[S.edit][y.id]).map(y=>y.n+' ×'+fm(y.m)).concat(COMBOS.filter(c=>c.t(p)).map(c=>c.n+' '+pct(c.b))),pen=PEN.t(p),tip=synTips()[0];
  return '<p class="ezt"><span class="nm">Groove <b>×'+fm(Math.round((GC[S.edit]||1)*100)/100)+'</b></span><span class="ds">'+(on.length?on.length+' uyum tutuyor':'henüz uyum yok')+'</span></p>'+(on.length||pen?'<div class="chips" style="margin-top:6px">'+on.map(n=>'<span class="chip on">'+n+'</span>').join('')+(pen?'<span class="chip bad on">'+PEN.n+' ×'+fm(PEN.m)+' · bir adımda çok vuruş</span>':'')+'</div>':'')+
  (tip?'<p class="tip"><b>Sıradaki: '+tip[1]+'</b> · '+tip[2]+'</p>':'')}
+/* ---------- Akıllı desen (v19): rolüne göre ritim, nefes içinde, uyumlar kendiliğinden tutar. Aksan ve kitap kalıbı kullanmaz:
+   elle uğraşan daha fazlasını bulur (hedef: elle kurulanın %85–90'ı). S.rowm['A0']: 1/2/3 otomatik seviye, 'm' elle düzenlendi. */
+const EZ_LV=[[1,'Sade',0.5],[2,'Hareketli',0.7],[3,'Yoğun',0.9]];
+const AUTO_ORDER=['darbe','keskin','kalkan','alan','seri','destek','delici','titresim','gudum','zincir','yavas'];
+function rolePrio(si,pk){const x=slotIns(si),N=MI.N,gs=MI.gs,mids=MI.mids.filter(s=>s<N),p=S.pat[pk],B=pk==='B',all=[...Array(N).keys()];
+ const stepsOf=(...rs)=>{const set=new Set();rs.forEach(r=>slotsRole(r).forEach(sj=>{if(sj!==si)for(let s=0;s<N;s++)if(p[sj][s])set.add(s)}));return [...set].sort((a,b)=>a-b)};
+ const ev=all.filter(s=>s%2===0),od=all.filter(s=>s%2===1);let pr;
+ switch(x.role){
+  case 'darbe':pr=[...gs,gs[gs.length-1]-1,...mids];break;
+  case 'keskin':if(x.fam==='vur'){pr=gs.filter((s,k)=>k%2===1);if(!pr.length)pr=[gs[gs.length-1]];pr=pr.concat(B?[N-1]:[],mids.filter((s,k)=>k%2===1));break}
+  /* melodik keskin: güdümlü gibi */
+  case 'gudum':case 'zincir':{const mel=S.slots.map((id,sj)=>sj).filter(sj=>{const y=slotIns(sj);return y&&y.fam!=='vur'&&['gudum','zincir','keskin'].includes(y.role)}),k=mel.indexOf(si),half=Math.floor(N/2);
+   if(mel.length>=2&&k>=0&&k<2){const first=(k===0)!==B;pr=ev.filter(s=>first?s<half:s>=half)}else pr=mids.concat(ev.filter(s=>!MI.gsSet.has(s)),ev);break}
+  case 'kalkan':pr=[...gs];break;
+  case 'alan':pr=[0];break;
+  case 'seri':{const d=stepsOf('darbe'),last=all.filter(s=>MI.pos[s]===MI.g[MI.grp[s]]-1),first=all.filter(s=>MI.pos[s]===1);pr=mids.concat(B?first:last,B?last:first,all).filter(s=>!d.includes(s));break}
+  case 'destek':{const k=stepsOf('keskin');pr=k.length?k.concat(stepsOf('darbe')):[...gs];break}
+  case 'delici':case 'titresim':{const d=stepsOf('darbe');pr=d.length>=2?d:[...gs];break}
+  case 'yavas':pr=mids.slice();break;
+  default:pr=ev.filter(s=>!MI.gsSet.has(s)).concat(od,ev)}
+ return [...new Set(pr.filter(s=>s>=0&&s<N))]}
+/* bir satırın seçilecek adımları: seviye nefesin yarısı / dörtte üçü / tamamı; bir adımda 6. vuruş (kakofoni) yok */
+function autoPicks(si,pk,lv){const x=slotIns(si);if(!x)return[];const p=S.pat[pk],nf=Math.floor(nefesOf(si,pk)),pr=rolePrio(si,pk),frac=EZ_LV[lv-1][2];
+ /* uyumu tutan en az sayı korunur (davul tüm vuruş başları, trampet 2 ve 4); kalan sıklık seviyeye göre */
+ const keep=x.role==='darbe'?MI.gs.length:(x.role==='keskin'&&x.fam==='vur')?Math.max(1,Math.floor(MI.gs.length/2)):x.role==='kalkan'?MI.gs.length:x.role==='yavas'||x.role==='delici'||x.role==='titresim'?2:1;
+ let n=x.role==='alan'?1:Math.min(nf,Math.max(keep,Math.round(nf*frac)));
+ const out=[];for(const s of pr){if(out.length>=n)break;let c=0;for(let i=0;i<S.slots.length;i++)if(i!==si&&p[i][s])c++;if(c>=5)continue;out.push(s)}return out}
+const rowOf=st=>{const r=Array(18).fill(0);st.forEach(s=>r[s]=1);return r};
+/* sis: yazılacak satırlar (null = elle düzenlenmemiş hepsi), lv: seviye (0 = satırın son seviyesi ya da Yoğun). Bağımlılık sırası: davul → trampet → … → bas → melodi.
+   Bedel ödenir; nota yetmezse en kalabalık satırdan başlayarak kısaltır. Kolay'da ve B açıksa nakarat da yazılır. */
+function autoRows(sis,lv){const pks=['A'].concat(hasB()&&S.ui!=='detay'?['B']:[]),skipped=[];let spent=0,wrote=0;
+ const want=(si,pk)=>{if(!S.slots[si])return false;if(sis)return sis.includes(si);if(S.rowm[pk+si]==='m'){if(pk==='A')skipped.push(si);return false}return true};
+ for(const pk of pks){const order=S.slots.map((id,si)=>si).filter(si=>want(si,pk)).sort((a,b)=>{const ra=AUTO_ORDER.indexOf(slotIns(a).role),rb=AUTO_ORDER.indexOf(slotIns(b).role);return (ra<0?99:ra)-(rb<0?99:rb)});if(!order.length)continue;
+  const sv=JSON.parse(JSON.stringify(S.pat[pk])),lvs={},picks={};
+  order.forEach(si=>{S.pat[pk][si]=Array(18).fill(0)});
+  order.forEach(si=>{const L=lv||(+S.rowm['A'+si]>0?+S.rowm['A'+si]:3);lvs[si]=L;picks[si]=autoPicks(si,pk,L);S.pat[pk][si]=rowOf(picks[si])});
+  const target=JSON.parse(JSON.stringify(S.pat[pk]));for(let i=0;i<sv.length;i++)S.pat[pk][i]=sv[i];
+  const rowsFor=()=>{const r={};order.forEach(si=>r[si]=rowOf(picks[si]));return r};
+  let rows=rowsFor(),c=planReplace(pk,rows),guard=200;
+  while(c>S.nota&&guard-->0){const big=order.filter(si=>picks[si].length>1).sort((a,b)=>picks[b].length-picks[a].length)[0];if(big==null)break;picks[big].pop();rows=rowsFor();c=planReplace(pk,rows)}
+  if(c>S.nota){msg('Yeterli nota yok · ♪ '+fmt(c)+' gerekli');break}
+  S.nota-=c;spent+=c;order.forEach(si=>{for(let s=0;s<18;s++)S.pat[pk][si][s]=rows[si][s];S.rowm[pk+si]=lvs[si];wrote++});void target}
+ changed();if(wrote)msg((sis&&sis.length===1?slotIns(sis[0]).n+' · '+EZ_LV[(lv||3)-1][1]:'Grup düzenlendi')+(spent>0?' · ♪ '+fmt(spent):spent<0?' · ♪ '+fmt(-spent)+' geri':'')+(skipped.length?' · '+skipped.length+' elle satır korundu':''))}
+function lvlBtns(si){const m=S.rowm['A'+si];return '<span class="ezopts sm">'+EZ_LV.map(([v,n])=>'<button data-act="alvl" data-i="'+si+'" data-v="'+v+'" aria-pressed="'+(m===v)+'">'+n+'</button>').join('')+(m==='m'?'<small class="cnt">elle</small>':'')+'</span>'}
+/* Kolay'da sahneye giren enstrüman, satırı boşsa Hareketli ritimle gelir */
+function ezPlaced(si){if(S.ui==='detay'||!S.slots[si]||STEPS(S.pat.A,si).length)return;autoRows([si],2)}
+/* dolgu: Kapalı / Otomatik (sekizlik yükseliş; 4+ vuruş geçişte zil ve ×1,25) */
+function fillAuto(on){const rows={};S.slots.forEach((id,si)=>{if(isFillRow(si))rows[si]=Array(18).fill(0)});if(!Object.keys(rows).length){msg('Sahnede vurmalı yok');return}
+ if(on){const tpl=FILLS.eighth,z0=Math.floor(MI.N/2),zl=MI.N-z0;const pick=part=>{for(const id of FILL_PARTS[part]){const si=S.slots.indexOf(id);if(si>=0)return si}return S.slots.findIndex((id,si)=>isFillRow(si))};
+  tpl.h.forEach(([off,part,v])=>{const si=pick(part);if(si<0)return;const s=Math.min(MI.N-1,z0+Math.round(off*zl/8));rows[si][s]=Math.max(rows[si][s],v)})}
+ applyRows('F',rows,on?'Geçiş dolgusu otomatik':'Geçiş dolgusu kapalı')}
 function setScale(v){if(!SCALES[v]||albUnl()<SCALES[v].al)return true;S.scale=v;msg('Gam: '+SCALES[S.scale].n);changed();return true}
 function setMeter(v){if(!METERS[v]||albUnl()<METERS[v].al)return true;S.meter=v;MI=meterInfo();step=step%MI.N;eRot=0;eK=Math.min(eK,MI.N);msg('Ölçü: '+METERS[S.meter].n);changed();return true}
 /* ---------- Geri al: desen, plan, akor, solo, ölçü ve gam düzenlemeleri. Satın almalar geri alınmaz.
@@ -452,7 +508,7 @@ function setMeter(v){if(!METERS[v]||albUnl()<METERS[v].al)return true;S.meter=v;
 const UNDO_MAX=30;let undoSt=[],undoPend=null;
 const UNDO_SVG='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>';
 const undoBtn=()=>'<button class="btn ghost undo" data-act="undo" aria-label="Geri al" title="Geri al (Ctrl+Z)"'+(undoSt.length?'':' disabled')+'>'+UNDO_SVG+'</button>';
-function undoKey(){const so={};Object.keys(S.solos||{}).forEach(k=>{const v=S.solos[k];if(v&&Array.isArray(v.notes)&&v.notes.length)so[k]=v});return JSON.stringify([S.pat,S.plan,S.prog,S.prate,so,S.solo,S.needle,S.meter,S.scale])}
+function undoKey(){const so={};Object.keys(S.solos||{}).forEach(k=>{const v=S.solos[k];if(v&&Array.isArray(v.notes)&&v.notes.length)so[k]=v});return JSON.stringify([S.pat,S.plan,S.prog,S.prate,so,S.solo,S.needle,S.meter,S.scale,S.rowm,S.progAuto])}
 function undoMark(){if(!undoPend)undoPend={k:undoKey(),n:S.nota,t:S.total}}
 function undoCommit(){const p=undoPend;undoPend=null;if(!p)return;if(undoKey()===p.k)return;undoSt.push({k:p.k,d:(S.nota-p.n)-(S.total-p.t)});if(undoSt.length>UNDO_MAX)undoSt.shift();undoUI()}
 function undoReset(){undoSt=[];undoPend=null;undoUI()}
@@ -461,7 +517,7 @@ function undo(){undoCommit();const u=undoSt.pop();if(!u){msg('Geri alınacak dü
  if(u.d>0&&S.nota<u.d){undoSt.push(u);msg('Geri almak için yeterli nota yok · ♪ '+fmt(u.d)+' gerekli');return}
  const o=JSON.parse(u.k),mc=o[7]!==S.meter;S.pat=o[0];S.plan=o[1];S.prog=o[2];S.prate=o[3];
  const so=o[4];Object.keys(S.solos||{}).forEach(k=>{if(!so[k]&&S.solos[k])S.solos[k].notes=[]});Object.keys(so).forEach(k=>{S.solos[k]=so[k]});
- S.solo=o[5];S.needle=o[6];S.meter=o[7];S.scale=o[8];S.nota-=u.d;if(mc){MI=meterInfo();step=step%MI.N}soloSel=-1;
+ S.solo=o[5];S.needle=o[6];S.meter=o[7];S.scale=o[8];S.rowm=o[9]||{};S.progAuto=o[10]!==false;S.nota-=u.d;if(mc){MI=meterInfo();step=step%MI.N}soloSel=-1;
  changed();undoUI();msg('Geri alındı'+(u.d<0?' · ♪ '+fmt(-u.d)+' iade':u.d>0?' · ♪ '+fmt(u.d)+' ödendi':''))}
 ['pointerdown','click','change','keydown'].forEach(ev=>{document.addEventListener(ev,undoMark,true);document.addEventListener(ev,undoCommit)});
 /* sürükleme (solo notası taşıma/uzatma): basışın kendisi ayrı adım, sürüklenen hâli bırakınca ayrı adım */
