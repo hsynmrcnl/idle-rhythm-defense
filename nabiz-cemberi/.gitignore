@@ -3,3 +3,4 @@ build/
 nabiz-cemberi-site.zip
 tests/out/
 __pycache__/
+tools/.cache/
