@@ -18,7 +18,7 @@ def check(ok, what):
     if not ok: fails.append(what)
 
 # ilerlemiş bir oyun: albüm, menajer, öğretici bitmiş, Detaylı, otomatikler kapalı, açılmış bölümler
-SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};S.ui='detay';S.nota=5e8;S.total=9e8;S.wave=30;S.bestWave=40;S.kills=999;
+SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};window.__nb.unlockAll();S.ui='detay';S.nota=5e8;S.total=9e8;S.wave=30;S.bestWave=40;S.kills=999;
   S.albums=[{n:'X',f:5,b:120,w:20}];S.albMax=1;S.hayran=5;S.mn={lv:1};S.am.yeni=false;S.open={syn:1,rhy:1,pat:1};S.famOpen.tel=1;S.lv.bas=10;S.muted=true;
   nb.renderPanels();localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}"""
 

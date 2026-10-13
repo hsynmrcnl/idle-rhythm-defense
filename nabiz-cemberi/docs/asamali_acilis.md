@@ -1,4 +1,4 @@
-# Aşamalı açılış ve açıldıkça öğretici (öneri, onay bekliyor)
+# Aşamalı açılış ve açıldıkça öğretici (v26'da uygulandı)
 
 Hedef: oyuncu ilk açılışta yalnız sahneyi görür; her şey oynadıkça, belli eşiklerde gelir. Her açılışta kısa bir öğretici kartı (1–2 cümle) çıkar ve yeni yeri neonla gösterir.
 
@@ -29,6 +29,7 @@ Hedef: oyuncu ilk açılışta yalnız sahneyi görür; her şey oynadıkça, be
 
 Ayarlar (dil, ses, kayıt, sıfırla) her zaman açık.
 
-## Karar bekleyenler
-1. Eşikler uygun mu (özellikle 2, 3 ve 10)?
-2. Kilitli dock simgeleri: **gizli** (önerim, ekran sade) mi, **soluk ve kilitli** mi (ne geleceği görünür)?
+## Kararlar
+1. Eşikler önerildiği gibi.
+2. Kilitli dock simgeleri gizli; açılınca neonla gelir.
+3. Uygularken: Kitap, kalıp bulunsa da Albüm açıldıktan sonra gelir (trampet gelir gelmez kalıp bulunuyordu). Telefonda başka sekmedeyken Analiz ve Ritme vur kartları Sahne simgesini parlatır.

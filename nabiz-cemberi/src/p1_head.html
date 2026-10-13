@@ -585,6 +585,18 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .amsub{display:grid;gap:4px;padding:2px 0 8px 10px;border-left:2px solid var(--line);margin:0 0 4px 2px}
 .amsub .pl{font-family:var(--f-m);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
 .amsub .ezopts.sm{margin:0}
+.dk[hidden],.tab[hidden],.subnav button[hidden],#tap[hidden]{display:none!important}
+.stats.locked{cursor:default}.stats.locked .chev{display:none}
+.tut.unl{border-color:var(--hot);box-shadow:0 0 18px -8px var(--hot)}
+@media (max-width:700px){
+ .dock{justify-content:center}
+ .dk{flex:0 1 78px}
+ .dk.tut-hi{box-shadow:none!important;animation:none;color:var(--hot)}
+ .dk.tut-hi svg{animation:dkPulse 1.1s ease-in-out infinite}
+}
+@keyframes dkPulse{0%,100%{filter:drop-shadow(0 0 2px var(--hot)) drop-shadow(0 0 6px var(--hot))}50%{filter:drop-shadow(0 0 5px var(--hot)) drop-shadow(0 0 16px var(--hot));transform:scale(1.12)}}
+@media (prefers-reduced-motion: reduce){.dk.tut-hi svg{animation:none;filter:drop-shadow(0 0 5px var(--hot))}}
+.tut.unl .tag{color:var(--hot);border-color:var(--hot)}
 @keyframes sotbBlink{0%,100%{box-shadow:0 0 4px var(--hot);opacity:1}50%{box-shadow:0 0 16px var(--hot),0 0 26px var(--hot);opacity:.5}}
 @keyframes sotpIn{from{transform:scaleX(.35);opacity:0}to{transform:none;opacity:1}}
 @media (max-width:940px) and (max-height:520px) and (orientation:landscape){.stats{display:flex}.stats .sn{font-size:16px}}
@@ -637,6 +649,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         <button class="tab" role="tab" id="t-album" aria-selected="false" data-act="tab" data-tab="album">Albüm</button>
       </div>
 
+      <div id="p-lock" role="tabpanel" hidden><section class="block card"><h2>Stüdyo</h2><p class="note">Önce sahnede çal: halkaya vuruş ekle, ▶ ile başlat. İlk susturucu düşünce Stüdyo açılır; diğer bölümler oynadıkça gelir.</p></section></div>
       <div id="p-studio" role="tabpanel">
         <div class="topbar"><div class="subnav seg" role="group"><button data-act="tab" data-tab="studio" aria-pressed="true">Stüdyo</button><button data-act="tab" data-tab="coll" aria-pressed="false" data-bd="coll">Koleksiyon</button></div><nav class="secbar studio" id="secBar" aria-label="Stüdyo bölümleri"></nav></div>
         <section class="block card" data-sec="sahne"><h2><span class="ht">Sahne<button class="ib" data-act="info" aria-expanded="false" aria-label="Bilgi">i</button></span><span class="h2r"><span id="undoBox"></span><span class="seg" id="buyMode"></span></span></h2><div class="info" hidden>Her sahne yerinde bir enstrüman durur; desen yere aittir, seviye enstrümana. Her enstrümanın ölçü başına bir <b>nefesi</b> vardır: o kadar vuruşa kadar tam güç, fazlası her vuruşu zayıflatır; aksan iki nefes harcar. Düşmanlar art arda gelen aynı sese <b>alışır</b>: her ardışık vuruşta hasar ×0,85, bir es sıfırlar.</div><div id="slotList"></div><div id="slotAdd"></div></section>

@@ -19,7 +19,7 @@ def check(ok, what):
     print(('  ok  ' if ok else '  FAIL ') + what)
     if not ok: fails.append(what)
 
-SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};S.ui='kolay';S.nota=1e9;S.bestWave=6;S.open={syn:1,rhy:1,pat:1};S.famOpen={vur:1,tel:1};
+SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};window.__nb.unlockAll();S.ui='kolay';S.nota=1e9;S.bestWave=6;S.open={syn:1,rhy:1,pat:1};S.famOpen={vur:1,tel:1};
   S.slots=['davul','trampet','hihat','bas'];S.lv={davul:10,trampet:10,hihat:10,bas:10};S.up={};S.rowm={};
   ['A','B','S','F'].forEach(k=>S.pat[k]=S.pat[k].map(r=>r.map(()=>0)));nb.recalc();nb.renderPanels()}"""
 row = lambda p, k, i: p.evaluate("([k,i])=>window.__nb.S.pat[k][i].slice(0,16).join('')", [k, i])

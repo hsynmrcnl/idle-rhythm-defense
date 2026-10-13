@@ -36,6 +36,10 @@ with sync_playwright() as pw:
         check(tut['cv'] >= 240, 'öğretici açıkken de sahne yeterince büyük (kart %dpx, canvas %dpx)' % (tut['tut'], tut['cv']))
         if w == 375: p.screenshot(path=os.path.join(OUT, 'v13_tutorial_375.png'))
         p.click('#tut [data-act=tutSkip]'); p.wait_for_timeout(150)
+        # v26: yeni oyunda dock'ta yalnız Sahne; geri kalan ölçümler için her şey açılır
+        dk = p.evaluate("()=>[...document.querySelectorAll('.dk')].filter(d=>!d.hidden).map(d=>d.id)")
+        check(dk == ['d-stage'], 'yeni oyunda dock’ta yalnız Sahne (%s)' % dk)
+        p.evaluate("()=>window.__nb.unlockAll()"); p.wait_for_timeout(100)
         m = p.evaluate("""()=>{const r=q=>document.querySelector(q).getBoundingClientRect();const cv=r('#cv');
           return {scroll:document.scrollingElement.scrollHeight-innerHeight,cvW:cv.width,cvH:cv.height,cvR:cv.right,vw:innerWidth,
           cvB:cv.bottom,dock:r('#dock').top,gear:r('#t-set').right,top:!!document.querySelector('.top h1').offsetParent,
@@ -102,14 +106,14 @@ with sync_playwright() as pw:
                 if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'studio': p.click('#p-coll .subnav [data-tab=studio]'); p.wait_for_timeout(80)
             go_studio()
             vis = lambda: p.evaluate("()=>[...document.querySelectorAll('#p-studio [data-sec]')].filter(e=>!e.hidden).map(e=>e.dataset.sec)")
-            check(vis() == ['sahne', 'auto'], 'yeni oyunda Stüdyo’da yalnız Sahne ve Otomatik var (%s)' % vis())
+            check(vis() == ['sahne'], 'yeni oyunda Stüdyo’da yalnız Sahne var (%s)' % vis())
             p.click('#p-studio [data-sec=sahne] .ib'); p.wait_for_timeout(80)
             check(p.evaluate("()=>!document.querySelector('#p-studio [data-sec=sahne] .info').hidden"), 'ⓘ açıklamayı açıyor')
             p.click('#d-def'); p.wait_for_timeout(80)
             p.evaluate("()=>{const S=window.__nb.S;S.lv.trampet=1;S.slots[1]='trampet';window.__nb.renderPanels()}"); p.wait_for_timeout(400)
             check(p.evaluate("()=>!document.querySelector('#d-studio .dot').hidden"), 'yeni bölüm açılınca Stüdyo simgesinde nokta')
             go_studio()
-            check(vis() == ['sahne', 'auto', 'syn'] and p.locator('#p-studio .card.isnew .newtag').count() == 1, '2. enstrümanla Uyum (Kolay’da Groove ile tek kart) “Yeni” etiketiyle açılıyor (%s)' % vis())
+            check(vis() == ['sahne', 'auto', 'syn'] and p.locator('#p-studio .card.isnew .newtag').count() == 2, '2. enstrümanla Uyum ve Otomatik “Yeni” etiketiyle açılıyor (%s)' % vis())
             p.evaluate("()=>{const S=window.__nb.S;S.bestWave=5;S.up.sef=1;window.__nb.renderPanels()}"); p.wait_for_timeout(400)
             check(vis() == ['sahne', 'auto', 'rhy', 'pat', 'plan', 'syn'], 'dalga 5 ve Şef ile Ritim stüdyosu, Desen ve Şarkı planı açık (%s)' % vis())
             p.click('#d-def'); p.wait_for_timeout(100)
@@ -145,10 +149,12 @@ with sync_playwright() as pw:
             p.click('#setBox [data-act=mute][data-v="0"]')
             # öğretici: Savunma adımı dock simgesini vurguluyor
             open_set(); p.click('#p-set [data-act=tutRestart]')
-            p.evaluate("()=>{window.__nb.S.tut.s=8}")
+            nq = p.evaluate("()=>window.__nb.S.tipq.length")
+            check(nq >= 10, 'öğreticiyi yeniden başlatınca açılmış yerlerin kartları sıraya giriyor (%d)' % nq)
+            p.evaluate("()=>{const S=window.__nb.S;S.tut.done=true;S.tipq=['def']}")
             try: p.wait_for_selector('#d-def.tut-hi', state='attached', timeout=2000)
             except Exception: pass
-            check(p.locator('#d-def.tut-hi').count() == 1, 'öğretici Savunma adımında dock simgesi vurgulu (adım %s)' % p.evaluate("()=>window.__nb.S.tut.s"))
+            check(p.locator('#d-def.tut-hi').count() == 1, 'Savunma kartında dock simgesi vurgulu')
             # İngilizce
             open_set()
             with p.expect_navigation(): p.click('#setBox [data-act=lang][data-v="en"]')
@@ -163,7 +169,7 @@ with sync_playwright() as pw:
     print('masaüstü 1280x800')
     ctx = b.new_context(viewport={'width': 1280, 'height': 800}); p = ctx.new_page(); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
-    p.goto(URL); p.wait_for_timeout(600)
+    p.goto(URL); p.wait_for_timeout(600); p.evaluate("()=>window.__nb.unlockAll()"); p.wait_for_timeout(100)
     d = p.evaluate("()=>({dock:getComputedStyle(document.getElementById('dock')).display,tabs:getComputedStyle(document.querySelector('.tabs')).display,tap:!!document.getElementById('tap').offsetParent,h1:getComputedStyle(document.querySelector('.top h1')).display})")
     check(d['dock'] == 'none' and d['tabs'] != 'none' and d['tap'] and d['h1'] != 'none', 'masaüstü düzeni aynı (dock yok, sekmeler ve düğmeler yerinde)')
     p.click('#t-set'); p.wait_for_timeout(100)

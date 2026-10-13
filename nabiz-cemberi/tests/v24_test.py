@@ -19,7 +19,7 @@ def check(ok, what):
     print(('  ok  ' if ok else '  FAIL ') + what)
     if not ok: fails.append(what)
 
-SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};S.ui='kolay';S.nota=5e6;S.wave=12;S.bestWave=15;S.famOpen.tel=1;S.open={syn:1,rhy:1,pat:1};
+SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};window.__nb.unlockAll();S.ui='kolay';S.nota=5e6;S.wave=12;S.bestWave=15;S.famOpen.tel=1;S.open={syn:1,rhy:1,pat:1};
   S.slots=['davul','trampet','hihat','bas'];S.lv={davul:30,trampet:22,hihat:11,bas:8,clap:3};S.def={hasar:3,menzil:2,nabiz:2};nb.renderPanels()}"""
 SOLO = """()=>{const nb=window.__nb,S=nb.S;S.up.solo=1;S.up.sdevir=1;S.up.suzun=1;S.slots[2]='gitar';S.lv.gitar=2;S.solo={2:1};
   S.solos={2:{notes:[{t:0,len:3,r:0,art:'none'},{t:6,len:1,r:2,art:'none'}],style:'hendrix'}};nb.renderPanels()}"""
@@ -84,11 +84,11 @@ with sync_playwright() as pw:
         check(not o, 'Stüdyo yana taşmıyor %s' % o)
         # öğretici seviye adımı gizli bölümdeki düğmeyi vurguluyorsa o bölüme geçer
         p.tap('#secBar [data-k=auto]'); p.wait_for_timeout(80)
-        p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=1;S.tut={s:3,done:false};window.__nb.renderPanels()}")
+        p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=1;S.tipq=['studio'];window.__nb.renderPanels()}")
         try: p.wait_for_selector('#lvb-davul.tut-hi', state='visible', timeout=2500)
         except Exception: pass
         check(p.is_visible('#lvb-davul') and shown() == ['sahne'], 'öğretici vurguladığı düğmenin bölümünü açıyor (%s)' % shown())
-        p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=30;S.tut={s:0,done:true};window.__nb.renderPanels()}")
+        p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=30;S.tipq=[];window.__nb.renderPanels()}")
         # Koleksiyon: aile simgeleri, kilitli ailede koşullar, açık ailede sıkı satır
         p.click('#p-studio .subnav [data-tab=coll]'); p.wait_for_timeout(120)
         fb = p.evaluate("()=>[...document.querySelectorAll('#famBar .sb')].map(e=>[e.dataset.f,e.classList.contains('locked'),e.textContent.trim()])")

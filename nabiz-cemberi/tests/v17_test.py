@@ -24,7 +24,7 @@ with sync_playwright() as pw:
     p = b.new_page(viewport={'width': 1280, 'height': 800}); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto('http://127.0.0.1:%d/' % PORT); p.wait_for_timeout(500)
-    p.evaluate("()=>{const S=window.__nb.S;S.tut={s:0,done:true};S.ui='detay';S.scale='minor';S.meter='m44';window.__nb.recalc()}")
+    p.evaluate("()=>{const S=window.__nb.S;S.tut={s:0,done:true};window.__nb.unlockAll();S.ui='detay';S.scale='minor';S.meter='m44';window.__nb.recalc()}")
     check(p.evaluate("()=>window.__nb.S.harm") == 'zengin', 'varsayılan armoni zengin')
     q = lambda s: p.evaluate("(s)=>({f:window.__nb.chordFreqsAt(0,s),l:window.__nb.chordLabel(0,s),w:window.__nb.walkSemi(0,s)})", s)
     # minör pop: Am F C G → Am7 Fmaj7 Cmaj7 G7sus4→G7, sesler A3–G#4 aralığında

@@ -17,7 +17,7 @@ def check(ok, what):
     print(('  ok  ' if ok else '  FAIL ') + what)
     if not ok: fails.append(what)
 
-SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};S.ui='kolay';S.nota=1e9;S.bestWave=6;S.open={syn:1,rhy:1,pat:1};
+SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};window.__nb.unlockAll();S.ui='kolay';S.nota=1e9;S.bestWave=6;S.open={syn:1,rhy:1,pat:1};
   S.slots=['davul','trampet',null,null];S.lv={davul:5,trampet:3};S.rowm={};
   ['A','B','S','F'].forEach(k=>S.pat[k]=S.pat[k].map(r=>r.map(()=>0)));for(const s of [0,4,8,12])S.pat.A[0][s]=1;S.pat.A[1][0]=1;S.rowm.A1='m';nb.recalc();nb.renderPanels()}"""
 
@@ -27,7 +27,8 @@ with sync_playwright() as pw:
     p = b.new_page(viewport={'width': 1280, 'height': 800}); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(400)
-    check('Yoğun' in p.text_content('#tutP'), 'öğretici Kolay’da hazır ritimleri anlatıyor')
+    # v26: masaüstünde ilk adımda Stüdyo kapalı → hücreye dokunmayı anlatır; telefonda alttaki Yoğun'u da söyler (aşağıda)
+    check('hücreye dokun' in p.text_content('#tutP') and 'Yoğun' not in p.text_content('#tutP'), 'masaüstünde ilk adım hücreye dokunmayı anlatıyor')
     p.click('#t-set'); p.wait_for_timeout(80); p.click('#setBox [data-act=ui][data-v=detay]'); p.wait_for_timeout(150)
     check('hücreye dokun: vuruş ekle' in p.text_content('#tutP'), 'Detaylı’da eski öğretici metni')
     p.evaluate(SEED); p.click('[data-act=tab][data-tab=studio]'); p.wait_for_timeout(50)
@@ -58,9 +59,10 @@ with sync_playwright() as pw:
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     ctx.close()
     # EN
-    p = b.new_page(viewport={'width': 1280, 'height': 800}); errs = []
+    ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); p = ctx.new_page(); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(300)
+    check('Yoğun' in p.text_content('#tutP'), 'telefonda Kolay öğretici alttaki Yoğun’u anlatıyor')
     p.evaluate("()=>{window.__nb.S.lang='en';window.__nb.S.tut={s:0,done:false};localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(window.__nb.S))}")
     with p.expect_navigation(): p.reload()
     p.wait_for_timeout(400)

@@ -17,7 +17,7 @@ def check(ok, what):
     print(('  ok  ' if ok else '  FAIL ') + what)
     if not ok: fails.append(what)
 
-SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};S.ui='kolay';S.nota=5000;S.slots=['davul','trampet','hihat',null];S.lv={davul:3,trampet:2,hihat:1};S.up={};S.def={};
+SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};window.__nb.unlockAll();S.ui='kolay';S.nota=5000;S.slots=['davul','trampet','hihat',null];S.lv={davul:3,trampet:2,hihat:1};S.up={};S.def={};
   ['A','B','S','F'].forEach(k=>S.pat[k]=S.pat[k].map(r=>r.map(()=>0)));for(const s of [0,4,8,12])S.pat.A[0][s]=1;S.pat.A[1][4]=1;S.pat.A[1][12]=1;for(const s of [2,6,10,14])S.pat.A[2][s]=1;nb.recalc();nb.renderPanels()}"""
 
 with sync_playwright() as pw:
