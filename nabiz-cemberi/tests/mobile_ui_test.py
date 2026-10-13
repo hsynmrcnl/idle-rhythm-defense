@@ -43,6 +43,11 @@ with sync_playwright() as pw:
         check(m['scroll'] <= 0, 'sahne kaydırmasız (fazla %dpx)' % m['scroll'])
         check(abs(m['cvW'] - m['cvH']) < 1 and m['cvR'] <= m['vw'], 'canvas kare ve ekranda (%dx%d)' % (m['cvW'], m['cvH']))
         check(m['cvB'] <= m['dock'], 'sahne dock’un üstünde')
+        # v22 düzeltmesi: sahne yapışkan konumun top değeriyle aşağı kaymasın (çentikli telefonda alt ped sırası kayboluyordu)
+        pd = p.evaluate("""()=>{const pads=[...document.querySelectorAll('#pads .pad')],g=document.querySelector('.grid'),st=document.querySelector('.stage');
+          return {last:pads.length?pads[pads.length-1].getBoundingClientRect().bottom:0,dock:document.getElementById('dock').getBoundingClientRect().top,
+          off:st.getBoundingClientRect().top-g.getBoundingClientRect().top-parseFloat(getComputedStyle(g).paddingTop),top:getComputedStyle(st).top}}""")
+        check(pd['last'] <= pd['dock'] and abs(pd['off']) < 1, 'son ped sırası dock’un üstünde, sahne kaymıyor (alt %d / dock %d, kayma %.0f, top %s)' % (pd['last'], pd['dock'], pd['off'], pd['top']))
         check(not m['top'] and m['hidden'], 'başlık, EN, alttaki Başlat, Ritme vur, Ses, Örnek şarkı ve üst sekmeler gizli')
         check(m['gear'] >= m['vw'] - 20, 'Ayarlar sağ üstte')
         # boş yere dokun → ritme vur (çalmıyorken uyarı verir)
