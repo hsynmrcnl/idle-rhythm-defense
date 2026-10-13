@@ -11,7 +11,7 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - [x] Sahne katmanları gelire gerçekten ×1,1 ekler (Analiz'de de görünür)
 - [x] Nabız sıfırlanınca bir dalga geri gidilir
 
-## 3. Küçük temizlik (v21, küçük)
+## 3. Küçük temizlik (v22, küçük)
 - [ ] Öğretici Kolay'a göre: hücre hücre vuruş yerine Sade/Hareketli/Yoğun ve Hepsini düzenle anlatılır; Nefes adımı sadeleşir
 - [ ] Uyum ipucuna **Uygula** düğmesi (ilgili satırı otomatik yazar)
 - [ ] Telefonda Sahne ekranındaki ped başlığına Sade/Hareketli/Yoğun
