@@ -45,11 +45,13 @@ function leadTone(t,f,p,a){const dur=p.dur||0.4;const o=ac.createOscillator();o.
 function brassTone(t,f,p,a){const dur=p.dur||0.3;const o=ac.createOscillator();o.type='sawtooth';o.frequency.value=f;const fl=ac.createBiquadFilter();fl.type=p.nasal?'bandpass':'lowpass';if(p.nasal)fl.Q.value=4;fl.frequency.setValueAtTime(p.nasal?f*3:300,t);fl.frequency.exponentialRampToValueAtTime(p.lp||3000,t+0.08);const g=ac.createGain();env(g,t,(p.a||0.15)*a,dur,0.02);o.connect(fl);fl.connect(g);g.connect(music);g.connect(send);if(p.growl){const o2=ac.createOscillator();o2.type='sawtooth';o2.frequency.value=f*1.01;o2.connect(fl);o2.start(t);o2.stop(t+dur+0.1)}o.start(t);o.stop(t+dur+0.1);return g}
 let SOLO_F=0;
 let CUR_B=0;
-const chordAt=s=>SOLO_F?[SOLO_F,SOLO_F*1.25,SOLO_F*1.5]:chordFreqs(curChord(CUR_B,s));
+const chordAt=s=>SOLO_F?[SOLO_F,SOLO_F*1.25,SOLO_F*1.5]:chordFreqsAt(CUR_B,s);
 const rootAt=s=>rootFreq(curChord(CUR_B,s));
 function crashVoice(t,a){try{GEN.metal(t,a||1,IDX.zil.v,0)}catch(e){}}
-const arpF=s=>chordAt(s)[[0,1,2,1][MI.pos[s]%4]]*2;
-function pitchOf(p,s){if(SOLO_F)return SOLO_F*Math.pow(2,p.oct||0);let f;switch(p.pitch){case 'root':f=rootAt(s);break;case 'arp':f=arpF(s);break;case 'high':f=arpF(s)*2;break;case 'low':f=rootAt(s)/2;break;default:f=p.f||220}return f*Math.pow(2,p.oct||0)}
+/* arpej: zengin armonide kök konumunda kök–üçlü–beşli–yedili, üçlüde kök–üçlü–beşli–üçlü */
+const arpF=s=>{if(SOLO_F||!richOn())return chordAt(s)[[0,1,2,1][MI.pos[s]%4]]*2;const ch=curChord(CUR_B,s),t=chordTonesAt(CUR_B,s),k=(t.length>3?[0,1,2,3]:[0,1,2,1])[MI.pos[s]%4];return scaleBase()*Math.pow(2,(chordSemi(ch)+t[k])/12)*2};
+const bassAt=s=>scaleBase()/2*Math.pow(2,walkSemi(CUR_B,s)/12);
+function pitchOf(p,s){if(SOLO_F)return SOLO_F*Math.pow(2,p.oct||0);let f;switch(p.pitch){case 'root':f=p.walk?bassAt(s):rootAt(s);break;case 'arp':f=arpF(s);break;case 'high':f=arpF(s)*2;break;case 'low':f=rootAt(s)/2;break;default:f=p.f||220}return f*Math.pow(2,p.oct||0)}
 const KSC={};
 function ksBuf(f,dur,bright){const key=Math.round(f*4)+':'+dur+':'+bright;if(KSC[key])return KSC[key];const sr=ac.sampleRate,N=Math.max(2,Math.round(sr/f)),len=Math.floor(sr*dur),buf=ac.createBuffer(1,len,sr),d=buf.getChannelData(0);const r=rng(Math.round(f*7)+11);let x=0;for(let i=0;i<N;i++){x=x*(1-bright)+(r()*2-1)*bright;d[i]=x}const g=Math.pow(0.001,N/(sr*dur*1.6));for(let i=N;i<len;i++){d[i]=g*0.5*(d[i-N]+d[i-N+1])}return KSC[key]=buf}
 const soloSeqs={};
@@ -118,7 +120,9 @@ function soloPlay(x,t,nt,sd,dyn){const a=artEff(x,nt.art),L=noteLenEff(nt),row=n
   if(a==='fb'){const f=soloFreq2(x,row),t16=t+16*sd,e2=t+L*sd+0.2,sq=ac.createOscillator(),sg=ac.createGain();sq.type='sine';sq.frequency.setValueAtTime(f*4,t16);sq.frequency.exponentialRampToValueAtTime(f*7,e2);sg.gain.setValueAtTime(0.0001,t16);sg.gain.exponentialRampToValueAtTime(0.09*dyn,t16+0.3);sg.gain.setValueAtTime(0.09*dyn,e2-0.15);sg.gain.exponentialRampToValueAtTime(0.0001,e2);sq.connect(sg);sg.connect(music);sq.start(t16);sq.stop(e2+0.05);Nz(t16,'highpass',3000,0,0.05*dyn,e2-t16,music)}}}
 function duck(t){side.gain.setValueAtTime(1,t);side.gain.linearRampToValueAtTime(0.45,t+0.012);side.gain.linearRampToValueAtTime(1,t+0.22)}
 /* ---- sampled instruments: General MIDI soundfonts (gleitz/midi-js-soundfonts, FluidR3_GM) loaded per instrument; any failure falls back to synthesis ---- */
-function voice(x,t,v,s,solo,dyn){const a=(v===2?1.5:1)*(lvOf(x.id)>=25?1.1:1)*(solo?1.3:1)*(dyn||1);if(solo&&x.fam!=='vur')SOLO_F=soloFreq(solo.win,solo.pos,s);if(!solo&&sfVoice(x,t,a,s)){SOLO_F=0;return}try{GEN[x.v.g](t,a,x.v,s)}catch(e){}SOLO_F=0;if(lvOf(x.id)>=25&&x.fam==='vur'&&x.v.g==='kick')O('sine',55,t,0.4,0.2*a,drum)}
+function voice(x,t,v,s,solo,dyn){let a=(v===2?1.5:1)*(lvOf(x.id)>=25?1.1:1)*(solo?1.3:1)*(dyn||1);if(solo&&x.fam!=='vur')SOLO_F=soloFreq(solo.win,solo.pos,s);
+ /* dört sesli akor üç sesli kadar yüksek: genlik √(3/n) */
+ if(!SOLO_F&&(x.v.pitch==='chord'||x.v.chord||x.v.g==='pad'||x.v.g==='organ'||x.v.g==='vox')){const n=chordAt(s).length;if(n>3)a*=Math.sqrt(3/n)}if(!solo&&sfVoice(x,t,a,s)){SOLO_F=0;return}try{GEN[x.v.g](t,a,x.v,s)}catch(e){}SOLO_F=0;if(lvOf(x.id)>=25&&x.fam==='vur'&&x.v.g==='kick')O('sine',55,t,0.4,0.2*a,drum)}
 function playStep(s,pk,t,b,k){const p=S.pat[pk],sa=soloActive(b),pa=planAt(b),dyn=dynAt(b);k=k||1;CUR_B=b;const fb=k===1&&fillBar(b);if(k===1&&s===0&&pa.barIn===0&&b>0&&fillBar(b-1)&&fillHits()>=4)crashVoice(t,0.9*dyn);for(let i=0;i<S.slots.length;i++){const x=slotIns(i);if(!x)continue;if(needleOf(i)!==k)continue;if(muteUntil[i]>t)continue;if(pa.sec.solo&&isSolo(i)){const dp=duetPart(i);if(dp<0&&sa!==i)continue;if(x.fam!=='vur'&&hasSoloNotes(i)){const sd=60/curBpm(b)/4,off=(pa.barIn%2)*MI.N+s;if(!duetPlays(i,off))continue;soloNotesOf(i).forEach(nt=>{if(nt.t!==off)return;soloPlay(x,t,nt,sd,dyn*(dp>=0?1.1:1))});continue}const vs=S.pat.S[i][s];if(!vs)continue;voice(x,t,vs,s,{win:Math.floor(b/SEC_BARS),pos:pa.barIn},dyn);continue}const v=(fb&&fillZone(s)&&x.fam==='vur')?S.pat.F[i][s]:p[i][s];if(!v)continue;if(!allowed(pa.sec,x,i))continue;voice(x,t,v,s,null,dyn);if(x.id==='davul'&&S.up.side)duck(t)}}
 
 let playing=false,timer=0,nextT=0,step=0,bar=0,queue=[],grid=[],beats=[],hitBar=false,playPk='A',lastLogic=0;

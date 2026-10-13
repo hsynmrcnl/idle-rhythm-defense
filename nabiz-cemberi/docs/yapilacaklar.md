@@ -17,10 +17,10 @@ Oyun değerlendirmesinden çıkan liste. Paylaşma, sıralama ve başkalarının
 
 ## 3. grup: müzik içeriği (önce laboratuvar sayfasında dinle)
 Dinleme ve karar sayfası: https://claude.ai/artifact/MtAYigjhjf6d3dwahYaAKh (kararlar sayfanın `deney` koleksiyonunda)
-- [ ] Komalı Hicaz/Kürdi akordu (53-TET) — küçük-orta
-- [ ] Zengin armoni: 7'li, sus, çevrim, yürüyen bas — orta
-- [ ] 12/8 shuffle ölçüsü — küçük
-- [ ] Hayalet nota (hafif vuruş) — orta
+- [x] Zengin armoni: 7'li, add9, sus, yakın ses yürüyüşü, yürüyen bas — v17'de yapıldı (Görünüm'den Üçlü'ye dönülür)
+- [–] Komalı Hicaz/Kürdi akordu (53-TET) — dinlendi, fark duyulmadı; yapılmayacak
+- [–] 12/8 shuffle ölçüsü — dinlendi, gerek yok
+- [–] Hayalet nota (hafif vuruş) — dinlendi, gerek yok
 
 ## 4. grup: oyun dengesi (önce ölçüm)
 - [ ] Ekonomi simülasyonu (hızlı ileri sarma botu) — orta
