@@ -294,7 +294,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .stats:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:10px}
 .stat.more .lbl::after{content:"";display:inline-block;width:5px;height:5px;margin-left:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);opacity:.75}
 .stats[aria-expanded="true"] .stat.more{border-color:var(--acc)}
-@media (max-width:940px){.stage{position:relative}}
+@media (max-width:940px){.stage{position:relative;top:auto}}
 .anl{position:absolute;left:0;right:0;top:var(--anlTop,56px);z-index:6;max-height:min(70vh,560px);overflow-y:auto;overscroll-behavior:contain;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px 12px;box-shadow:0 14px 36px rgba(0,0,0,.5)}
 .anl[hidden]{display:none}
 .anl .ah{display:flex;align-items:center;justify-content:space-between;gap:8px}
