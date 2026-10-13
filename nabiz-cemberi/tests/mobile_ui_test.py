@@ -102,9 +102,9 @@ with sync_playwright() as pw:
             p.evaluate("()=>{const S=window.__nb.S;S.lv.trampet=1;S.slots[1]='trampet';window.__nb.renderPanels()}"); p.wait_for_timeout(400)
             check(p.evaluate("()=>!document.querySelector('#d-studio .dot').hidden"), 'yeni bölüm açılınca Stüdyo simgesinde nokta')
             go_studio()
-            check(vis() == ['sahne', 'syn', 'groove'] and p.locator('#p-studio .card.isnew .newtag').count() == 2, '2. enstrümanla Uyum ve Groove “Yeni” etiketiyle açılıyor (%s)' % vis())
+            check(vis() == ['sahne', 'syn'] and p.locator('#p-studio .card.isnew .newtag').count() == 1, '2. enstrümanla Uyum (Kolay’da Groove ile tek kart) “Yeni” etiketiyle açılıyor (%s)' % vis())
             p.evaluate("()=>{const S=window.__nb.S;S.bestWave=5;S.up.sef=1;window.__nb.renderPanels()}"); p.wait_for_timeout(400)
-            check(vis() == ['sahne', 'rhy', 'pat', 'plan', 'syn', 'groove'], 'dalga 5 ve Şef ile Ritim stüdyosu, Desen ve Şarkı planı açık (%s)' % vis())
+            check(vis() == ['sahne', 'rhy', 'pat', 'plan', 'syn'], 'dalga 5 ve Şef ile Ritim stüdyosu, Desen ve Şarkı planı açık (%s)' % vis())
             p.click('#d-def'); p.wait_for_timeout(100)
             check(p.locator('#p-studio .card.isnew').count() == 0, 'Stüdyo’dan çıkınca “Yeni” etiketleri kalkıyor')
             fit = p.evaluate("()=>{const r=document.getElementById('rack');return r.scrollHeight-r.clientHeight}")
@@ -138,8 +138,10 @@ with sync_playwright() as pw:
             p.click('#setBox [data-act=mute][data-v="0"]')
             # öğretici: Savunma adımı dock simgesini vurguluyor
             open_set(); p.click('#p-set [data-act=tutRestart]')
-            p.evaluate("()=>{window.__nb.S.tut.s=8}"); p.wait_for_timeout(400)
-            check(p.locator('#d-def.tut-hi').count() == 1, 'öğretici Savunma adımında dock simgesi vurgulu')
+            p.evaluate("()=>{window.__nb.S.tut.s=8}")
+            try: p.wait_for_selector('#d-def.tut-hi', state='attached', timeout=2000)
+            except Exception: pass
+            check(p.locator('#d-def.tut-hi').count() == 1, 'öğretici Savunma adımında dock simgesi vurgulu (adım %s)' % p.evaluate("()=>window.__nb.S.tut.s"))
             # İngilizce
             open_set()
             with p.expect_navigation(): p.click('#setBox [data-act=lang][data-v="en"]')

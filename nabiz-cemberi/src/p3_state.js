@@ -1,18 +1,18 @@
 
 /* ================= state ================= */
 const mkPat=()=>Array.from({length:MAXSLOTS},()=>Array(18).fill(0));
-const freshRun=()=>{const A=mkPat();A[0][0]=1;A[0][8]=1;return{nota:25,slots:['davul',null,null,null],lv:{davul:1},pat:{A,B:mkPat(),S:mkPat(),F:mkPat()},edit:'A',bpm:90,bmax:90,seri:0,up:{},def:{},solo:{},solos:{},plan:null,needle:{},wave:1,runEarned:0,meter:'m44',scale:'minor',prog:Array(8).fill('pop'),prate:'beat'}};
-const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin'});
+const freshRun=()=>{const A=mkPat();A[0][0]=1;A[0][8]=1;return{nota:25,slots:['davul',null,null,null],lv:{davul:1},pat:{A,B:mkPat(),S:mkPat(),F:mkPat()},edit:'A',bpm:90,bmax:90,seri:0,up:{},def:{},solo:{},solos:{},plan:null,needle:{},wave:1,runEarned:0,meter:'m44',scale:'minor',prog:Array(8).fill('pop'),prate:'beat',progAuto:true,rowm:{}}};
+const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin',ui:'kolay',det:{}});
 const KEY='nabiz-cemberi-v3';
 let S=Object.assign(freshRun(),freshMeta());
 try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.v===3&&d.pat&&Array.isArray(d.pat.A)&&Array.isArray(d.slots)){S=Object.assign(S,d);if(!d.tut)S.tut=null}}}catch(e){}
 function normalizeS(){
-['up','def','found','stage','fxo','lv','themes','famOpen','solo','needle','solos','open'].forEach(k=>{if(!S[k]||typeof S[k]!=='object')S[k]={}});
+['up','def','found','stage','fxo','lv','themes','famOpen','solo','needle','solos','open','det','rowm'].forEach(k=>{if(!S[k]||typeof S[k]!=='object')S[k]={}});
 if(!Array.isArray(S.orders))S.orders=[];
 while(S.pat.A.length<MAXSLOTS)S.pat.A.push(Array(18).fill(0));
 while(S.pat.B.length<MAXSLOTS)S.pat.B.push(Array(18).fill(0));if(!Array.isArray(S.pat.S))S.pat.S=mkPat();while(S.pat.S.length<MAXSLOTS)S.pat.S.push(Array(18).fill(0));if(S.edit==='S'&&!S.up.solo)S.edit='A';
 if(!Array.isArray(S.pat.F))S.pat.F=mkPat();while(S.pat.F.length<MAXSLOTS)S.pat.F.push(Array(18).fill(0));if(S.edit==='F'&&!S.up.dolgu)S.edit='A';
-if(!Array.isArray(S.prog)||S.prog.length!==8)S.prog=Array(8).fill('pop');if(S.prate!=='bar')S.prate='beat';
+if(!Array.isArray(S.prog)||S.prog.length!==8)S.prog=Array(8).fill('pop');if(typeof S.progAuto!=='boolean')S.progAuto=S.prog.every(p=>p==='pop');if(S.prate!=='bar')S.prate='beat';
 S.slots=S.slots.slice(0,MAXSLOTS).map(id=>id&&IDX[id]?id:null);
 while(S.slots.length<4)S.slots.push(null);
 if(!S.bmax)S.bmax=Math.max(90,S.bpm);
@@ -23,7 +23,7 @@ S.famOpen.vur=1;[['tel',5],['tus',12],['nef',20],['ele',30],['dun',45]].forEach(
 if(S.stage.crown){S.stage.wall=1;delete S.stage.crown}
 if(!S.themes[S.theme])S.theme='neon';
  if(!S.tut||typeof S.tut!=='object')S.tut={s:0,done:(S.kills>0||S.albums.length>0||Object.keys(S.lv).length>1||(S.total||0)>50)};
- if(S.sfx!==false)S.sfx=true;if(S.dnum!==false)S.dnum=true;if(S.harm!=='uclu')S.harm='zengin';if(S.lang!=='en')S.lang='tr';
+ if(S.sfx!==false)S.sfx=true;if(S.dnum!==false)S.dnum=true;if(S.harm!=='uclu')S.harm='zengin';if(S.ui!=='detay')S.ui='kolay';delete S.autoUp;if(S.lang!=='en')S.lang='tr';
  if(!S.mn||typeof S.mn!=='object')S.mn={};if(!S.auto||typeof S.auto!=='object')S.auto={lv:true,ord:true,ins:true,alb:false};if(!S.cities||typeof S.cities!=='object')S.cities={};S.efsane=Math.max(0,Math.floor(S.efsane||0));S.tours=Math.max(0,Math.floor(S.tours||0));S.city=((S.city|0)%CITIES.length+CITIES.length)%CITIES.length;
 }
 normalizeS();
@@ -227,7 +227,12 @@ const habF=run=>Math.pow(HAB,Math.max(0,run-1));
 function bookFx(p){const fx={row:{},roleD:{},famD:{},nota:1,dmg:1,slow:0,meter:0,wall:1,crit:0,nefes:{},on:{}};
  S.slots.forEach((id,si)=>{if(!id)return;const st=STEPS(p,si).join(',');const e=BOOK.find(b=>S.found[b.id]&&b.m===S.meter&&b.s.join(',')===st);if(!e)return;fx.on[e.id]=si;const f=e.fx||{};fx.row[si]=(fx.row[si]||1)*(f.row||1.3);if(f.roleD)Object.entries(f.roleD).forEach(([r,m])=>fx.roleD[r]=(fx.roleD[r]||1)*m);if(f.famD)Object.entries(f.famD).forEach(([r,m])=>fx.famD[r]=(fx.famD[r]||1)*m);if(f.nota)fx.nota*=f.nota;if(f.dmg)fx.dmg*=f.dmg;if(f.slow)fx.slow=Math.max(fx.slow,f.slow);if(f.meter)fx.meter+=f.meter;if(f.wall)fx.wall*=f.wall;if(f.crit)fx.crit=Math.max(fx.crit,f.crit);if(f.nefes)fx.nefes[si]=(fx.nefes[si]||0)+f.nefes});
  return fx}
+/* otomatik akor (v19, S.progAuto): nakarat/düşüş 'klasik' (tonikte başlar), ondan önceki bölüm V'de biten yürüyüş (kadans), makamda kıta 'makam', solo ve kalanlar 'pop' → zıtlık + kadans + makam bonusları */
+function autoProgApply(){if(!S.progAuto)return;const ps=PROGS[S.scale]||PROGS.minor,pl=planArr(),mk=(S.scale==='hicaz'||S.scale==='kurdi')&&ps.makam,isB=t=>SECTS[t].pk==='B';
+ const toV=['kadans','endulus','blues'].find(k=>ps[k]&&ps[k].c[3][0]===7&&ps[k].c[3][1]!=='5'),chorus=ps.klasik&&ps.klasik.c[0][0]===0?'klasik':'pop';
+ for(let i=0;i<8;i++){const t=pl[i%pl.length],nx=pl[(i+1)%pl.length];S.prog[i]=SECTS[t].solo?'pop':isB(t)?chorus:(isB(nx)&&toV)?toV:mk?'makam':'pop'}}
 function recalc(){
+ autoProgApply();
  for(const pk of ['A','B','S','F']){const p=S.pat[pk];BK[pk]=bookFx(p);NF[pk]=S.slots.map((id,si)=>nefesF(p,si,pk));RUN[pk]=S.slots.map((id,si)=>runsOf(p,si));
   const syn={},rm=S.slots.map(()=>1);SYN.forEach(y=>{const o=y.t(p);const ks=Object.keys(o);if(ks.length){syn[y.id]=1;ks.forEach(si=>rm[si]*=y.m)}});SYNON[pk]=syn;
   const bk=BK[pk];S.slots.forEach((id,si)=>{if(!id)return;const x=IDX[id];rm[si]*=(bk.row[si]||1)*(bk.roleD[x.role]||1)*(bk.famD[x.fam]||1)});ROWM[pk]=rm;BOOKON[pk]=bk.on;
@@ -262,7 +267,9 @@ const tourM=()=>(1+0.03*S.efsane)*(1+0.02*Object.keys(S.cities).length);
 const cityM=()=>{const c=cityOf();return (S.scale===c.scale?1.1:1)*(S.meter===c.meter?1.1:1)};
 const tourGain=()=>Math.max(1,Math.round(2*Math.sqrt(S.hayran)+albumsN()));
 const canTour=()=>albumsN()>=TOUR_AL;
-const globalM=()=>seriM()*upM()*fanM()*bookM()*fitM()*meterM()*scaleM()*waveM()*tourM()*cityM();
+/* sahne katmanları (Görünüm): albümden sonra da kalır, her biri gelire ×1,1 */
+const stageM=()=>Math.pow(1.1,SUP.filter(u=>S.stage[u.id]).length);
+const globalM=()=>seriM()*upM()*fanM()*bookM()*fitM()*meterM()*scaleM()*waveM()*tourM()*cityM()*stageM();
 const curBpm=b=>S.bpm*tempoMulAt(b||0);
 const barDur=()=>60/S.bpm*MI.N/4;
 function rate(){return planAvg('n')*globalM()*planBonus()*(S.bpm*4/60)/MI.N}

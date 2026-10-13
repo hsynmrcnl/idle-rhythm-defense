@@ -13,7 +13,7 @@ function laneDist(a,b){const d=Math.abs(a-b);return S.layout==='circle'?Math.min
 function bounty(e){const T=ETYPES[e.ty];return(2*Math.pow(1.18,e.w-1)*T.b+rate()*0.4*T.b)*bountyM()}
 function kill(e,k,now){const g=bounty(e);earn(g);S.kills++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);if(S.dnum!==false&&pops.length<48)pops.push({e,t:'+♪ '+fmt(g),life:1,k:1});if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
 function leak(e,k,now){const T=ETYPES[e.ty];let dmg=T.dmg*(1+0.03*e.w);if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}core.hp-=dmg;retreatFlash=Math.max(retreatFlash,0.6);if(T.mute){const cands=S.slots.map((id,si)=>id?si:-1).filter(x=>x>=0);if(cands.length){const si=cands[Math.floor(Math.random()*cands.length)];muteUntil[si]=now+barDur();msg(slotIns(si).n+' bir ölçü susturuldu')}}enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;if(core.hp<=0)retreat(now)}
-function retreat(now){retreatCount++;const from=S.wave,to=Math.max(1,Math.floor(S.wave*0.8));enemies=[];core.hp=hpMax();core.sh=0;retreatFlash=1.5;msg('Sessizlik A.Ş. sahneyi bastı. Dalga '+from+' → '+to+'. Nabız tazelendi.');startWave(to,now)}
+function retreat(now){retreatCount++;const from=S.wave,to=Math.max(1,S.wave-1);enemies=[];core.hp=hpMax();core.sh=0;retreatFlash=1.5;msg('Sessizlik A.Ş. sahneyi bastı. Dalga '+from+' → '+to+'. Nabız tazelendi.');startWave(to,now)}
 function wallHit(e){const k=Math.floor(e.a*WN)%WN;const E=wallE[k];if(E<=0.02)return 0;const b=wallBase(),top=b+Math.min(1,E)*wallSpan();if(e.d>=b&&e.d<=top)return E*wallD[k];return 0}
 function logic(now){
  const dt=clamp(now-lastLogic,0,0.1);lastLogic=now;if(dt<=0||!wave)return;

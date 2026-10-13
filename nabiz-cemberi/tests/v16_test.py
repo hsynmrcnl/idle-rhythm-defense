@@ -19,7 +19,7 @@ def check(ok, what):
     if not ok: fails.append(what)
 
 # öğretici kapalı, birkaç enstrüman ve bölüm açık bir kayıt
-SEED = """()=>{const S=window.__nb.S;S.tut={s:0,done:true};S.nota=1e6;S.bestWave=6;S.open={syn:1,rhy:1,pat:1};
+SEED = """()=>{const S=window.__nb.S;S.tut={s:0,done:true};S.ui='detay';S.nota=1e6;S.bestWave=6;S.open={syn:1,rhy:1,pat:1};
   S.slots=['davul','trampet','hihat',null];S.lv={davul:5,trampet:3,hihat:2};
   for(const s of [0,4,8,12])S.pat.A[0][s]=1;S.pat.A[1][4]=1;S.pat.A[1][12]=1;for(const s of [2,6,10,14])S.pat.A[2][s]=1;
   S.bpm=100;S.bmax=120;window.__nb.recalc();window.__nb.renderPanels()}"""
