@@ -96,7 +96,7 @@ const vis=()=>GLX?view:scene;
 const PH=()=>L<480;let lowQ=false,slowT=0;
 /* orta düğme: durgunken neon ▶ (içi arka plan rengi, arkasında yanıp sönen neon), dokununca yaylanarak BPM göbeğine küçülür; çalarken göbeğe dokun: durdur */
 let orbK=1,orbV=0,orbRip=-1,orbP=0,orbWas=false;
-function orbAt(){const R=L/2;if(S.layout==='strip'){const gt=(soloView()>=0?0.4:0.6)*L;return{x:R,y:gt*0.46,r0:0.15*R,strip:true}}const g=geom();return{x:g.c,y:g.c,r0:g.r0,rIn:g.rIn||g.r0*1.3}}
+function orbAt(){const R=L/2;if(S.layout==='strip'){const gt=(soloView()>=0?0.4:0.6)*L;return{x:R,y:gt*0.46,r0:0.15*R,strip:true}}const g=geom();if(D3){const p=corePos(g);return{x:p[0],y:p[1],r0:g.r0,rIn:g.rIn}}return{x:g.c,y:g.c,r0:g.r0,rIn:g.rIn||g.r0*1.3}}
 function orbHit(e){const [x,y]=cvPt(e),o=orbAt(),d=Math.hypot(x-o.x,y-o.y);
  if(o.strip)return d<o.r0*(playing?0.75:1.35);return d<(playing?o.r0*1.05:Math.max(o.r0*1.05,Math.min(o.r0*1.3,o.rIn)))}
 function orbStep(dt){const tgt=playing?0:1;if(playing&&!orbWas)orbRip=0;orbWas=playing;orbP=Math.max(0,orbP-dt*5);
@@ -128,9 +128,10 @@ const SEG=()=>TAU/MI.N;
 function cellAng(s){const sg=SEG(),A0=-Math.PI/2+dirS*s*sg+rot,A1=A0+dirS*sg,gp=Math.min(0.022,sg*0.12);return[Math.min(A0,A1)+gp,Math.max(A0,A1)-gp]}
 const midAng=s=>-Math.PI/2+dirS*(s+0.5)*SEG()+rot;
 function cellPath(c,ri,ro,a0,a1){ctx.beginPath();ctx.arc(c,c,ro,a0,a1);ctx.arc(c,c,ri,a1,a0,true);ctx.closePath()}
-function cellPos(si,s,g){if(g.layout==='strip')return[g.x0+(s+0.5)*g.colW,g.gridTop+(si+0.5)*g.rowH];const r=g.rIn+(si+0.5)*g.t,a=midAng(s);return[g.c+Math.cos(a)*r,g.c+Math.sin(a)*r]}
-function enemyPos(e,g){if(g.layout==='strip')return[g.x0+e.a*(g.x1-g.x0),g.fieldTop+(1-e.d)*(g.gridTop-g.fieldTop)];const r=g.r0+e.d*(1.02*g.R-g.r0),a=e.a*TAU-Math.PI/2;return[g.c+Math.cos(a)*r,g.c+Math.sin(a)*r]}
-function corePos(g){return g.layout==='strip'?[g.c,g.gridTop]:[g.c,g.c]}
+function cellPos(si,s,g){if(g.layout==='strip')return[g.x0+(s+0.5)*g.colW,g.gridTop+(si+0.5)*g.rowH];const r=g.rIn+(si+0.5)*g.t,a=midAng(s),x=g.c+Math.cos(a)*r,y=g.c+Math.sin(a)*r;return D3?pj(x,y,g.rOut*(0.05+0.36*Math.min(1.35,pz3[si][s]))):[x,y]}
+function enemyGround(e,g){const r=g.r0+e.d*(1.02*g.R-g.r0),a=e.a*TAU-Math.PI/2;return[g.c+Math.cos(a)*r,g.c+Math.sin(a)*r]}
+function enemyPos(e,g){if(g.layout==='strip')return[g.x0+e.a*(g.x1-g.x0),g.fieldTop+(1-e.d)*(g.gridTop-g.fieldTop)];const p=enemyGround(e,g);return D3?pj(p[0],p[1],0.05*g.R):p}
+function corePos(g){return g.layout==='strip'?[g.c,g.gridTop]:D3?pj(g.c,g.c,coreZ3(g)):[g.c,g.c]}
 function spawnPart(si,s){
  if(RM||parts.length>280)return;const th=dispTheme(),g=geom(),x=slotIns(si);if(!x)return;const [px,py]=cellPos(si,s,g);const ang=g.layout==='strip'?-Math.PI/2:midAng(s);
  const n=th.part==='splat'?4:th.part==='dust'?1:3,col=insColor(x,th);
@@ -265,6 +266,7 @@ function drawRings(dt,g,th){
   if(th.ring==='kilim'){ctx.setLineDash([3,3]);ctx.strokeStyle=hexA(col,0.3);ctx.lineWidth=1;ctx.beginPath();ctx.arc(c,c,ri-0.6,0,TAU);ctx.stroke();ctx.setLineDash([])}
   for(let s=0;s<N;s++){
    const v=pat[i][s],f=flash[i][s]=Math.max(0,flash[i][s]-dt*3.5),[a0,a1]=cellAng(s),gsx=MI.gsSet.has(s),hl=playing&&s===curOf(i);
+   if(D3&&v){cellPath(c,ri,ro,a0,a1);ctx.fillStyle=hexA(col,muted||dimS?0.2:0.45);ctx.fill();continue}
    if(th.ring==='neon'||th.ring==='vinyl'||th.ring==='kilim'){
     const ex=f*0.012*R;cellPath(c,Math.max(1,ri-ex*0.3),ro+ex,a0,a1);
     if(v){if(!GLX&&th.ring==='neon'){ctx.shadowColor=col;ctx.shadowBlur=6+16*f}ctx.fillStyle=hexA(col,muted||dimS?0.25:over?0.35+0.3*f:v===2?0.95:0.62+0.38*f);ctx.fill();ctx.shadowBlur=0;if(v===2){ctx.strokeStyle='rgba(255,255,255,0.85)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(c,c,ro-1.5,a0+0.01,a1-0.01);ctx.stroke()}if(th.ring==='kilim'){ctx.fillStyle=hexA(th.cv.ink,0.5);const m=midAng(s),rm=(ri+ro)/2;ctx.beginPath();ctx.arc(c+Math.cos(m)*rm,c+Math.sin(m)*rm,1.6,0,TAU);ctx.fill()}}
@@ -291,7 +293,7 @@ function drawMarks(g,th){
  if(th.ring==='hud'){for(let s=0;s<N;s++){const a=-Math.PI/2+s*SEG(),cs=Math.cos(a),sn=Math.sin(a);ctx.beginPath();ctx.moveTo(c+cs*(rOut+3),c+sn*(rOut+3));ctx.lineTo(c+cs*(rOut+6),c+sn*(rOut+6));ctx.stroke()}}
  MI.gs.forEach(s=>{const a=-Math.PI/2+dirS*s*SEG()+rot,cs=Math.cos(a),sn=Math.sin(a),off=th.ring==='vinyl'?0.06*R:0.022*R;
   ctx.beginPath();ctx.moveTo(c+cs*(rOut+3),c+sn*(rOut+3));ctx.lineTo(c+cs*(rOut+off),c+sn*(rOut+off));ctx.stroke();
-  const tr=rOut+(th.ring==='vinyl'?0.09:0.05)*R;ctx.fillText(String(s+1),c+cs*tr,c+sn*tr)});
+  const tr=rOut+(th.ring==='vinyl'?0.09:0.05)*R;if(!D3)ctx.fillText(String(s+1),c+cs*tr,c+sn*tr)});
  const rr=g.r0+range()*(1.02*R-g.r0);ctx.setLineDash([2,6]);ctx.strokeStyle=hexA(th.cv.hot,0.3);ctx.lineWidth=1;ctx.beginPath();ctx.arc(c,c,rr,0,TAU);ctx.stroke();ctx.setLineDash([]);
 }
 function drawNeedle(g,th){
@@ -356,6 +358,7 @@ function drawCore(dt,g,th){
  }
  const hpf=clamp(core.hp/hpMax(),0,1);ctx.lineWidth=3;ctx.strokeStyle=hexA(th.cv.dim,0.6);ctx.beginPath();ctx.arc(c,c,r0*1.3,0,TAU);ctx.stroke();ctx.strokeStyle=hpf<0.35?th.cv.hot:th.cv.acc;ctx.beginPath();ctx.arc(c,c,r0*1.3,-Math.PI/2,-Math.PI/2+hpf*TAU);ctx.stroke();
  if(core.sh>0){ctx.strokeStyle=hexA(th.cv.ink,0.8);ctx.lineWidth=2;ctx.beginPath();ctx.arc(c,c,r0*1.38,-Math.PI/2,-Math.PI/2+clamp(core.sh/hpMax(),0,1)*TAU);ctx.stroke()}
+ if(d3Own()){const gold=goldOf(th),rc=r0*1.47;ctx.strokeStyle=hexA(gold,0.16);ctx.lineWidth=2;ctx.beginPath();ctx.arc(c,c,rc,0,TAU);ctx.stroke();if(charge>0){ctx.strokeStyle=gold;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(c,c,rc,-Math.PI/2,-Math.PI/2+charge*TAU);ctx.stroke()}}
  ctx.textAlign='center';ctx.textBaseline='middle';
  const dark=th.core==='eye'||th.core==='label';const ink=dark?'#120d0b':th.cv.ink,sub=dark?'rgba(18,13,11,0.75)':hexA(th.cv.ink,0.6);
  if(tapFx&&tapFx.life>0){
@@ -397,6 +400,7 @@ function drawStrip(dt,g,th){
 }
 function drawEnemy(e,th,g){
  const [x,y]=enemyPos(e,g),T=ETYPES[e.ty],sz=0.022*g.R*T.r*(e.boss?1.4:1),col=e.boss?th.en.boss:th.en.body,edge=th.en.edge,st=th.en.style,fl=e.flash>0.2;
+ if(D3){const gp=enemyGround(e,g),b=pj(gp[0],gp[1],0);ctx.fillStyle=th.light?'rgba(0,0,0,0.15)':'rgba(0,0,0,0.4)';ctx.beginPath();ctx.ellipse(b[0],b[1],sz*1.1,sz*1.1*sinE,0,0,TAU);ctx.fill()}
  ctx.save();ctx.translate(x,y);if(st==='spray')ctx.rotate(Math.sin(clock*6+e.wob)*0.08);
  ctx.beginPath();switch(T.shape){case 'tri':ctx.moveTo(0,-sz);ctx.lineTo(sz*0.9,sz*0.7);ctx.lineTo(-sz*0.9,sz*0.7);ctx.closePath();break;case 'hex':for(let k=0;k<6;k++){const a=k*Math.PI/3;ctx.lineTo(Math.cos(a)*sz,Math.sin(a)*sz)}ctx.closePath();break;case 'dot':ctx.arc(0,0,sz*0.6,0,TAU);break;case 'square':ctx.rect(-sz*0.8,-sz*0.8,sz*1.6,sz*1.6);break;case 'boss':for(let k=0;k<10;k++){const a=k*TAU/10+clock*0.4,rr=k%2?sz*0.65:sz;ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}ctx.closePath();break;default:ctx.arc(0,0,sz,0,TAU)}
  if(st==='wire'){ctx.strokeStyle=fl?'#ffffff':col;ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle=hexA(col,fl?0.6:0.15);ctx.fill()}
@@ -411,17 +415,21 @@ function drawEnemy(e,th,g){
  if(e.boss){const w=sz*3;ctx.fillStyle=hexA(th.cv.ink,0.25);ctx.fillRect(x-w/2,y-sz*1.9,w,3);ctx.fillStyle=th.en.boss;ctx.fillRect(x-w/2,y-sz*1.9,w*clamp(e.hp/e.hpMax,0,1),3);ctx.fillStyle=hexA(th.cv.ink,0.8);ctx.font='600 10px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(T.n,x,y-sz*2.1)}
 }
 function drawVfx(dt,g,th){
- const [cx,cy]=corePos(g);ctx.lineCap='round';
- for(let k=vfx.length-1;k>=0;k--){const f=vfx[k];const rate_={tracer:4,homing:4,burst:3,crit:2,ring:2,beam:3,chain:3,shield:2,bolt:5,wallpush:4}[f.k]||3;f.life-=dt*rate_;if(f.life<=0){vfx.splice(k,1);continue}const a=f.life;
-  if(f.k==='tracer'||f.k==='homing'){const [x0,y0]=cellPos(f.o.si,f.o.s,g),[x1,y1]=enemyPos(f.e,g);ctx.strokeStyle=hexA(f.col,a*0.9);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x0,y0);if(f.k==='homing'){const mx=(x0+x1)/2+(y1-y0)*0.25,my=(y0+y1)/2-(x1-x0)*0.25;ctx.quadraticCurveTo(mx,my,x1,y1)}else ctx.lineTo(x1,y1);ctx.stroke();ctx.fillStyle=hexA(f.col,a);ctx.beginPath();ctx.arc(x1,y1,2.5,0,TAU);ctx.fill()}
+ /* 3D'de zemin efektleri (halka, delici, duvar, kalkan) zemine yatırılır; saldırılar merkezden ışın olarak çıkar */
+ const [cx,cy]=D3?[g.c,g.c]:corePos(g),[kx,ky]=corePos(g);ctx.lineCap='round';
+ for(let k=vfx.length-1;k>=0;k--){const f=vfx[k];const rate_={tracer:4,homing:4,burst:3,crit:2,ring:2,beam:3,chain:3,shield:2,bolt:5,wallpush:4,charge:3}[f.k]||3;f.life-=dt*rate_;if(f.life<=0){vfx.splice(k,1);continue}const a=f.life,gk=D3&&(f.k==='ring'||f.k==='beam'||f.k==='wallpush'||f.k==='shield');if(gk)gIn();
+  if(D3&&(f.k==='tracer'||f.k==='homing')){const [x1,y1]=enemyPos(f.e,g),w=3.2*a;ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';ctx.strokeStyle=hexA(f.col,0.9*a);ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(kx,ky);ctx.lineTo(x1,y1);ctx.stroke();ctx.strokeStyle=th.light?hexA(th.cv.ink,0.6*a):'rgba(255,255,255,'+(0.8*a).toFixed(3)+')';ctx.lineWidth=Math.max(1,w*0.35);ctx.stroke();ctx.fillStyle=hexA(f.col,0.6*a);ctx.beginPath();ctx.arc(x1,y1,0.02*L*(1.6-a),0,TAU);ctx.fill();ctx.restore()}
+  else if(f.k==='charge'){const u=1-a,[x0,y0]=cellPos(f.o.si,f.o.s,g),x=x0+(kx-x0)*u,y=y0+(ky-y0)*u-(D3?0.12*g.rOut*Math.sin(Math.PI*u):0),gold=goldOf(th),r=0.012*L;ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';const gr=ctx.createRadialGradient(x,y,0,x,y,r*3);gr.addColorStop(0,th.light?gold:'rgba(255,255,255,0.95)');gr.addColorStop(0.35,hexA(gold,0.9));gr.addColorStop(1,hexA(gold,0));ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,r*3,0,TAU);ctx.fill();ctx.strokeStyle=hexA(gold,0.35*a);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x,y);ctx.stroke();ctx.restore()}
+  else if(f.k==='tracer'||f.k==='homing'){const [x0,y0]=cellPos(f.o.si,f.o.s,g),[x1,y1]=enemyPos(f.e,g);ctx.strokeStyle=hexA(f.col,a*0.9);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x0,y0);if(f.k==='homing'){const mx=(x0+x1)/2+(y1-y0)*0.25,my=(y0+y1)/2-(x1-x0)*0.25;ctx.quadraticCurveTo(mx,my,x1,y1)}else ctx.lineTo(x1,y1);ctx.stroke();ctx.fillStyle=hexA(f.col,a);ctx.beginPath();ctx.arc(x1,y1,2.5,0,TAU);ctx.fill()}
   else if(f.k==='burst'){const [x,y]=enemyPos(f.e,g);ctx.strokeStyle=hexA(f.col,a*0.8);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,(1-a)*0.05*L+3,0,TAU);ctx.stroke()}
   else if(f.k==='crit'){const [x,y]=enemyPos(f.e,g);ctx.strokeStyle=hexA(th.cv.warn,a);ctx.lineWidth=2;for(let q=0;q<4;q++){const an=q*Math.PI/4;const r1=0.012*L,r2=(0.03+(1-a)*0.02)*L;ctx.beginPath();ctx.moveTo(x+Math.cos(an)*r1,y+Math.sin(an)*r1);ctx.lineTo(x+Math.cos(an)*r2,y+Math.sin(an)*r2);ctx.moveTo(x-Math.cos(an)*r1,y-Math.sin(an)*r1);ctx.lineTo(x-Math.cos(an)*r2,y-Math.sin(an)*r2);ctx.stroke()}}
   else if(f.k==='ring'){ctx.strokeStyle=hexA(f.col,a*0.7);ctx.lineWidth=2+a*3;if(g.layout==='strip'){const y=g.gridTop-(1-a)*(g.gridTop-g.fieldTop);ctx.beginPath();ctx.moveTo(g.x0,y);ctx.lineTo(g.x1,y);ctx.stroke()}else{ctx.beginPath();ctx.arc(cx,cy,g.r0+(1-a)*(1.02*g.R-g.r0),0,TAU);ctx.stroke()}}
   else if(f.k==='beam'){ctx.strokeStyle=hexA(f.col,a*0.85);ctx.lineWidth=2+a*4;ctx.beginPath();if(g.layout==='strip'){const x=g.x0+f.a*(g.x1-g.x0);ctx.moveTo(x,g.gridTop);ctx.lineTo(x,g.fieldTop)}else{const an=f.a*TAU-Math.PI/2;ctx.moveTo(cx+Math.cos(an)*g.r0,cy+Math.sin(an)*g.r0);ctx.lineTo(cx+Math.cos(an)*1.05*g.R,cy+Math.sin(an)*1.05*g.R)}ctx.stroke()}
   else if(f.k==='chain'){const [x0,y0]=enemyPos(f.e1,g),[x1,y1]=enemyPos(f.e,g);ctx.strokeStyle=hexA(f.col,a);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x0,y0);const mx=(x0+x1)/2+(Math.random()-0.5)*8,my=(y0+y1)/2+(Math.random()-0.5)*8;ctx.lineTo(mx,my);ctx.lineTo(x1,y1);ctx.stroke()}
-  else if(f.k==='bolt'){const [x1,y1]=enemyPos(f.e,g);ctx.strokeStyle=hexA(f.col,a);ctx.lineWidth=2.2;ctx.beginPath();ctx.moveTo(cx,cy);const segs=6;for(let q=1;q<=segs;q++){const t=q/segs,jx=(Math.random()-0.5)*14*(q<segs?1:0),jy=(Math.random()-0.5)*14*(q<segs?1:0);ctx.lineTo(cx+(x1-cx)*t+jx,cy+(y1-cy)*t+jy)}ctx.stroke()}
+  else if(f.k==='bolt'){const [x1,y1]=enemyPos(f.e,g);ctx.strokeStyle=hexA(f.col,a);ctx.lineWidth=2.2;ctx.beginPath();ctx.moveTo(kx,ky);const segs=6;for(let q=1;q<=segs;q++){const t=q/segs,jx=(Math.random()-0.5)*14*(q<segs?1:0),jy=(Math.random()-0.5)*14*(q<segs?1:0);ctx.lineTo(kx+(x1-kx)*t+jx,ky+(y1-ky)*t+jy)}ctx.stroke()}
   else if(f.k==='wallpush'){ctx.strokeStyle=hexA(f.col,a*0.9);ctx.lineWidth=3;if(g.layout==='strip'){const x=g.x0+f.a*(g.x1-g.x0);ctx.beginPath();ctx.moveTo(x-10,g.gridTop-12);ctx.lineTo(x+10,g.gridTop-12);ctx.stroke()}else{const an=f.a*TAU-Math.PI/2,rb=g.rOut+0.012*g.R;ctx.beginPath();ctx.arc(cx,cy,rb+(1-a)*8,an-0.12,an+0.12);ctx.stroke()}}
   else if(f.k==='shield'){ctx.strokeStyle=hexA(f.col,a*0.8);ctx.lineWidth=2;if(g.layout==='strip'){ctx.beginPath();ctx.moveTo(g.x0,g.gridTop-9-(1-a)*20);ctx.lineTo(g.x1,g.gridTop-9-(1-a)*20);ctx.stroke()}else{ctx.beginPath();ctx.arc(cx,cy,g.r0*(1.4+(1-a)*0.8),0,TAU);ctx.stroke()}}
+  if(gk)gOut();
  }
  ctx.lineCap='butt';
 }
@@ -459,30 +467,122 @@ function drawOverlay(dt,g,th){
  if(soloFlash>0&&soloNow>=0){soloFlash=Math.max(0,soloFlash-dt*0.5);const a=Math.min(1,soloFlash*1.6),x=slotIns(soloNow);ctx.globalAlpha=a;ctx.fillStyle=th.cv.hot;ctx.font=(th.id==='punk'||th.id==='synth'?'':'600 ')+Math.round(0.05*L)+'px '+th.font.d;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Solo · '+(x?x.n:''),g.c,g.layout==='strip'?0.42*L:0.92*L);ctx.globalAlpha=1}
  if(retreatFlash>0){retreatFlash=Math.max(0,retreatFlash-dt*1.2);const gr=ctx.createRadialGradient(g.c,g.c,0.4*L,g.c,g.c,0.75*L);gr.addColorStop(0,hexA(th.cv.hot,0));gr.addColorStop(1,hexA(th.cv.hot,Math.min(0.6,retreatFlash*0.5)));ctx.fillStyle=gr;ctx.fillRect(-OX,-OY,CW,CH)}
 }
+/* ================= v27 3D sahne ================= */
+/* izdüşüm: zemin noktası (x,y kare koordinatında), yükseklik z → ekran. Gerçek izometri (35,26°): zemin y'si sinE kadar basık, yükseklik cosE kadar yukarı.
+   Zemin (halkalar, ibre, menzil, katmanlar) 2D çizimin aynısı, gIn() ile zemine yatırılır; sütunlar, düşmanlar ve merkez zemindeki y'ye göre arkadan öne çizilir. */
+const EL3=Math.asin(Math.tan(Math.PI/6)),LX3=-0.55,LY3=0.83;
+let D3=false,sinE=1,cosE=0,C3Y=0;const K3=1.2;/* K3: zemin basık olduğu için sahne 3D'de %20 büyük çizilir, düşmanlar yanlardan kadraja girer */
+const pz3=Array.from({length:MAXSLOTS},()=>new Float32Array(18)),pf3=Array.from({length:MAXSLOTS},()=>new Float32Array(18));
+const pj=(x,y,z)=>[L/2+(x-L/2)*K3,C3Y+((y-L/2)*sinE-z*cosE)*K3];
+function gIn(){ctx.save();ctx.translate(L/2,C3Y);ctx.scale(K3,K3*sinE);ctx.translate(-L/2,-L/2)}
+function gOut(){ctx.restore()}
+const coreZ3=g=>g.rOut*(0.26+0.02*Math.sin(clock*2));
+const shq=(h,k)=>shade(h,clamp(Math.round(k*40)/40,-1,1));
+function arc3(c,r,a0,a1,z,n){const o=[];for(let k=0;k<=n;k++){const a=a0+(a1-a0)*k/n;o.push(pj(c+Math.cos(a)*r,c+Math.sin(a)*r,z))}return o}
+function poly3(pts,fill,stroke,lw){ctx.beginPath();pts.forEach((p,k)=>k?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1;ctx.stroke()}}
+const wall3=(col,nx,ny,gl)=>shq(col,-0.62+0.36*Math.max(0,nx*LX3+ny*LY3)+0.25*gl);
+/* [a0,a1] içinde sg·sin>0 olan aralıklar: dış duvar önde (sin>0), iç duvar arkada görünür */
+function spans3(a0,a1,sg){const c=[a0];for(let m=Math.ceil(a0/Math.PI);m*Math.PI<a1;m++)c.push(m*Math.PI);c.push(a1);const o=[];for(let k=0;k<c.length-1;k++)if(c[k+1]-c[k]>1e-4&&sg*Math.sin((c[k]+c[k+1])/2)>0)o.push([c[k],c[k+1]]);return o}
+/* görünen duvar tek parça, uçtan uca renk geçişi: dilimler arasında ek yeri (siyah çizgi) kalmaz */
+function wallRun3(c,r,b0,b1,h,col,gl,sg){const m=lowQ?3:6,pb=arc3(c,r,b0,b1,0,m),pt=arc3(c,r,b0,b1,h,m),A=pb[0],B=pb[m],c0=wall3(col,sg*Math.cos(b0),sg*Math.sin(b0),gl),c1=wall3(col,sg*Math.cos(b1),sg*Math.sin(b1),gl);
+ let f=c0;if(!lowQ&&Math.abs(B[0]-A[0])+Math.abs(B[1]-A[1])>0.5){f=ctx.createLinearGradient(A[0],A[1],B[0],B[1]);f.addColorStop(0,c0);f.addColorStop(1,c1)}poly3(pb.concat(pt.reverse()),f,f,0.8)}
+/* sütun: hücrenin halka dilimi zeminden h kadar yükselir; yükselirken parlar (gl) */
+function column3(g,th,i,s,col,h,gl){const c=g.c,[a0,a1]=cellAng(s),r0=g.rIn+i*g.t+1.2,r1=g.rIn+(i+1)*g.t-1.2,n=lowQ?2:4;
+ const ob=arc3(c,r1,a0,a1,0,n),ot=arc3(c,r1,a0,a1,h,n),ib=arc3(c,r0,a0,a1,0,n),it=arc3(c,r0,a0,a1,h,n);
+ if(gl>0.05&&!th.light&&!lowQ){const am=(a0+a1)/2,rm=(r0+r1)/2,m=pj(c+Math.cos(am)*rm,c+Math.sin(am)*rm,0),R=0.16*g.rOut*K3;ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(m[0],m[1]);ctx.scale(1,sinE);const gr=ctx.createRadialGradient(0,0,0,0,0,R);gr.addColorStop(0,hexA(col,(GLX?0.22:0.45)*gl));gr.addColorStop(1,hexA(col,0));ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,R,0,TAU);ctx.fill();ctx.restore()}
+ spans3(a0,a1,1).forEach(([b0,b1])=>wallRun3(c,r1,b0,b1,h,col,gl,1));
+ spans3(a0,a1,-1).forEach(([b0,b1])=>wallRun3(c,r0,b0,b1,h,col,gl,-1));
+ if(Math.cos(a0)<0){const k=wall3(col,Math.sin(a0),-Math.cos(a0),gl);poly3([ib[0],ob[0],ot[0],it[0]],k,k,0.8)}
+ if(Math.cos(a1)>0){const k=wall3(col,-Math.sin(a1),Math.cos(a1),gl);poly3([ib[n],ob[n],ot[n],it[n]],k,k,0.8)}
+ /* dikey kenarlar: yalnız görünen yüzün köşeleri (arkadaki köşe öndeki yüzün üstüne çizilmez) */
+ ctx.strokeStyle=th.light?hexA(th.cv.ink,0.3+0.4*gl):'rgba(255,255,255,'+(0.18+0.4*gl).toFixed(3)+')';ctx.lineWidth=1;
+ [[r1,1],[r0,-1]].forEach(([r,sg])=>spans3(a0,a1,sg).forEach(sp=>sp.forEach(b=>{if(b!==a0&&b!==a1)return;const x=c+Math.cos(b)*r,y=c+Math.sin(b)*r,p=pj(x,y,0),q=pj(x,y,h);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke()})));
+ const top=ot.concat(it.slice().reverse());
+ if(gl>0.05){ctx.save();if(!GLX){ctx.shadowColor=col;ctx.shadowBlur=24*gl}poly3(top,shq(col,GLX?0.12+0.3*gl:0.2+0.5*gl));ctx.restore();if(!th.light&&!GLX){ctx.save();ctx.globalCompositeOperation='lighter';poly3(top,hexA(col,0.5*gl));ctx.restore()}}
+ poly3(top,gl>0.05?null:shq(col,0.12),th.light?hexA(th.cv.ink,0.55):'rgba(255,255,255,'+(0.3+0.5*gl).toFixed(3)+')',1.2)}
+/* zeminde merkez: nabız ve kalkan halkası (2D'deki gibi), altın şarj halkası, ışık havuzu */
+function ground3(g,th){const c=g.c,r0=g.r0,gold=goldOf(th),R=r0*0.95;
+ if(!th.light){const rr=g.rIn*1.6,gl=ctx.createRadialGradient(c,c,0,c,c,rr);gl.addColorStop(0,hexA(th.cv.acc,Math.min(0.9,0.2+0.3*kickP+0.25*charge+(S.stage.core?0.12:0))*(GLX?0.6:1)));gl.addColorStop(1,hexA(th.cv.acc,0));ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=gl;ctx.beginPath();ctx.arc(c,c,rr,0,TAU);ctx.fill();ctx.restore()}
+ const hpf=clamp(core.hp/hpMax(),0,1);ctx.lineWidth=3;ctx.strokeStyle=hexA(th.cv.dim,0.6);ctx.beginPath();ctx.arc(c,c,r0*1.3,0,TAU);ctx.stroke();ctx.strokeStyle=hpf<0.35?th.cv.hot:th.cv.acc;ctx.beginPath();ctx.arc(c,c,r0*1.3,-Math.PI/2,-Math.PI/2+hpf*TAU);ctx.stroke();
+ if(core.sh>0){ctx.strokeStyle=hexA(th.cv.ink,0.8);ctx.lineWidth=2;ctx.beginPath();ctx.arc(c,c,r0*1.38,-Math.PI/2,-Math.PI/2+clamp(core.sh/hpMax(),0,1)*TAU);ctx.stroke()}
+ ctx.strokeStyle=hexA(gold,0.18);ctx.lineWidth=5;ctx.beginPath();ctx.arc(c,c,R,0,TAU);ctx.stroke();
+ if(charge>0){ctx.save();if(!GLX){ctx.shadowColor=gold;ctx.shadowBlur=10+12*charge}ctx.strokeStyle=gold;ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.arc(c,c,R,-Math.PI/2,-Math.PI/2+TAU*charge);ctx.stroke();ctx.restore()}
+ if(novaT>=0){const k=1-novaT;ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';if(!GLX){ctx.shadowColor=gold;ctx.shadowBlur=30*k}ctx.strokeStyle=th.light?hexA(gold,k):hexA('#ffffff',k);ctx.lineWidth=4+8*k;ctx.beginPath();ctx.arc(c,c,R,0,TAU);ctx.stroke();ctx.restore()}}
+/* vuruş başı numaraları zeminde ama yazı basık değil */
+function marks3(g,th){const {R,c,rOut}=g,fs=Math.max(10,Math.round(R*0.034)),tr=rOut+(th.ring==='vinyl'?0.07:0.035)*R;ctx.font=(th.id==='punk'?'':'600 ')+fs+'px '+(th.id==='punk'?th.font.d:th.font.m);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=hexA(th.cv.ink,0.55);
+ MI.gs.forEach(s=>{const a=-Math.PI/2+dirS*s*SEG()+rot,p=pj(c+Math.cos(a)*tr,c+Math.sin(a)*tr,0);ctx.fillText(String(s+1),p[0],p[1])})}
+/* merkez: Kristal (temanın renkleri, şarjla içi ışır), Küre, Güneş, Plak — Görünüm'de satın alınır */
+function crystal3(P3,zc,th){const cr=[th.cv.acc,th.cv.hot,th.fam.tel],gold=goldOf(th),pump=1+0.1*kickP+0.08*charge,a=0.1*pump,ht=0.2*pump,hb=0.15*pump,rt=clock*0.6,C=[0,cosE,sinE],Lw=[-0.5,0.5,0.7];
+ const V=[];for(let k=0;k<6;k++){const q=rt+k*Math.PI/3;V.push([Math.cos(q)*a,Math.sin(q)*a,zc])}const T=[0,0,zc+ht],B=[0,0,zc-hb],faces=[];
+ for(let k=0;k<6;k++){const p=V[k],q=V[(k+1)%6];faces.push({v:[p,q,T],k,up:1},{v:[q,p,B],k,up:0})}
+ faces.forEach(f=>{const [p,q,r]=f.v,u=[q[0]-p[0],q[1]-p[1],q[2]-p[2]],w=[r[0]-p[0],r[1]-p[1],r[2]-p[2]];let n=[u[1]*w[2]-u[2]*w[1],u[2]*w[0]-u[0]*w[2],u[0]*w[1]-u[1]*w[0]];const l=Math.hypot(n[0],n[1],n[2])||1;n=n.map(x=>x/l);
+  const cx=(p[0]+q[0]+r[0])/3,cy=(p[1]+q[1]+r[1])/3,cz=(p[2]+q[2]+r[2])/3;if(n[0]*cx+n[1]*cy+n[2]*(cz-zc)<0)n=n.map(x=>-x);f.vis=n[0]*C[0]+n[1]*C[1]+n[2]*C[2];f.lit=Math.max(0,n[0]*Lw[0]+n[1]*Lw[1]+n[2]*Lw[2]);f.d=cy});
+ const mix=(x,y,t)=>{const p=rgbOf(x),q=rgbOf(y);return p.map((v,i)=>v+(q[i]-v)*t)};
+ const draw=(f,al)=>{const pts=f.v.map(v=>P3(v[0],v[1],v[2])),t=(f.k%3)/2,base=f.up?mix(cr[0],cr[1],t*0.6):mix(cr[1],cr[2],0.3+t*0.5),k=0.45+0.75*f.lit;poly3(pts,'rgba('+base.map(v=>Math.min(255,Math.round(v*k))).join(',')+','+al+')',hexA(th.cv.ink,al>0.5?0.75:0.25),1)};
+ faces.filter(f=>f.vis<=0).forEach(f=>draw(f,0.35));
+ const cc=P3(0,0,zc),R=P3(0.07+0.06*charge+0.03*kickP,0,zc)[0]-cc[0];ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';const gr=ctx.createRadialGradient(cc[0],cc[1],0,cc[0],cc[1],R*2.2);gr.addColorStop(0,'rgba(255,255,255,0.9)');gr.addColorStop(0.3,hexA(charge>0.6?gold:th.cv.acc,0.7));gr.addColorStop(1,hexA(th.cv.acc,0));ctx.fillStyle=gr;ctx.beginPath();ctx.arc(cc[0],cc[1],R*2.2,0,TAU);ctx.fill();ctx.restore();
+ faces.filter(f=>f.vis>0).sort((x,y)=>x.d-y.d).forEach(f=>draw(f,0.62));
+ const tp=P3(T[0],T[1],T[2]),s2=(P3(0.012,0,0)[0]-P3(0,0,0)[0]);ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';ctx.fillStyle='rgba(255,255,255,'+(0.6+0.4*Math.sin(clock*5)).toFixed(3)+')';ctx.beginPath();ctx.arc(tp[0],tp[1],2.2,0,TAU);ctx.fill();
+ for(let k=0;k<3;k++){const q=clock*1.4+k*TAU/3,p=P3(Math.cos(q)*0.2,Math.sin(q)*0.2,zc+0.04*Math.sin(clock*2+k));ctx.fillStyle=hexA(k===1?cr[1]:cr[0],0.9);ctx.beginPath();ctx.moveTo(p[0],p[1]-s2*1.6);ctx.lineTo(p[0]+s2,p[1]);ctx.lineTo(p[0],p[1]+s2*1.6);ctx.lineTo(p[0]-s2,p[1]);ctx.closePath();ctx.fill()}ctx.restore()}
+function core3(dt,g,th){const c=g.c,U=g.rOut,P3=(x,y,z)=>pj(c+x*U,c+y*U,z*U),zc=coreZ3(g)/U,kk=S.d3.core,gold=goldOf(th),Us=U*K3;
+ if(!RM)dotRot+=dt*(0.25+kickP*0.6);
+ if(kk==='plak'){const b=P3(0,0,0.03),R=Us*0.15;ctx.save();ctx.translate(b[0],b[1]);ctx.scale(1,sinE);ctx.fillStyle='#0b0b12';ctx.beginPath();ctx.arc(0,0,R,0,TAU);ctx.fill();ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;for(let q=0.45;q<0.98;q+=0.09){ctx.beginPath();ctx.arc(0,0,R*q,0,TAU);ctx.stroke()}
+  ctx.fillStyle=th.cv.hot;ctx.beginPath();ctx.arc(0,0,R*0.34,0,TAU);ctx.fill();const q=clock*3.2*(playing?1:0.2);ctx.fillStyle=th.cv.bg;ctx.beginPath();ctx.arc(Math.cos(q)*R*0.2,Math.sin(q)*R*0.2,R*0.05,0,TAU);ctx.fill();ctx.fillStyle=gold;ctx.beginPath();ctx.arc(0,0,R*0.04,0,TAU);ctx.fill();ctx.restore()}
+ else if(kk==='gunes'){const p=P3(0,0,zc),R=Us*0.17*(1+0.08*kickP+0.05*charge);ctx.save();ctx.beginPath();ctx.arc(p[0],p[1],R,0,TAU);ctx.clip();const gr=ctx.createLinearGradient(0,p[1]-R,0,p[1]+R);gr.addColorStop(0,gold);gr.addColorStop(0.55,th.cv.acc);gr.addColorStop(1,th.fam.tel);ctx.fillStyle=gr;ctx.fillRect(p[0]-R,p[1]-R,2*R,2*R);ctx.fillStyle=th.cv.bg;for(let j=0;j<6;j++)ctx.fillRect(p[0]-R,p[1]+R*(0.1+j*0.15),2*R,1.5+j*1.6);ctx.restore()}
+ else if(kk==='kure'){const p=P3(0,0,zc),r=Us*0.13*(1+0.12*kickP+0.06*charge),gr=ctx.createRadialGradient(p[0]-r*0.35,p[1]-r*0.4,r*0.1,p[0],p[1],r);gr.addColorStop(0,'#ffffff');gr.addColorStop(0.25,shq(th.cv.acc,0.3));gr.addColorStop(1,shq(th.cv.acc,-0.6));ctx.fillStyle=gr;ctx.beginPath();ctx.arc(p[0],p[1],r,0,TAU);ctx.fill();
+  if(!th.light){ctx.save();ctx.globalCompositeOperation='lighter';const h=ctx.createRadialGradient(p[0],p[1],r*0.8,p[0],p[1],r*1.8);h.addColorStop(0,hexA(charge>0.6?gold:th.cv.acc,0.35+0.3*kickP));h.addColorStop(1,hexA(th.cv.acc,0));ctx.fillStyle=h;ctx.beginPath();ctx.arc(p[0],p[1],r*1.8,0,TAU);ctx.fill();ctx.restore()}}
+ else crystal3(P3,zc,th);
+ /* kristalin üstünde tempo; Ritme vur sonucu bir an onun yerini alır (2D'deki göbek yazısı gibi) */
+ const fs=Math.max(10,Math.round(g.r0*0.15)),top=P3(0,0,zc+0.3);ctx.textAlign='center';ctx.textBaseline='middle';
+ if(tapFx&&tapFx.life>0){tapFx.life-=dt*1.3;ctx.globalAlpha=clamp(tapFx.life*1.5,0,1);ctx.fillStyle=tapFx.c;ctx.font=(th.id==='punk'?'':'600 ')+Math.round(g.r0*0.36)+'px '+th.font.d;ctx.fillText(tapFx.t,top[0],top[1]-g.r0*0.22);ctx.fillStyle=hexA(th.cv.ink,0.7);ctx.font='500 '+fs+'px '+th.font.m;ctx.fillText(tapFx.sub,top[0],top[1]+g.r0*0.08);ctx.globalAlpha=1}
+ else{const es=effSeri();ctx.font='500 '+fs+'px '+th.font.m;ctx.fillStyle=hexA(th.cv.ink,0.6);ctx.fillText(Math.round(curBpm(curBar))+' BPM'+(bActive()?' · '+playPk:'')+(es>0?' · seri '+es:''),top[0],top[1])}
+ tapP=Math.max(0,tapP-dt*2.5)}
+/* sütunlar, düşmanlar ve merkez: zemindeki y'ye göre arkadan öne */
+function depth3(dt,g,th){const pat=S.pat[S.edit],ns=S.slots.length,now=nowT(),U=g.rOut,c=g.c,sec=planAt(curBar).sec,items=[];
+ for(let i=0;i<ns;i++){const x=slotIns(i);if(!x)continue;const col=insColor(x,th),muted=muteUntil[i]>now,solo=isSolo(i),soloOn=solo&&soloNow===i,dim=muted||(S.edit==='S'&&!solo)||(S.edit==='F'&&x.fam!=='vur')||(playing&&!soloOn&&!allowed(sec,x,i)),rm=g.rIn+(i+0.5)*g.t,boost=x.role==='alan';
+  for(let s=0;s<MI.N;s++){const v=pat[i][s],f=flash[i][s];if(f>pf3[i][s]+0.01)pz3[i][s]=v===2||boost?1.35:1;pf3[i][s]=f;pz3[i][s]*=Math.exp(-dt*4.2);if(!v)continue;
+   const p=pz3[i][s],gl=dim?0:Math.min(1,p),h=U*((v===2?0.09:0.05)+0.36*p*(dim?0.6:1)+(playing?0.01*Math.sin(clock*7+i*1.7+s):0)),am=midAng(s);
+   items.push({y:c+Math.sin(am)*rm,d:()=>{if(dim)ctx.globalAlpha=0.45;column3(g,th,i,s,col,h,gl);ctx.globalAlpha=1}})}}
+ enemies.forEach(e=>items.push({y:enemyGround(e,g)[1],d:()=>drawEnemy(e,th,g)}));
+ items.push({y:c+0.001,d:()=>core3(dt,g,th)});
+ items.sort((a,b)=>a.y-b.y).forEach(it=>it.d())}
+/* patlama: zeminde yayılan altın dalga, 3D'de merkezin altındaki şarj halkasından yükselen ışık sütunu, kısa beyaz parlama */
+function drawNova(dt,g,th){if(novaT<0)return;novaT+=dt/0.8;if(novaT>=1){novaT=-1;return}const u=novaT,k=1-u,gold=goldOf(th),wht=th.light?th.cv.ink:'#ffffff';ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';
+ if(g.layout==='strip'){const y=g.gridTop-u*(g.gridTop-g.fieldTop);ctx.strokeStyle=hexA(gold,0.9*k);ctx.lineWidth=14*k+2;ctx.beginPath();ctx.moveTo(g.x0,y);ctx.lineTo(g.x1,y);ctx.stroke()}
+ else{const c=g.c,R=g.r0+u*(1.1*g.R-g.r0);if(D3)gIn();ctx.strokeStyle=hexA(gold,0.9*k);ctx.lineWidth=14*k+2;ctx.beginPath();ctx.arc(c,c,R,0,TAU);ctx.stroke();ctx.strokeStyle=hexA(wht,0.7*k);ctx.lineWidth=3;ctx.beginPath();ctx.arc(c,c,R*0.92,0,TAU);ctx.stroke();if(D3)gOut();
+  if(D3){const b=pj(c,c,0),beam=(w,al)=>{const gr=ctx.createLinearGradient(0,-OY,0,b[1]+w*sinE);gr.addColorStop(0,hexA(gold,0));gr.addColorStop(1,hexA(th.light?gold:'#ffffff',al));ctx.fillStyle=gr;ctx.beginPath();ctx.moveTo(b[0]-w,-OY);ctx.lineTo(b[0]-w,b[1]);ctx.ellipse(b[0],b[1],w,w*sinE,0,Math.PI,0,true);ctx.lineTo(b[0]+w,-OY);ctx.closePath();ctx.fill()};beam(g.r0*0.95*K3,0.35*k);beam(g.r0*0.45*K3*k+1,0.8*k)}
+  else{const rr=g.rIn*2,gr=ctx.createRadialGradient(c,c,0,c,c,rr);gr.addColorStop(0,hexA(wht,0.8*k));gr.addColorStop(0.4,hexA(gold,0.6*k));gr.addColorStop(1,hexA(gold,0));ctx.fillStyle=gr;ctx.beginPath();ctx.arc(c,c,rr,0,TAU);ctx.fill()}}
+ ctx.restore();if(u<0.4&&!th.light){ctx.fillStyle='rgba(255,255,255,'+((0.4-u)*0.5).toFixed(3)+')';ctx.fillRect(-OX,-OY,CW,CH)}}
 function drawScene(dt){
- const th=dispTheme(),g=geom();
+ const th=dispTheme(),g=geom(),sv=soloView();
+ /* 3D: çember düzeni, solo sahnesi değilken; zemin merkezi biraz aşağıda, kristal (başlat düğmesi) tam ortada kalır */
+ D3=is3D()&&sv<0&&g.layout==='circle';if(D3){sinE=Math.sin(EL3);cosE=Math.cos(EL3);C3Y=L/2+g.rOut*0.26*cosE*K3}
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.shadowBlur=0;
- const shk=fxVal(th,'shake')*kickP;if(shk>0&&!RM)ctx.translate((Math.random()-0.5)*shk*0.02*L,(Math.random()-0.5)*shk*0.02*L);
+ const shk=fxVal(th,'shake')*kickP+(novaT>=0?(1-novaT)*1.2:0);if(shk>0&&!RM)ctx.translate((Math.random()-0.5)*shk*0.02*L,(Math.random()-0.5)*shk*0.02*L);
  drawBg(th,g);ctx.translate(OX,OY);
  rot=th.ring==='vinyl'&&g.layout==='circle'?phase*TAU:0;dirS=th.ring==='vinyl'&&g.layout==='circle'?-1:1;
  kickP=Math.max(0,kickP-dt*3.2);bassP=Math.max(0,bassP-dt*2.5);
  if(S.stage.stars)drawStars(dt,g,th);
  if(S.stage.beams)drawBeams(g,th);
+ if(D3)gIn();
  if(S.stage.tunnel)drawTunnel(dt,g,th);
  if(S.stage.wall)drawWall(dt,g,th);
+ if(D3)gOut();
  if(S.stage.tower)drawTower(dt,g,th);
  if(S.stage.mirror)drawMirror(g,th);
+ if(D3)gIn();
  if(th.ring==='vinyl'&&g.layout==='circle')drawDisk(g,th);
  if(S.stage.wave)drawWave(g,th);
  if(playing&&S.up.dolgu&&fillBar(curBar)&&g.layout==='circle'){ctx.strokeStyle=hexA(th.cv.warn||'#ffb13f',0.35+0.3*Math.sin(clock*12));ctx.lineWidth=3;ctx.beginPath();ctx.arc(g.c,g.c,g.rOut+5,0,TAU);ctx.stroke()}
- const sv=soloView();
- if(sv>=0){drawSoloStage(dt,sgeom(),th,sv);if(g.layout!=='strip')drawCoreS(dt,g,th)}
+ if(D3){drawRings(dt,g,th);drawMarks(g,th);drawNeedle(g,th);drawExtraNeedles(g,th);ground3(g,th);gOut();marks3(g,th);depth3(dt,g,th)}
+ else if(sv>=0){drawSoloStage(dt,sgeom(),th,sv);if(g.layout!=='strip')drawCoreS(dt,g,th)}
  else if(g.layout==='strip'){drawStrip(dt,g,th)}
  else{drawRings(dt,g,th);drawMarks(g,th);drawNeedle(g,th);drawExtraNeedles(g,th);drawCoreS(dt,g,th)}
- if(S.up.akor&&sv<0&&g.layout==='circle'){const lab=chordLabel(curBar,Math.floor(phase*MI.N)%MI.N);ctx.fillStyle=hexA(th.cv.acc,0.85);ctx.font='600 '+Math.max(9,Math.round(g.r0*0.3))+'px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lab,g.c,g.c+g.r0*0.55)}
+ if(S.up.akor&&sv<0&&g.layout==='circle'){const lab=chordLabel(curBar,Math.floor(phase*MI.N)%MI.N),lp=D3?pj(g.c,g.c,coreZ3(g)+g.rOut*0.44):[g.c,g.c+g.r0*0.55];ctx.fillStyle=hexA(th.cv.acc,0.85);ctx.font='600 '+Math.max(9,Math.round(g.r0*0.3))+'px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lab,lp[0],lp[1])}
  if(crashFlash>0){crashFlash=Math.max(0,crashFlash-dt*2.5);ctx.fillStyle='rgba(255,255,255,'+(crashFlash*0.18).toFixed(3)+')';ctx.fillRect(-OX,-OY,CW,CH)}
- enemies.forEach(e=>drawEnemy(e,th,g));
+ if(!D3)enemies.forEach(e=>drawEnemy(e,th,g));
  drawVfx(dt,g,th);
+ drawNova(dt,g,th);
  drawParts(dt,th);
  drawPops(dt,g,th);
  orbStep(dt);drawOrb(th);
@@ -529,6 +629,8 @@ function drawSoloStage(dt,g,th,si){const x=slotIns(si),col=insColor(x,th),ink=th
 function hitTest(e){
  const [x,y]=cvPt(e),g=geom();
  if(g.layout==='strip'){if(y<g.gridTop-6)return{core:true};const i=Math.floor((y-g.gridTop)/g.rowH),s=Math.floor((x-g.x0)/g.colW);if(i<0||i>=S.slots.length||s<0||s>=MI.N)return null;return{i,s}}
+ /* 3D'de sahneye dokunmak ritim yerleştirmez: Ritme vur ya da merkez */
+ if(D3){const o=orbAt();return Math.hypot(x-o.x,y-o.y)<g.r0*1.05?{core:true}:null}
  const dx=x-g.c,dy=y-g.c,r=Math.hypot(dx,dy);
  if(r<g.r0*1.05)return{core:true};if(r<g.rIn||r>g.rOut)return null;
  let a=(Math.atan2(dy,dx)+Math.PI/2-rot)*dirS;a=((a%TAU)+TAU)%TAU;
@@ -585,7 +687,7 @@ setInterval(()=>{if(S.orders.some(o=>!o.tpl&&o.ready&&Date.now()>=o.ready)){rend
 setInterval(save,5000);setInterval(()=>{try{autoTick()}catch(e){console.warn(e)}},2000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{bgKey=''});
-window.__nb={get S(){return S},unlockAll(){UNLK.forEach(u=>{S.unl[u.k]=1});S.tipq=[];unlVis();tutShow()},unlCheck,unlVis,tabOn,retreatNow:()=>retreat(nowT()),stageM,globalM,chordFreqsAt,chordLabel,walkSemi,chordTonesAt,get pops(){return pops},undo,get undoN(){return undoSt.length},anlRank,anlToggle,get anlOn(){return anlOn},ff:ffSim,rate,dps,recalc,renderPanels,setWave,get enemies(){return enemies},get wave(){return wave},get core(){return core},IDX,INS,get playing(){return playing},get soloNow(){return soloNow},get curBar(){return curBar},soloVoice:(id,row,hold,art)=>{ensureAudio();soloVoice(IDX[id],ac.currentTime+0.01,row,hold,art,1);return true},genSolo,testVoice:(id,s)=>{ensureAudio();const x=IDX[id];SOLO_F=0;GEN[x.v.g](ac.currentTime+0.01,1,x.v,s||0);return true},soloFreq,tickPow,analyzeSolo,artOk,noteSus,soloView:()=>soloView(),sgeom:()=>sgeom(),get soloEdSlot(){return soloEdSlot},set soloEdSlot(v){soloEdSlot=v},get soloSel(){return soloSel},get L(){return L},setEdit(v){S.edit=v;renderPanels();updUI()},renderPads,get lowQ(){return lowQ},parseCode,exportCode,curChord,chordName,kadansAt,contrastM,transM,fillHits,fillBar,cellClick,get crashFlash(){return crashFlash},get transText(){return transText},planAvg,autoTick,autoReset:()=>{autoT=0},sfLoad,SF,sfReady:id=>sfReady(IDX[id]),sfVoice:(id,s)=>{ensureAudio();return sfVoice(IDX[id],ac.currentTime+0.02,1,s||0)},get sfDir(){return SF_DIR},set sfDir(v){SF_DIR=v},get sfVol(){return SF_VOL},set sfVol(v){SF_VOL=v},sfDrum:(id,t,a,s)=>{ensureAudio();return sfDrum(IDX[id],t||ac.currentTime+0.02,a||1,s||0)},sfSolo:(id,t,row,hold,art,a)=>{ensureAudio();return sfSolo(IDX[id],t||ac.currentTime+0.02,row||0,hold||1,art||'none',a||1)},soloVoice:(id,t,row,hold,art,a)=>{ensureAudio();soloVoice(IDX[id],t||ac.currentTime+0.02,row||0,hold||1,art||'none',a||1)},voice:(id,t,v,s)=>{ensureAudio();voice(IDX[id],t||ac.currentTime+0.02,v||1,s||0)},get ac(){return ac},get analyser(){return analyser},get playingNow(){return playing},goTour,tourM,cityOf,albUnl,waveComp,get demoMode(){return demoMode},get demoIdx(){return demoIdx},DEMOS,enterDemo,exitDemo,soloMerge,sAng,get scene(){return scene},get orbK(){return orbK},sfKeyOf:id=>sfProg(id)||null,get dorukFlash(){return dorukFlash}};
+window.__nb={get S(){return S},unlockAll(){UNLK.forEach(u=>{S.unl[u.k]=1});S.tipq=[];unlVis();tutShow()},unlCheck,unlVis,tabOn,retreatNow:()=>retreat(nowT()),stageM,globalM,chordFreqsAt,chordLabel,walkSemi,chordTonesAt,get pops(){return pops},undo,get undoN(){return undoSt.length},anlRank,anlToggle,get anlOn(){return anlOn},ff:ffSim,rate,dps,recalc,renderPanels,setWave,get enemies(){return enemies},get wave(){return wave},get core(){return core},IDX,INS,get playing(){return playing},get soloNow(){return soloNow},get curBar(){return curBar},soloVoice:(id,row,hold,art)=>{ensureAudio();soloVoice(IDX[id],ac.currentTime+0.01,row,hold,art,1);return true},genSolo,testVoice:(id,s)=>{ensureAudio();const x=IDX[id];SOLO_F=0;GEN[x.v.g](ac.currentTime+0.01,1,x.v,s||0);return true},soloFreq,tickPow,analyzeSolo,artOk,noteSus,soloView:()=>soloView(),sgeom:()=>sgeom(),get soloEdSlot(){return soloEdSlot},set soloEdSlot(v){soloEdSlot=v},get soloSel(){return soloSel},get L(){return L},setEdit(v){S.edit=v;renderPanels();updUI()},renderPads,get lowQ(){return lowQ},parseCode,exportCode,curChord,chordName,kadansAt,contrastM,transM,fillHits,fillBar,cellClick,get crashFlash(){return crashFlash},get transText(){return transText},planAvg,autoTick,autoReset:()=>{autoT=0},sfLoad,SF,sfReady:id=>sfReady(IDX[id]),sfVoice:(id,s)=>{ensureAudio();return sfVoice(IDX[id],ac.currentTime+0.02,1,s||0)},get sfDir(){return SF_DIR},set sfDir(v){SF_DIR=v},get sfVol(){return SF_VOL},set sfVol(v){SF_VOL=v},sfDrum:(id,t,a,s)=>{ensureAudio();return sfDrum(IDX[id],t||ac.currentTime+0.02,a||1,s||0)},sfSolo:(id,t,row,hold,art,a)=>{ensureAudio();return sfSolo(IDX[id],t||ac.currentTime+0.02,row||0,hold||1,art||'none',a||1)},soloVoice:(id,t,row,hold,art,a)=>{ensureAudio();soloVoice(IDX[id],t||ac.currentTime+0.02,row||0,hold||1,art||'none',a||1)},voice:(id,t,v,s)=>{ensureAudio();voice(IDX[id],t||ac.currentTime+0.02,v||1,s||0)},get ac(){return ac},get analyser(){return analyser},get playingNow(){return playing},goTour,tourM,cityOf,albUnl,waveComp,get demoMode(){return demoMode},get demoIdx(){return demoIdx},DEMOS,enterDemo,exitDemo,soloMerge,sAng,get scene(){return scene},get orbK(){return orbK},sfKeyOf:id=>sfProg(id)||null,get dorukFlash(){return dorukFlash},get charge(){return charge},set charge(v){charge=v},blast,chargeHit,get blastN(){return blastN},get novaT(){return novaT},get D3(){return D3},is3D,pj,coreScreen:()=>{const g=geom();return corePos(g)}};
 requestAnimationFrame(frame);
 })();
 </script>

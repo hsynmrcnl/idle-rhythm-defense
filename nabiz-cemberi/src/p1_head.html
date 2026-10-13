@@ -463,6 +463,11 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 @keyframes pdanger{50%{opacity:.3}}
 .stchip{position:absolute;top:8px;right:8px;z-index:3;display:inline-flex;align-items:center;gap:6px;font:600 12.5px var(--f-m);padding:9px 12px;min-height:40px;border-radius:10px;border:1px solid var(--hot);background:color-mix(in srgb,var(--panel) 88%,transparent);color:var(--fg);cursor:pointer;box-shadow:0 0 12px -2px var(--hot)}
 .stchip[hidden]{display:none}
+/* v27: 3D / 2D düğmesi, sahnenin sağ üstünde (telefonda Ayarlar dişlisinin altında) */
+.v3d{position:absolute;top:8px;right:8px;z-index:3;width:40px;height:40px;padding:0;border-radius:10px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent);color:var(--muted);font:700 13px var(--f-m);letter-spacing:.02em;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .2s,border-color .2s,box-shadow .2s}
+.v3d[aria-pressed="true"]{color:var(--acc);border-color:var(--acc);box-shadow:0 0 10px -2px var(--acc);text-shadow:0 0 6px var(--acc)}
+.v3d[hidden]{display:none}
+.v3d:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .stchip:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .sotb{display:none}
 @media (max-width:700px){
@@ -478,6 +483,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
  .cvwrap>.msg{left:18px;right:18px}
  .demochip:not([hidden]){left:16px;top:6px}
  .stchip{top:6px;right:16px}
+ .v3d{top:6px;right:12px}
  .pads{position:relative}
  .sotb{display:flex;position:absolute;right:0;bottom:calc(100% + 8px);z-index:4;align-items:flex-end;gap:8px;pointer-events:none}
  .sotb[hidden]{display:none}
@@ -625,7 +631,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         <span class="pulse" id="stNabiz" title="Nabız"><i class="hp" id="sHpBar"></i><i class="sh" id="sShBar"></i><span class="pv" id="sHp">100%</span></span>
       </div>
       <div class="anl" id="anl" role="region" aria-label="Analiz" hidden></div>
-      <div class="cvwrap" id="cvwrap"><button class="demochip" id="demoChip" hidden>Örnek şarkı · çık</button><button class="stchip" id="soloChip" hidden aria-label="Solo düzenlemeden çık">✓ Solodan çık</button><canvas id="cv" aria-label="Ritim sıralayıcı ve savunma sahnesi. Çember düzeninde halkalar, şerit düzeninde satırlar enstrümanları gösterir; düşmanlar kenarlardan sahneye yaklaşır."></canvas></div>
+      <div class="cvwrap" id="cvwrap"><button class="demochip" id="demoChip" hidden>Örnek şarkı · çık</button><button class="stchip" id="soloChip" hidden aria-label="Solo düzenlemeden çık">✓ Solodan çık</button><button class="v3d" id="v3d" hidden aria-pressed="true" aria-label="3D sahne" title="3D sahne">3D</button><canvas id="cv" aria-label="Ritim sıralayıcı ve savunma sahnesi. Çember düzeninde halkalar, şerit düzeninde satırlar enstrümanları gösterir; düşmanlar kenarlardan sahneye yaklaşır."></canvas></div>
       <div class="pads" id="pads" hidden aria-label="Seçili sahne yerinin adımları"></div>
       <p class="hint" id="hint"></p>
       <div class="controls">
@@ -677,6 +683,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       </div>
       <div id="p-look" role="tabpanel" hidden>
         <section class="block"><h2>Düzen</h2><p class="note">Çember: halkalar ve dönen ibre, düşmanlar her yönden gelir. Şerit: satırlar ve kayan çubuk, önünde ekolayzer silüeti, düşmanlar yukarıdan iner.</p><div id="layoutBox"></div></section>
+        <section class="block"><h2>3D sahne</h2><p class="note">Ritimler zeminden yükselen sütunlar olur, saldırılar merkezden ışın olarak çıkar. Vurgulu adımlar ve Alan rolü merkezi şarj eder; dolunca merkez patlar, tüm sahneye 10 saniyelik hasar vurur (patronlara yarısı). 3D’de sahneye dokunmak Ritme vur olur; ritim yerleştirmek için 2D’ye geç.</p><div id="d3Box"></div></section>
         <section class="block"><h2>Temalar</h2><p class="note">Tema görüntüyü, ses rengini ve düşman çizimini değiştirir. Temanın sevdiği tempoda çalarsan gelir ×1,25.</p><div class="themes" id="themeList"></div></section>
         <section class="block"><h2>Sahne katmanları</h2><p class="note">Albümden sonra da kalır, her biri gelire ×1,1 ekler ve her düzende farklı çizilir.</p><div id="stageList"></div></section>
         <section class="block" data-sec="fx"><h2>Efekt laboratuvarı</h2><div id="fxBox"></div></section>

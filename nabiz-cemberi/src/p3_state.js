@@ -2,7 +2,7 @@
 /* ================= state ================= */
 const mkPat=()=>Array.from({length:MAXSLOTS},()=>Array(18).fill(0));
 const freshRun=()=>{const A=mkPat();A[0][0]=1;A[0][8]=1;return{nota:25,slots:['davul',null,null,null],lv:{davul:1},pat:{A,B:mkPat(),S:mkPat(),F:mkPat()},edit:'A',bpm:90,bmax:90,seri:0,up:{},def:{},solo:{},solos:{},plan:null,needle:{},wave:1,runEarned:0,meter:'m44',scale:'minor',prog:Array(8).fill('pop'),prate:'beat',progAuto:true,rowm:{}}};
-const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin',ui:'kolay',det:{},unl:{},tipq:[],am:{yeni:true,nakarat:true,solo:true,k:{lv:1,rup:1,srup:1,tempo:0,def:0},b:0.5}});
+const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin',ui:'kolay',det:{},unl:{},tipq:[],am:{yeni:true,nakarat:true,solo:true,k:{lv:1,rup:1,srup:1,tempo:0,def:0},b:0.5},d3:{own:D3_TEST?1:0,on:1,core:'kristal',cores:{kristal:1}}});
 const KEY='nabiz-cemberi-v3';
 let S=Object.assign(freshRun(),freshMeta());
 try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.v===3&&d.pat&&Array.isArray(d.pat.A)&&Array.isArray(d.slots)){S=Object.assign(S,d);if(!d.tut)S.tut=null;if(!d.am)S.am=null;if(!d.unl)S.unl=null}}}catch(e){}
@@ -29,6 +29,8 @@ if(!S.themes[S.theme])S.theme='neon';
  if(!S.am||typeof S.am!=='object'){const on=S.ui!=='detay';S.am={yeni:on,nakarat:on,solo:on}}['yeni','nakarat','solo'].forEach(k=>{if(typeof S.am[k]!=='boolean')S.am[k]=true});if(!S.am.k||typeof S.am.k!=='object')S.am.k={lv:1,rup:1,srup:1,tempo:0,def:0};if(![0.25,0.5,0.9].includes(S.am.b))S.am.b=0.5;
  /* v26 aşamalı açılış: unl'si olmayan eski kayıtta koşulu tutanlar açılışta sessiz açılır (unlQuiet) */
  if(!S.unl||typeof S.unl!=='object'){S.unl={};unlQuiet=true}if(!Array.isArray(S.tipq))S.tipq=[];
+ /* v27 3D sahne: own geliştirme, on görünüm (3D/2D), core seçili merkez, cores alınanlar */
+ if(!S.d3||typeof S.d3!=='object')S.d3={own:0,on:1,core:'kristal',cores:{}};if(D3_TEST)S.d3.own=1;S.d3.own=S.d3.own?1:0;S.d3.on=S.d3.on===0||S.d3.on===false?0:1;if(!S.d3.cores||typeof S.d3.cores!=='object')S.d3.cores={};S.d3.cores.kristal=1;if(!S.d3.cores[S.d3.core]||!CORES.some(c=>c.id===S.d3.core))S.d3.core='kristal';
  if(!S.mn||typeof S.mn!=='object')S.mn={};if(!S.auto||typeof S.auto!=='object')S.auto={lv:true,ord:true,ins:true,alb:false};if(!S.cities||typeof S.cities!=='object')S.cities={};S.efsane=Math.max(0,Math.floor(S.efsane||0));S.tours=Math.max(0,Math.floor(S.tours||0));S.city=((S.city|0)%CITIES.length+CITIES.length)%CITIES.length;
 }
 normalizeS();
@@ -52,6 +54,8 @@ const ownTheme=()=>THEMES[S.theme];
 const albumsN=()=>S.albums.length;
 function albUnl(){return Math.max(S.albums.length,S.albMax||0)}
 const hasB=()=>albUnl()>=1;
+/* v27: 3D sahne yalnız çember düzeninde; geliştirme alınmış (own), görünüm 3D (on) ve ilk öğretici bitmiş olmalı (öğretici halkaya dokunarak ritim yazdırır, 3D'de dokunuş yerleştirmez) */
+const d3Has=()=>!!(S.d3&&S.d3.own),d3Own=()=>d3Has()&&!(S.tut&&!S.tut.done),is3D=()=>d3Own()&&!!S.d3.on&&S.layout==='circle';
 const themeOwned=id=>!!S.themes[id];
 const famOpen=f=>!!S.famOpen[f];
 const famCond=f=>FAMS.find(x=>x[0]===f)[2];

@@ -36,6 +36,11 @@ function logic(now){
  if(!wave.queue.length&&enemies.length===0&&!wave.done){wave.done=true;wave.nextAt=now+bd}
  if(wave.done&&now>=wave.nextAt)startWave(wave.n+1,now);
 }
+/* v27 şarj: vurgulu adımlar ve Alan rolü merkezi doldurur (ölçü başına en çok CH_BAR); dolunca merkez patlar: tüm sahneye BLAST_S sn'lik hasar, patrona yarısı */
+let charge=0,chBar=0,novaT=-1,blastN=0;
+function chargeHit(si,s,v,x){if(!d3Own())return;const a=(v===2?CH_ACC:0)+(x.role==='alan'?CH_ALAN:0),add=Math.min(a,CH_BAR-chBar);if(add<=0)return;chBar+=add;charge=Math.min(1,charge+add);if(vfx.length<90)vfx.push({k:'charge',o:{si,s},life:1});if(charge>=1-1e-9)blast()}
+function blast(){charge=0;const th=dispTheme(),d=dps()*BLAST_S*globalMDmg(),col=goldOf(th);enemies.slice().forEach(e=>{if(enemies.includes(e))hit(e,d*(e.boss?0.5:1),col,null)});novaT=0;blastN++;kickP=1;
+ if(ac&&playing&&!S.muted){const t=ac.currentTime+0.01;O('sine',90,t,1,0.9,drum,28,0.8);Nz(t,'lowpass',600,0,0.35,1,drum)}msg('Merkez patladı · tüm sahneye hasar')}
 function inRange(){const r=range();return enemies.filter(e=>e.d<=r)}
 function hit(e,dmg,col,origin,kind){e.dnA=(e.dnA||0)+Math.min(dmg,Math.max(0,e.hp));e.hp-=dmg;e.flash=1;const k=enemies.indexOf(e);if(origin)vfx.push({k:kind||'tracer',o:origin,e,col,life:1});if(e.hp<=0&&k>=0)kill(e,k,lastLogic)}
 function applySlow(e,amt,dur){if(ETYPES[e.ty].noSlow)return;e.slow=Math.max(e.slow,amt);e.slowT=Math.max(e.slowT,dur)}
@@ -70,7 +75,7 @@ function fire(si,s,v,pk,mult,art,raw){
 }
 function onStep(q){
  const nk=q.k||1;
- if(q.s===0&&nk===1){if(!hitBar)S.seri=Math.floor(S.seri/2);hitBar=false;playPk=q.pk;
+ if(q.s===0&&nk===1){if(!hitBar)S.seri=Math.floor(S.seri/2);hitBar=false;playPk=q.pk;chBar=0;
   if(S.stage.tower&&enemies.length){const tg=enemies.slice().sort((a,b)=>b.hp-a.hp)[0];const d=(DR[q.pk]*GC[q.pk]/MI.N)*4*globalMDmg();if(d>0){hit(tg,d,dispTheme().cv.hot,null);vfx.push({k:'bolt',e:tg,col:dispTheme().cv.hot,life:1})}}}
  const p=S.pat[q.pk],M=GC[q.pk]*globalM(),vis=q.pk===S.edit;let g=0;
  const b=q.b||0,sa=soloActive(b),pa=planAt(b);let dyn=dynAt(b);if(nk===1)curBar=b;const fb=nk===1&&fillBar(b);
@@ -78,11 +83,11 @@ function onStep(q){
  if(q.s===0&&nk===1){if(sa>=0&&soloNow!==sa){soloFlash=1;msg('Solo: '+slotIns(sa).n)}soloNow=sa;if(pa.barIn===0&&(S.up.sef||pa.sec.solo||bActive())){secFlash=1;secName=T(pa.sec.n)}}
  for(let i=0;i<S.slots.length;i++){const x=slotIns(i);if(!x)continue;if(needleOf(i)!==nk)continue;if(muteUntil[i]>q.t)continue;const soloing=pa.sec.solo&&isSolo(i);let v,pkk=q.pk;if(soloing){const dp=duetPart(i);if(dp<0&&sa!==i)continue;if(x.fam!=='vur'&&hasSoloNotes(i)){const off=(pa.barIn%2)*MI.N+q.s;let gs=0;if(duetPlays(i,off)){const A=analyzeSolo(i),dm=dp>=0?1.2:1,R=soloRows();A.ns.forEach((nt,j)=>{const a=artEff(x,nt.art),L=noteLenEff(nt);
    if(nt.t===off){const m=SOLO_M*dyn*A.hab[j]*A.mult*dm;gs+=hitNota('S',i,1)*m*(ART_M[a]||1);flash[i][q.s]=1;spawnPart(i,q.s);fire(i,q.s,1,'S',m,a)}
-   else if(off>nt.t&&off<nt.t+L){const k=off-nt.t,p=tickPow(x,k,a);if(p<0){squeal(i);return}if(p<=0)return;const m=SOLO_M*dyn*p*A.mult*dm;gs+=hitNota('S',i,1)*m;fire(i,q.s,1,'S',m,a==='fb'?'fb':'none');if(S.up.sdoruk&&k===3&&L>=4&&nr(nt)>=R-Math.ceil(R/3))doruk(i)}})}g+=gs;continue}v=S.pat.S[i][q.s];pkk='S'}else{const fr=fb&&fillZone(q.s)&&x.fam==='vur';v=fr?S.pat.F[i][q.s]:p[i][q.s];if(v&&!allowed(pa.sec,x,i))continue;if(fr&&v){const sm=dyn;g+=fillRowVal(i,v)*sm;flash[i][q.s]=1;spawnPart(i,q.s);if(x.id==='davul'||x.fam==='vur'&&x.dmg>=4)kickP=Math.max(kickP,v===2?1:0.85);fire(i,q.s,v,pkk,sm,null,true);continue}}if(!v)continue;const sm=(soloing?SOLO_M:1)*dyn;g+=hitNota(pkk,i,v)*sm;
+   else if(off>nt.t&&off<nt.t+L){const k=off-nt.t,p=tickPow(x,k,a);if(p<0){squeal(i);return}if(p<=0)return;const m=SOLO_M*dyn*p*A.mult*dm;gs+=hitNota('S',i,1)*m;fire(i,q.s,1,'S',m,a==='fb'?'fb':'none');if(S.up.sdoruk&&k===3&&L>=4&&nr(nt)>=R-Math.ceil(R/3))doruk(i)}})}g+=gs;continue}v=S.pat.S[i][q.s];pkk='S'}else{const fr=fb&&fillZone(q.s)&&x.fam==='vur';v=fr?S.pat.F[i][q.s]:p[i][q.s];if(v&&!allowed(pa.sec,x,i))continue;if(fr&&v){const sm=dyn;g+=fillRowVal(i,v)*sm;flash[i][q.s]=1;spawnPart(i,q.s);if(x.id==='davul'||x.fam==='vur'&&x.dmg>=4)kickP=Math.max(kickP,v===2?1:0.85);fire(i,q.s,v,pkk,sm,null,true);chargeHit(i,q.s,v,x);continue}}if(!v)continue;const sm=(soloing?SOLO_M:1)*dyn;g+=hitNota(pkk,i,v)*sm;
   if(vis||soloing){flash[i][q.s]=1;spawnPart(i,q.s)}
   if(x.id==='davul'||x.fam==='vur'&&x.dmg>=4){kickP=Math.max(kickP,v===2?1:0.85);if(S.stage.tunnel){if(!RM&&waves.length<8)waves.push({r:0,a:v===2?1:0.8,rot:Math.random()*TAU});enemies.forEach(e=>{if(e.d<0.95&&e.d>0.05)e.d=Math.min(1,e.d+(e.boss?0.008:0.02))})}}
   if(x.role==='delici'||x.role==='titresim')bassP=1;
-  fire(i,q.s,v,pkk,sm);
+  fire(i,q.s,v,pkk,sm);chargeHit(i,q.s,v,x);
  }
  earn(g*M*planBonus());
 }
