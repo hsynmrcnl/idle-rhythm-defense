@@ -19,7 +19,7 @@ def check(ok, what):
     print(('  ok  ' if ok else '  FAIL ') + what)
     if not ok: fails.append(what)
 
-SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};S.ui='kolay';S.nota=1e9;S.bestWave=6;S.open={syn:1,rhy:1,pat:1};S.famOpen={vur:1,tel:1};
+SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};window.__nb.unlockAll();S.ui='kolay';S.nota=1e9;S.bestWave=6;S.open={syn:1,rhy:1,pat:1};S.famOpen={vur:1,tel:1};
   S.slots=['davul','trampet','hihat','bas'];S.lv={davul:10,trampet:10,hihat:10,bas:10};S.up={};S.rowm={};
   ['A','B','S','F'].forEach(k=>S.pat[k]=S.pat[k].map(r=>r.map(()=>0)));nb.recalc();nb.renderPanels()}"""
 row = lambda p, k, i: p.evaluate("([k,i])=>window.__nb.S.pat[k][i].slice(0,16).join('')", [k, i])
@@ -101,11 +101,12 @@ with sync_playwright() as pw:
     p.click('#collList [data-act=lv][data-id=clap]'); p.wait_for_timeout(80)
     si = p.evaluate("()=>window.__nb.S.slots.indexOf('clap')")
     check(si == 3 and row(p, 'A', 3).count('1') >= 1, 'Kolay: el çırpma sahneye ritmiyle geldi (%s)' % (row(p, 'A', 3) if si == 3 else si))
-    p.evaluate("()=>{const S=window.__nb.S;S.ui='detay';S.slots[3]=null;window.__nb.renderPanels()}")
+    # v24: yeni enstrüman ritmi Otomatik bölümünden kapatılır (Kolay/Detaylı'dan bağımsız)
+    p.evaluate("()=>{const S=window.__nb.S;S.ui='detay';S.am.yeni=false;S.slots[3]=null;window.__nb.renderPanels()}")
     p.click('#collList [data-act=place][data-id=clap]'); p.wait_for_timeout(50)
     p.evaluate("()=>{const S=window.__nb.S;S.pat.A[3]=S.pat.A[3].map(()=>0);S.slots[3]=null;S.lv.shaker=1;window.__nb.renderPanels()}")
     p.click('#collList [data-act=place][data-id=shaker]'); p.wait_for_timeout(50)
-    check(row(p, 'A', 3).count('1') == 0, 'Detaylı: sahneye giren enstrüman boş gelir')
+    check(row(p, 'A', 3).count('1') == 0, 'Yeni enstrüman ritmi kapalıyken sahneye giren enstrüman boş gelir')
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
 
     # telefon: satır düğmeleri sığıyor

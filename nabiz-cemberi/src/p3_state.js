@@ -2,10 +2,11 @@
 /* ================= state ================= */
 const mkPat=()=>Array.from({length:MAXSLOTS},()=>Array(18).fill(0));
 const freshRun=()=>{const A=mkPat();A[0][0]=1;A[0][8]=1;return{nota:25,slots:['davul',null,null,null],lv:{davul:1},pat:{A,B:mkPat(),S:mkPat(),F:mkPat()},edit:'A',bpm:90,bmax:90,seri:0,up:{},def:{},solo:{},solos:{},plan:null,needle:{},wave:1,runEarned:0,meter:'m44',scale:'minor',prog:Array(8).fill('pop'),prate:'beat',progAuto:true,rowm:{}}};
-const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin',ui:'kolay',det:{}});
+const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin',ui:'kolay',det:{},unl:{},tipq:[],am:{yeni:true,nakarat:true,solo:true,k:{lv:1,rup:1,srup:1,tempo:0,def:0},b:0.5}});
 const KEY='nabiz-cemberi-v3';
 let S=Object.assign(freshRun(),freshMeta());
-try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.v===3&&d.pat&&Array.isArray(d.pat.A)&&Array.isArray(d.slots)){S=Object.assign(S,d);if(!d.tut)S.tut=null}}}catch(e){}
+try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.v===3&&d.pat&&Array.isArray(d.pat.A)&&Array.isArray(d.slots)){S=Object.assign(S,d);if(!d.tut)S.tut=null;if(!d.am)S.am=null;if(!d.unl)S.unl=null}}}catch(e){}
+let unlQuiet=false;
 function normalizeS(){
 ['up','def','found','stage','fxo','lv','themes','famOpen','solo','needle','solos','open','det','rowm'].forEach(k=>{if(!S[k]||typeof S[k]!=='object')S[k]={}});
 if(!Array.isArray(S.orders))S.orders=[];
@@ -24,6 +25,10 @@ if(S.stage.crown){S.stage.wall=1;delete S.stage.crown}
 if(!S.themes[S.theme])S.theme='neon';
  if(!S.tut||typeof S.tut!=='object')S.tut={s:0,done:(S.kills>0||S.albums.length>0||Object.keys(S.lv).length>1||(S.total||0)>50)};
  if(S.sfx!==false)S.sfx=true;if(S.dnum!==false)S.dnum=true;if(S.harm!=='uclu')S.harm='zengin';if(S.ui!=='detay')S.ui='kolay';delete S.autoUp;if(S.lang!=='en')S.lang='tr';
+ /* v24 tek Otomatik: müzik otomatikleri Kolay/Detaylı'dan bağımsız; eski Detaylı kayıtta kapalı başlar */
+ if(!S.am||typeof S.am!=='object'){const on=S.ui!=='detay';S.am={yeni:on,nakarat:on,solo:on}}['yeni','nakarat','solo'].forEach(k=>{if(typeof S.am[k]!=='boolean')S.am[k]=true});if(!S.am.k||typeof S.am.k!=='object')S.am.k={lv:1,rup:1,srup:1,tempo:0,def:0};if(![0.25,0.5,0.9].includes(S.am.b))S.am.b=0.5;
+ /* v26 aşamalı açılış: unl'si olmayan eski kayıtta koşulu tutanlar açılışta sessiz açılır (unlQuiet) */
+ if(!S.unl||typeof S.unl!=='object'){S.unl={};unlQuiet=true}if(!Array.isArray(S.tipq))S.tipq=[];
  if(!S.mn||typeof S.mn!=='object')S.mn={};if(!S.auto||typeof S.auto!=='object')S.auto={lv:true,ord:true,ins:true,alb:false};if(!S.cities||typeof S.cities!=='object')S.cities={};S.efsane=Math.max(0,Math.floor(S.efsane||0));S.tours=Math.max(0,Math.floor(S.tours||0));S.city=((S.city|0)%CITIES.length+CITIES.length)%CITIES.length;
 }
 normalizeS();
@@ -32,7 +37,9 @@ const b64dec=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 async function exportCode(){const json=JSON.stringify(S);try{if(window.CompressionStream){const cs=new CompressionStream('deflate-raw'),w=cs.writable.getWriter();w.write(new TextEncoder().encode(json));w.close();const buf=await new Response(cs.readable).arrayBuffer();return 'NB2.'+b64enc(new Uint8Array(buf))}}catch(e){}return 'NB1.'+b64enc(new TextEncoder().encode(json))}
 async function parseCode(code){code=(code||'').replace(/\s+/g,'');if(!/^NB[12]\./.test(code))throw new Error('Bu bir Nabız Çemberi kayıt kodu değil');const body=code.slice(4);let bytes;if(code.startsWith('NB2.')){const ds=new DecompressionStream('deflate-raw'),w=ds.writable.getWriter();w.write(b64dec(body));w.close();bytes=new Uint8Array(await new Response(ds.readable).arrayBuffer())}else bytes=b64dec(body);const d=JSON.parse(new TextDecoder().decode(bytes));if(!(d&&d.v===3&&d.pat&&Array.isArray(d.pat.A)&&Array.isArray(d.slots)))throw new Error('Kod bozuk ya da eksik');return d}
 let demoMode=false,demoSnap=null;
-function save(){if(demoMode)return;S.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+/* wiping: sıfırlama sırasında (sayfa yeniden açılırken) hiçbir şey yazılmaz */
+let wiping=false;
+function save(){if(demoMode||wiping)return;S.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 let MI=null;
 function meterInfo(){const m=METERS[S.meter];const gs=[],grp=[],pos=[];let a=0;m.g.forEach((len,gi)=>{gs.push(a);for(let k=0;k<len;k++){grp.push(gi);pos.push(k)}a+=len});return{N:a,g:m.g,gs,gsSet:new Set(gs),grp,pos,mids:gs.map(s=>s+2)}}
