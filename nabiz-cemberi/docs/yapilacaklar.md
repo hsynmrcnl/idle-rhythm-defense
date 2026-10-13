@@ -3,13 +3,13 @@
 Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra önerilen sıradır.
 
 ## 1. Hemen (Hüseyin)
-- [ ] **Birleştir:** v18, v19 ve v20 branch'te, yayında değil
+- [ ] **Birleştir:** v18–v21 branch'te, yayında değil
 - [ ] **Telefonda dene:** Kolay görünüm, Sade/Hareketli/Yoğun, Hepsini düzenle, Otomatik geliştir, zengin armoni
 
-## 2. Karar bekleyen
-- [ ] **Otomatik geliştir ve Menajer: seviye:** Otomatik geliştir baştan ücretsiz; 1. albümdeki "Menajer: seviye" (♪ 2 Mn) neredeyse gereksiz kaldı. Seçenekler: menajer satırı kalkar · Otomatik geliştir menajerle açılır · ikisi de kalır
-- [ ] **Sahne katmanları metni:** "her biri gelire ×1,1 ekler" diyor, kodda çarpan yok. Metin düzelir mi, çarpan mı eklenir?
-- [ ] **Geri çekilme metni:** "Nabız sıfırlanırsa dalga 5 geri gider" diyor, oyun dalgayı %20 geri çekiyor (10 → 8, 50 → 40). Hangisi doğru?
+## 2. Kararlar (v21'de uygulandı)
+- [x] Otomatik geliştir menajerle gelir: "Menajer: otomatik geliştir" (1. albüm), Sahne kartından açılıp kapanır
+- [x] Sahne katmanları gelire gerçekten ×1,1 ekler (Analiz'de de görünür)
+- [x] Nabız sıfırlanınca bir dalga geri gidilir
 
 ## 3. Küçük temizlik (v21, küçük)
 - [ ] Öğretici Kolay'a göre: hücre hücre vuruş yerine Sade/Hareketli/Yoğun ve Hepsini düzenle anlatılır; Nefes adımı sadeleşir
@@ -39,4 +39,5 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v18: Kolay / Detaylı Stüdyo, herkes Kolay'da başlar
 - v19: akıllı desen (Sade/Hareketli/Yoğun, Hepsini düzenle), otomatik nakarat, akor ve dolgu; elle en iyinin %83–98'i
 - v20: Otomatik geliştir, Kolay'da savunma önerisi
+- v21: otomatik geliştir menajere bağlandı, sahne katmanı ×1,1, bir dalga geri
 - Dinlenip vazgeçilenler: komalı Hicaz/Kürdi (fark duyulmadı), 12/8 shuffle, hayalet nota

@@ -2,7 +2,7 @@
 /* ================= state ================= */
 const mkPat=()=>Array.from({length:MAXSLOTS},()=>Array(18).fill(0));
 const freshRun=()=>{const A=mkPat();A[0][0]=1;A[0][8]=1;return{nota:25,slots:['davul',null,null,null],lv:{davul:1},pat:{A,B:mkPat(),S:mkPat(),F:mkPat()},edit:'A',bpm:90,bmax:90,seri:0,up:{},def:{},solo:{},solos:{},plan:null,needle:{},wave:1,runEarned:0,meter:'m44',scale:'minor',prog:Array(8).fill('pop'),prate:'beat',progAuto:true,rowm:{}}};
-const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin',ui:'kolay',det:{},autoUp:false});
+const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin',ui:'kolay',det:{}});
 const KEY='nabiz-cemberi-v3';
 let S=Object.assign(freshRun(),freshMeta());
 try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.v===3&&d.pat&&Array.isArray(d.pat.A)&&Array.isArray(d.slots)){S=Object.assign(S,d);if(!d.tut)S.tut=null}}}catch(e){}
@@ -23,7 +23,7 @@ S.famOpen.vur=1;[['tel',5],['tus',12],['nef',20],['ele',30],['dun',45]].forEach(
 if(S.stage.crown){S.stage.wall=1;delete S.stage.crown}
 if(!S.themes[S.theme])S.theme='neon';
  if(!S.tut||typeof S.tut!=='object')S.tut={s:0,done:(S.kills>0||S.albums.length>0||Object.keys(S.lv).length>1||(S.total||0)>50)};
- if(S.sfx!==false)S.sfx=true;if(S.dnum!==false)S.dnum=true;if(S.harm!=='uclu')S.harm='zengin';if(S.ui!=='detay')S.ui='kolay';S.autoUp=S.autoUp===true;if(S.lang!=='en')S.lang='tr';
+ if(S.sfx!==false)S.sfx=true;if(S.dnum!==false)S.dnum=true;if(S.harm!=='uclu')S.harm='zengin';if(S.ui!=='detay')S.ui='kolay';delete S.autoUp;if(S.lang!=='en')S.lang='tr';
  if(!S.mn||typeof S.mn!=='object')S.mn={};if(!S.auto||typeof S.auto!=='object')S.auto={lv:true,ord:true,ins:true,alb:false};if(!S.cities||typeof S.cities!=='object')S.cities={};S.efsane=Math.max(0,Math.floor(S.efsane||0));S.tours=Math.max(0,Math.floor(S.tours||0));S.city=((S.city|0)%CITIES.length+CITIES.length)%CITIES.length;
 }
 normalizeS();
@@ -267,7 +267,9 @@ const tourM=()=>(1+0.03*S.efsane)*(1+0.02*Object.keys(S.cities).length);
 const cityM=()=>{const c=cityOf();return (S.scale===c.scale?1.1:1)*(S.meter===c.meter?1.1:1)};
 const tourGain=()=>Math.max(1,Math.round(2*Math.sqrt(S.hayran)+albumsN()));
 const canTour=()=>albumsN()>=TOUR_AL;
-const globalM=()=>seriM()*upM()*fanM()*bookM()*fitM()*meterM()*scaleM()*waveM()*tourM()*cityM();
+/* sahne katmanları (Görünüm): albümden sonra da kalır, her biri gelire ×1,1 */
+const stageM=()=>Math.pow(1.1,SUP.filter(u=>S.stage[u.id]).length);
+const globalM=()=>seriM()*upM()*fanM()*bookM()*fitM()*meterM()*scaleM()*waveM()*tourM()*cityM()*stageM();
 const curBpm=b=>S.bpm*tempoMulAt(b||0);
 const barDur=()=>60/S.bpm*MI.N/4;
 function rate(){return planAvg('n')*globalM()*planBonus()*(S.bpm*4/60)/MI.N}

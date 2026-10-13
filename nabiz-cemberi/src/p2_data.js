@@ -295,7 +295,7 @@ const LADDER=[
 ];
 /* manager automation, bought once and kept across albums; each tier can be switched off */
 const AUTO=[
- {id:'lv',n:'Menajer: seviye',d:'10 saniyede bir, notanın yarısını aşmayan en ucuz seviyeyi sahnedeki enstrümanlara alır',c:2e6,al:1},
+ {id:'lv',n:'Menajer: otomatik geliştir',d:'10 saniyede bir, notanın yarısını aşmadan en verimli seviye ya da ritim geliştirmesini alır; Sahne kartından açılıp kapanır',c:2e6,al:1},
  {id:'ord',n:'Menajer: sipariş',d:'Koşulu sağlanan siparişi kendisi teslim eder',c:2e7,al:2},
  {id:'ins',n:'Menajer: sahne',d:'Boş yer varsa ve notanın dörtte birine sığıyorsa açık ailelerden sıradaki enstrümanı açar, sahneye koyar ve rolüne uygun basit bir desen çizer',c:2e8,al:2},
  {id:'alb',n:'Menajer: albüm',d:'Dönem kazancı eşiğin iki katına ulaşınca albümü kendisi çıkarır',c:5e8,al:3}
