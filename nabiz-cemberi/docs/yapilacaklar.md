@@ -1,36 +1,42 @@
-# Yapılacaklar (sosyal olmayanlar)
+# Yapılacaklar
 
-Oyun değerlendirmesinden çıkan liste. Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı.
+Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra önerilen sıradır.
 
-## 1. grup: hızlı kazanç — v16'da yapıldı
-- [x] İnce tempo: ±1 BPM, satın alınan üst sınır içinde
-- [x] Çarpan dökümü: istatistik çubuğuna dokun → Analiz
-- [x] Geri al: desen, plan, akor, solo, ölçü, gam (30 adım; bedel birebir iade/tahsil)
-- [x] Vuruş geri bildirimi: hasar sayıları, düşende +♪ (Görünüm'den kapatılır)
-- [x] "Ne yapmalıyım": Analiz'de gelir ve savunma için sıradaki en verimli satın alma, tek dokunuşla al
+## 1. Hemen (Hüseyin)
+- [ ] **Birleştir:** v18, v19 ve v20 branch'te, yayında değil
+- [ ] **Telefonda dene:** Kolay görünüm, Sade/Hareketli/Yoğun, Hepsini düzenle, Otomatik geliştir, zengin armoni
 
-## 2. grup: yapımcı araçları
+## 2. Karar bekleyen
+- [ ] **Otomatik geliştir ve Menajer: seviye:** Otomatik geliştir baştan ücretsiz; 1. albümdeki "Menajer: seviye" (♪ 2 Mn) neredeyse gereksiz kaldı. Seçenekler: menajer satırı kalkar · Otomatik geliştir menajerle açılır · ikisi de kalır
+- [ ] **Sahne katmanları metni:** "her biri gelire ×1,1 ekler" diyor, kodda çarpan yok. Metin düzelir mi, çarpan mı eklenir?
+- [ ] **Geri çekilme metni:** "Nabız sıfırlanırsa dalga 5 geri gider" diyor, oyun dalgayı %20 geri çekiyor (10 → 8, 50 → 40). Hangisi doğru?
+
+## 3. Küçük temizlik (v21, küçük)
+- [ ] Öğretici Kolay'a göre: hücre hücre vuruş yerine Sade/Hareketli/Yoğun ve Hepsini düzenle anlatılır; Nefes adımı sadeleşir
+- [ ] Uyum ipucuna **Uygula** düğmesi (ilgili satırı otomatik yazar)
+- [ ] Telefonda Sahne ekranındaki ped başlığına Sade/Hareketli/Yoğun
+- [ ] Kolay'da terim birliği: "Desen A'yı temizle" → "Kıtayı temizle"; Analiz panelinde Gam/Ölçü yerine Ruh hâli/Ritim tipi
+- [ ] Kolay'da Albüm/Menajer/Turne kartları için sade açıklama (uzun metin ⓘ'ya)
+
+## 4. Oyun dengesi (önce ölçüm)
+- [ ] **Ekonomi simülasyonu:** hızlı ileri saran bot; Kolay + otomatik özelliklerle dalga süreleri, ilk satın almalar, tıkanma noktaları — orta. Otomatik özellikler geldiği için öncelikli
+- [ ] Idle–aktif denge: simülasyondan sonra
+- [ ] Kaybetme gerilimi (can azalınca müzik boğuklaşır, uyarı, kayıp cezası) — tasarım kararı Hüseyin'de
+- [ ] Aktif savunma (hedef seçme / bekleme süreli beceri) — tasarım kararı Hüseyin'de
+
+## 5. Yapımcı araçları
+- [ ] Reverb (oda/salon) gönderimi — küçük
 - [ ] MIDI dışa aktarma (.mid): desen + plan + akor + solo — orta
 - [ ] WAV kaydı: çalarken ana çıkış kaydı (gerçek zamanlı) — orta
-- [ ] Reverb (oda/salon) gönderimi — küçük
 - [ ] Basit mikser: enstrüman başına ses + pan (ses yolu değişir) — orta-büyük
-
-## 3. grup: müzik içeriği (önce laboratuvar sayfasında dinle)
-Dinleme ve karar sayfası: https://claude.ai/artifact/MtAYigjhjf6d3dwahYaAKh (kararlar sayfanın `deney` koleksiyonunda)
-- [x] Zengin armoni: 7'li, add9, sus, yakın ses yürüyüşü, yürüyen bas — v17'de yapıldı (Görünüm'den Üçlü'ye dönülür)
-- [–] Komalı Hicaz/Kürdi akordu (53-TET) — dinlendi, fark duyulmadı; yapılmayacak
-- [–] 12/8 shuffle ölçüsü — dinlendi, gerek yok
-- [–] Hayalet nota (hafif vuruş) — dinlendi, gerek yok
-
-## 4. grup: oyun dengesi (önce ölçüm)
-- [ ] Ekonomi simülasyonu (hızlı ileri sarma botu) — orta
-- [ ] Kaybetme gerilimi — tasarım kararı Hüseyin'de
-- [ ] Aktif savunma (odak hedefi / beceri) — tasarım kararı Hüseyin'de
-- [ ] Idle–aktif denge — simülasyondan sonra
 
 ## Şimdilik yapılamaz
 - Ney, zurna, tabla, gamelan, taiko için kaliteli kayıt: CC0 kaynak yok. Seçenek: sentezleri laboratuvarda iyileştirmek.
 
-## v16 sırasında bulunan tutarsızlıklar (karar bekliyor)
-- Görünüm → Sahne katmanları: metin "her biri gelire ×1,1 ekler" diyor, kodda böyle bir çarpan yok (`globalM` içinde sahne katmanı yok). Ya metin düzelir ya çarpan eklenir.
-- Kuşatma bilgisi ve öğretici: "Nabız sıfırlanırsa dalga 5 geri gider" diyor, kod dalgayı %20 geri çekiyor (`retreat`: dalga × 0,8; dalga 10 → 8, dalga 50 → 40).
+## Yapıldı
+- v16: ince tempo, Analiz (öneri + çarpan dökümü), geri al, hasar sayıları
+- v17: zengin armoni ve yürüyen bas (müzik deneylerinde B seçildi)
+- v18: Kolay / Detaylı Stüdyo, herkes Kolay'da başlar
+- v19: akıllı desen (Sade/Hareketli/Yoğun, Hepsini düzenle), otomatik nakarat, akor ve dolgu; elle en iyinin %83–98'i
+- v20: Otomatik geliştir, Kolay'da savunma önerisi
+- Dinlenip vazgeçilenler: komalı Hicaz/Kürdi (fark duyulmadı), 12/8 shuffle, hayalet nota
