@@ -2,7 +2,7 @@
 /* ================= state ================= */
 const mkPat=()=>Array.from({length:MAXSLOTS},()=>Array(18).fill(0));
 const freshRun=()=>{const A=mkPat();A[0][0]=1;A[0][8]=1;return{nota:25,slots:['davul',null,null,null],lv:{davul:1},pat:{A,B:mkPat(),S:mkPat(),F:mkPat()},edit:'A',bpm:90,bmax:90,seri:0,up:{},def:{},solo:{},solos:{},plan:null,needle:{},wave:1,runEarned:0,meter:'m44',scale:'minor',prog:Array(8).fill('pop'),prate:'beat'}};
-const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true});
+const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin'});
 const KEY='nabiz-cemberi-v3';
 let S=Object.assign(freshRun(),freshMeta());
 try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.v===3&&d.pat&&Array.isArray(d.pat.A)&&Array.isArray(d.slots)){S=Object.assign(S,d);if(!d.tut)S.tut=null}}}catch(e){}
@@ -23,7 +23,7 @@ S.famOpen.vur=1;[['tel',5],['tus',12],['nef',20],['ele',30],['dun',45]].forEach(
 if(S.stage.crown){S.stage.wall=1;delete S.stage.crown}
 if(!S.themes[S.theme])S.theme='neon';
  if(!S.tut||typeof S.tut!=='object')S.tut={s:0,done:(S.kills>0||S.albums.length>0||Object.keys(S.lv).length>1||(S.total||0)>50)};
- if(S.sfx!==false)S.sfx=true;if(S.dnum!==false)S.dnum=true;if(S.lang!=='en')S.lang='tr';
+ if(S.sfx!==false)S.sfx=true;if(S.dnum!==false)S.dnum=true;if(S.harm!=='uclu')S.harm='zengin';if(S.lang!=='en')S.lang='tr';
  if(!S.mn||typeof S.mn!=='object')S.mn={};if(!S.auto||typeof S.auto!=='object')S.auto={lv:true,ord:true,ins:true,alb:false};if(!S.cities||typeof S.cities!=='object')S.cities={};S.efsane=Math.max(0,Math.floor(S.efsane||0));S.tours=Math.max(0,Math.floor(S.tours||0));S.city=((S.city|0)%CITIES.length+CITIES.length)%CITIES.length;
 }
 normalizeS();
@@ -76,6 +76,23 @@ const scaleBase=()=>SCALES[S.scale].root[0]*2;
 const chordSemi=ch=>ch[0]>=5?ch[0]-12:ch[0];
 const chordFreqs=ch=>QUAL[ch[1]].map(iv=>scaleBase()*Math.pow(2,(chordSemi(ch)+iv)/12));
 const rootFreq=ch=>scaleBase()/2*Math.pow(2,chordSemi(ch)/12);
+/* ---- zengin armoni (S.harm!=='uclu', varsayılan): gamda olan 7'li ya da add9 eklenir; yürüyüşün 4. akoru (tonik değilse) ilk yarısında sus4'ten çözülür;
+   sesler tonikten başlayan tek oktava katlanır (akordan akora en kısa yol); bas akorun ikinci yarısında beşliye, son çeyreğinde sonraki köke yaklaşır.
+   Üçlü: eski kök konumu. Makam dem akorları ('5') iki modda da aynı. Laboratuvarda dinlenip seçildi (müzik deneyleri, armoni B). */
+const DIA={minor:[0,2,3,5,7,8,10],major:[0,2,4,5,7,9,11],hicaz:[0,1,4,5,7,8,10],kurdi:[0,1,3,5,7,8,10]};
+const richOn=()=>S.harm!=='uclu';
+const inDia=t=>(DIA[S.scale]||DIA.minor).includes(((t%12)+12)%12);
+/* akorun bu adımdaki yeri: dizideki sırası (ci), akor süresi içindeki konumu (f, 0..1), sonraki akor */
+function chordSpan(b,s){const ci=chordIdx(b,s);if(S.up.akor&&S.prate==='bar')return{ci,f:s/MI.N,next:curChord(b+1,0)};const g=MI.grp[s];return{ci,f:MI.pos[s]/MI.g[g],next:g+1<MI.g.length?curChord(b,MI.gs[g+1]):curChord(b+1,0)}}
+function richTones(ch,ci,f){const r=ch[0],q=ch[1];if(q==='5'||!richOn())return QUAL[q].slice();
+ const ext=q==='m'?(inDia(r+10)?10:inDia(r+2)?14:0):(inDia(r+11)?11:inDia(r+10)?10:inDia(r+2)?14:0);
+ const t=(q==='M'&&ci===3&&r!==0&&inDia(r+5)&&f<0.5)?[0,5,7]:QUAL[q].slice();if(ext)t.push(ext);return t}
+const chordTonesAt=(b,s)=>{const sp=chordSpan(b,s);return richTones(curChord(b,s),sp.ci,sp.f)};
+function chordFreqsAt(b,s){const ch=curChord(b,s);if(!richOn()||ch[1]==='5')return chordFreqs(ch);const base=scaleBase();return chordTonesAt(b,s).map(k=>base*Math.pow(2,((((ch[0]+k)%12)+12)%12)/12)).sort((x,y)=>x-y)}
+function walkSemi(b,s){const ch=curChord(b,s),cr=chordSemi(ch);if(!richOn()||ch[1]==='5')return cr;const sp=chordSpan(b,s);if(sp.f<0.5)return cr;const fifth=inDia(ch[0]+7)?cr+7:cr;if(sp.f<0.75)return fifth;
+ const nr=chordSemi(sp.next);if(nr===cr)return fifth;const dir=nr>cr?-1:1;for(let k=1;k<=2;k++)if(inDia(sp.next[0]+dir*k))return nr+dir*k;return cr}
+function chordLabel(b,s){const ch=curChord(b,s);if(!richOn()||ch[1]==='5')return chordName(ch);const t=chordTonesAt(b,s),off=Math.round(12*Math.log2(scaleBase()/440)+1200)%12,e=t.length>3?t[3]:0,sus=t[1]===5;
+ return NOTE_N[(off+ch[0])%12]+(ch[1]==='m'?'m':'')+(e===11?'maj7':e===10?'7':'')+(sus?'sus4':'')+(e===14?'(add9)':'')}
 const chordName=ch=>{const off=Math.round(12*Math.log2(scaleBase()/440)+1200)%12;return NOTE_N[(off+ch[0])%12]+(ch[1]==='m'?'m':ch[1]==='5'?'5':'')};
 const kadansAt=i=>{if(!S.up.akor)return false;const pl=planArr(),a=progOf(i).c,b=progOf((i+1)%pl.length).c;return a[3][0]===7&&b[0][0]===0&&a[3][1]!=='5'};
 const makamM=i=>(S.up.akor&&(S.scale==='hicaz'||S.scale==='kurdi')&&S.prog[i]==='makam')?1.1:1;
