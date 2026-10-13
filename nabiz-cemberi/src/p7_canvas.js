@@ -486,20 +486,24 @@ function spans3(a0,a1,sg){const c=[a0];for(let m=Math.ceil(a0/Math.PI);m*Math.PI
 /* görünen duvar tek parça, uçtan uca renk geçişi: dilimler arasında ek yeri (siyah çizgi) kalmaz */
 function wallRun3(c,r,b0,b1,h,col,gl,sg){const m=lowQ?3:6,pb=arc3(c,r,b0,b1,0,m),pt=arc3(c,r,b0,b1,h,m),A=pb[0],B=pb[m],c0=wall3(col,sg*Math.cos(b0),sg*Math.sin(b0),gl),c1=wall3(col,sg*Math.cos(b1),sg*Math.sin(b1),gl);
  let f=c0;if(!lowQ&&Math.abs(B[0]-A[0])+Math.abs(B[1]-A[1])>0.5){f=ctx.createLinearGradient(A[0],A[1],B[0],B[1]);f.addColorStop(0,c0);f.addColorStop(1,c1)}poly3(pb.concat(pt.reverse()),f,f,0.8)}
-/* sütun: hücrenin halka dilimi zeminden h kadar yükselir; yükselirken parlar (gl) */
-function column3(g,th,i,s,col,h,gl){const c=g.c,[a0,a1]=cellAng(s),r0=g.rIn+i*g.t+1.2,r1=g.rIn+(i+1)*g.t-1.2,n=lowQ?2:4;
- const ob=arc3(c,r1,a0,a1,0,n),ot=arc3(c,r1,a0,a1,h,n),ib=arc3(c,r0,a0,a1,0,n),it=arc3(c,r0,a0,a1,h,n);
- if(gl>0.05&&!th.light&&!lowQ){const am=(a0+a1)/2,rm=(r0+r1)/2,m=pj(c+Math.cos(am)*rm,c+Math.sin(am)*rm,0),R=0.16*g.rOut*K3;ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(m[0],m[1]);ctx.scale(1,sinE);const gr=ctx.createRadialGradient(0,0,0,0,0,R);gr.addColorStop(0,hexA(col,(GLX?0.22:0.45)*gl));gr.addColorStop(1,hexA(col,0));ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,R,0,TAU);ctx.fill();ctx.restore()}
+/* prizma: [r0,r1]×[a0,a1] halka dilimi zeminden h kadar yükselir, yükselirken parlar (gl). e0/e1: dilim bir uç mu (solo notası adım adım çizilir; iç eklerde beyaz kenar yok) */
+function prism3(th,c,r0,r1,a0,a1,h,col,gl,e0,e1){const n=lowQ?2:4,ob=arc3(c,r1,a0,a1,0,n),ot=arc3(c,r1,a0,a1,h,n),ib=arc3(c,r0,a0,a1,0,n),it=arc3(c,r0,a0,a1,h,n);
+ if(gl>0.05&&!th.light&&!lowQ){const am=(a0+a1)/2,rm=(r0+r1)/2,m=pj(c+Math.cos(am)*rm,c+Math.sin(am)*rm,0),R=0.06*L*K3;ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(m[0],m[1]);ctx.scale(1,sinE);const gr=ctx.createRadialGradient(0,0,0,0,0,R);gr.addColorStop(0,hexA(col,(GLX?0.22:0.45)*gl));gr.addColorStop(1,hexA(col,0));ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,R,0,TAU);ctx.fill();ctx.restore()}
  spans3(a0,a1,1).forEach(([b0,b1])=>wallRun3(c,r1,b0,b1,h,col,gl,1));
  spans3(a0,a1,-1).forEach(([b0,b1])=>wallRun3(c,r0,b0,b1,h,col,gl,-1));
  if(Math.cos(a0)<0){const k=wall3(col,Math.sin(a0),-Math.cos(a0),gl);poly3([ib[0],ob[0],ot[0],it[0]],k,k,0.8)}
  if(Math.cos(a1)>0){const k=wall3(col,-Math.sin(a1),Math.cos(a1),gl);poly3([ib[n],ob[n],ot[n],it[n]],k,k,0.8)}
- /* dikey kenarlar: yalnız görünen yüzün köşeleri (arkadaki köşe öndeki yüzün üstüne çizilmez) */
+ /* dikey kenarlar: yalnız görünen yüzün uç köşeleri (arkadaki köşe öndeki yüzün üstüne çizilmez) */
  ctx.strokeStyle=th.light?hexA(th.cv.ink,0.3+0.4*gl):'rgba(255,255,255,'+(0.18+0.4*gl).toFixed(3)+')';ctx.lineWidth=1;
- [[r1,1],[r0,-1]].forEach(([r,sg])=>spans3(a0,a1,sg).forEach(sp=>sp.forEach(b=>{if(b!==a0&&b!==a1)return;const x=c+Math.cos(b)*r,y=c+Math.sin(b)*r,p=pj(x,y,0),q=pj(x,y,h);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke()})));
+ [[r1,1],[r0,-1]].forEach(([r,sg])=>spans3(a0,a1,sg).forEach(sp=>sp.forEach(b=>{if(!(b===a0&&e0||b===a1&&e1))return;const x=c+Math.cos(b)*r,y=c+Math.sin(b)*r,p=pj(x,y,0),q=pj(x,y,h);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke()})));
  const top=ot.concat(it.slice().reverse());
  if(gl>0.05){ctx.save();if(!GLX){ctx.shadowColor=col;ctx.shadowBlur=24*gl}poly3(top,shq(col,GLX?0.12+0.3*gl:0.2+0.5*gl));ctx.restore();if(!th.light&&!GLX){ctx.save();ctx.globalCompositeOperation='lighter';poly3(top,hexA(col,0.5*gl));ctx.restore()}}
- poly3(top,gl>0.05?null:shq(col,0.12),th.light?hexA(th.cv.ink,0.55):'rgba(255,255,255,'+(0.3+0.5*gl).toFixed(3)+')',1.2)}
+ else{const f=shq(col,0.12);poly3(top,f,f,0.8)}
+ /* üst yüzün çizgisi: iki yay + yalnız uçlardaki kenarlar */
+ ctx.strokeStyle=th.light?hexA(th.cv.ink,0.55):'rgba(255,255,255,'+(0.3+0.5*gl).toFixed(3)+')';ctx.lineWidth=1.2;ctx.beginPath();
+ [ot,it].forEach(a=>a.forEach((p,k)=>k?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])));if(e0){ctx.moveTo(ot[0][0],ot[0][1]);ctx.lineTo(it[0][0],it[0][1])}if(e1){ctx.moveTo(ot[n][0],ot[n][1]);ctx.lineTo(it[n][0],it[n][1])}ctx.stroke()}
+/* sütun: sahne hücresi */
+function column3(g,th,i,s,col,h,gl){const [a0,a1]=cellAng(s);prism3(th,g.c,g.rIn+i*g.t+1.2,g.rIn+(i+1)*g.t-1.2,a0,a1,h,col,gl,true,true)}
 /* zeminde merkez: nabız ve kalkan halkası (2D'deki gibi), altın şarj halkası, ışık havuzu */
 function ground3(g,th){const c=g.c,r0=g.r0,gold=goldOf(th),R=r0*0.95;
  if(!th.light){const rr=g.rIn*1.6,gl=ctx.createRadialGradient(c,c,0,c,c,rr);gl.addColorStop(0,hexA(th.cv.acc,Math.min(0.9,0.2+0.3*kickP+0.25*charge+(S.stage.core?0.12:0))*(GLX?0.6:1)));gl.addColorStop(1,hexA(th.cv.acc,0));ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=gl;ctx.beginPath();ctx.arc(c,c,rr,0,TAU);ctx.fill();ctx.restore()}
@@ -546,6 +550,33 @@ function depth3(dt,g,th){const pat=S.pat[S.edit],ns=S.slots.length,now=nowT(),U=
  enemies.forEach(e=>items.push({y:enemyGround(e,g)[1],d:()=>drawEnemy(e,th,g)}));
  items.push({y:c+0.001,d:()=>core3(dt,g,th)});
  items.sort((a,b)=>a.y-b.y).forEach(it=>it.d())}
+/* 3D solo sahnesi: solo sahnesi zemine yatar (perde halkaları, ölçü çizgileri, ibre); notalar zeminden yükselen kavisli duvarlar, uzun notada her adım
+   sesin o andaki gücü (tickPow) kadar; çalan adım yükselip parlar (sp3). Düet eşinin notaları alçak ve soluk. Düzenlerken (S.edit==='S') sahne 2D kalır. */
+const sp3=new Float32Array(80);let sp3Off=-1;
+function soloStage3(dt,g,gg,th,si){const x=slotIns(si),col=insColor(x,th),ink=th.cv.ink,so=S.solos[si]||{notes:[]},n=(SOLO_SCALE[S.scale]||SOLO_SCALE.minor).length,ph=soloPhase(),off=ph>=0?Math.floor(ph*g.T):-1,c=g.c,U=g.rOut;
+ if(off!==sp3Off){sp3Off=off;if(off>=0&&off<sp3.length&&soloNow===si)sp3[off]=1}const dk=Math.exp(-dt*4.2);for(let k=0;k<sp3.length;k++)sp3[k]*=dk;
+ gIn();
+ for(let r=0;r<g.K;r++){const root=r%n===0;ctx.beginPath();ctx.arc(c,c,g.rIn+r*g.t+g.t/2,0,TAU);ctx.strokeStyle=hexA(col,root?0.16:0.07);ctx.lineWidth=g.t-1.5;ctx.stroke()}
+ for(let s=0;s<g.T;s++){const bar=s%MI.N===0,beat=MI.gsSet.has(s%MI.N),a=sAng(s),ex=bar?8:beat?5:2;ctx.strokeStyle=hexA(ink,bar?0.5:beat?0.25:0.08);ctx.lineWidth=bar?1.5:1;ctx.beginPath();ctx.moveTo(c+Math.cos(a)*(g.rIn-2),c+Math.sin(a)*(g.rIn-2));ctx.lineTo(c+Math.cos(a)*(g.rOut+ex),c+Math.sin(a)*(g.rOut+ex));ctx.stroke()}
+ if(ph>=0){const a=sAng(ph*g.T);ctx.strokeStyle=hexA(th.cv.acc,0.9);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(c+Math.cos(a)*g.r0*1.1,c+Math.sin(a)*g.r0*1.1);ctx.lineTo(c+Math.cos(a)*(g.rOut+3),c+Math.sin(a)*(g.rOut+3));ctx.stroke()}
+ ground3(gg,th);gOut();
+ /* nota adları ve ölçü yazıları zeminde, yazı basık değil */
+ const th1=g.t,fs=Math.max(8,Math.min(11,Math.round(th1*0.6)));
+ for(let r=0;r<g.K;r++){const root=r%n===0,rr=g.rIn+r*g.t+g.t/2,p=pj(r%2?c+rr:c-rr,c,0);ctx.beginPath();ctx.arc(p[0],p[1],fs*0.8,0,TAU);ctx.fillStyle=hexA(th.cv.bg,0.85);ctx.fill();ctx.fillStyle=hexA(ink,root?0.95:0.6);ctx.font=(root?'600 ':'500 ')+fs+'px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(soloNoteName(r),p[0],p[1])}
+ {const a=pj(c,c-g.rOut-0.06*g.R,0),b=pj(c,c+g.rOut+0.06*g.R,0);ctx.fillStyle=hexA(ink,0.5);ctx.font='500 10px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(T('1. ölçü'),a[0],a[1]);ctx.fillText(T('2. ölçü'),b[0],b[1])}
+ /* notalar, düşmanlar ve merkez: zemindeki y'ye göre arkadan öne */
+ const items=[],seg=(nts,cc,alpha,xx,live)=>nts.forEach(nt=>{const row=nr(nt),a=artEff(xx,nt.art),Ln=noteLenEff(nt),r0=g.rIn+row*g.t+1.2,r1=g.rIn+(row+1)*g.t-1.2;
+  for(let k=0;k<Ln;k++){const p=k?tickPow(xx,k,a):1,t0=nt.t+k;if(p<=0)continue;const pw=Math.min(1.2,p),pz=live?(sp3[t0]||0):0,gl=Math.min(1,pz),h=live?U*(0.04+0.2*pw+0.3*pz*pw):U*0.035,
+   a0=sAng(t0)+(k===0?0.012:0),a1=sAng(t0+1)-(k===Ln-1?0.012:0),am=(a0+a1)/2,ym=c+Math.sin(am)*(r0+r1)/2;
+   items.push({y:ym,d:()=>{if(alpha<1)ctx.globalAlpha=alpha;prism3(th,c,r0,r1,a0,a1,h,cc,gl,k===0,k===Ln-1);ctx.globalAlpha=1}})}});
+ const dp=duetPart(si);if(dp>=0){const ss=soloSlots().filter(s=>{const y=slotIns(s);return y&&y.fam!=='vur'}),other=ss[1-dp];if(other!=null&&other!==si){const y=slotIns(other);seg(soloNotesOf(other),insColor(y,th),0.4,y,false)}}
+ seg(so.notes,col,1,x,true);
+ enemies.forEach(e=>items.push({y:enemyGround(e,gg)[1],d:()=>drawEnemy(e,th,gg)}));
+ items.push({y:c+0.001,d:()=>core3(dt,gg,th)});
+ items.sort((a,b)=>a.y-b.y).forEach(it=>it.d());
+ /* seyir rozetleri ve DORUK, 2D'deki gibi ekranda */
+ if(S.up.sseyir){const A=analyzeSolo(si),items2=[[A.karar,T('KARAR')],[A.doruk,T('DORUK')],[A.sc,T('SORU-CEVAP')]],y=pj(c,c+g.rOut+0.14*g.R,0)[1];ctx.font='600 9px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='middle';const ws=items2.map(([,l])=>ctx.measureText(l).width),gap=Math.max(8,g.r0*0.35);let bx=c-(ws[0]+ws[1]+ws[2]+gap*2)/2;items2.forEach(([on,l],i)=>{ctx.fillStyle=hexA(on?th.cv.acc:ink,on?0.95:0.3);ctx.fillText(l,bx+ws[i]/2,y);bx+=ws[i]+gap});if(A.mg){ctx.fillStyle=hexA(th.cv.hot,0.9);ctx.fillText(T('MAKİNELİ')+' −'+A.mg,c,y+12)}}
+ if(dorukFlash>0){dorukFlash=Math.max(0,dorukFlash-dt*0.8);const p=pj(c,c-g.rOut*0.5,g.rOut*0.6);ctx.globalAlpha=Math.min(1,dorukFlash);ctx.fillStyle=col;ctx.font='600 '+Math.round(0.07*L)+'px '+th.font.d;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(T('DORUK'),p[0],p[1]);ctx.globalAlpha=1}}
 /* patlama: zeminde yayılan altın dalga, 3D'de merkezin altındaki şarj halkasından yükselen ışık sütunu, kısa beyaz parlama */
 function drawNova(dt,g,th){if(novaT<0)return;novaT+=dt/0.8;if(novaT>=1){novaT=-1;return}const u=novaT,k=1-u,gold=goldOf(th),wht=th.light?th.cv.ink:'#ffffff';ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';
  if(g.layout==='strip'){const y=g.gridTop-u*(g.gridTop-g.fieldTop);ctx.strokeStyle=hexA(gold,0.9*k);ctx.lineWidth=14*k+2;ctx.beginPath();ctx.moveTo(g.x0,y);ctx.lineTo(g.x1,y);ctx.stroke()}
@@ -555,8 +586,8 @@ function drawNova(dt,g,th){if(novaT<0)return;novaT+=dt/0.8;if(novaT>=1){novaT=-1
  ctx.restore();if(u<0.4&&!th.light){ctx.fillStyle='rgba(255,255,255,'+((0.4-u)*0.5).toFixed(3)+')';ctx.fillRect(-OX,-OY,CW,CH)}}
 function drawScene(dt){
  const th=dispTheme(),g=geom(),sv=soloView();
- /* 3D: çember düzeni, solo sahnesi değilken; zemin merkezi biraz aşağıda, kristal (başlat düğmesi) tam ortada kalır */
- D3=is3D()&&sv<0&&g.layout==='circle';if(D3){sinE=Math.sin(EL3);cosE=Math.cos(EL3);C3Y=L/2+g.rOut*0.26*cosE*K3}
+ /* 3D: çember düzeninde; solo düzenlenirken (sürükle-bırak) 2D. Zemin merkezi biraz aşağıda, kristal (başlat düğmesi) tam ortada kalır */
+ D3=is3D()&&g.layout==='circle'&&!(sv>=0&&S.edit==='S');if(D3){sinE=Math.sin(EL3);cosE=Math.cos(EL3);C3Y=L/2+g.rOut*0.26*cosE*K3}
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.shadowBlur=0;
  const shk=fxVal(th,'shake')*kickP+(novaT>=0?(1-novaT)*1.2:0);if(shk>0&&!RM)ctx.translate((Math.random()-0.5)*shk*0.02*L,(Math.random()-0.5)*shk*0.02*L);
  drawBg(th,g);ctx.translate(OX,OY);
@@ -574,7 +605,8 @@ function drawScene(dt){
  if(th.ring==='vinyl'&&g.layout==='circle')drawDisk(g,th);
  if(S.stage.wave)drawWave(g,th);
  if(playing&&S.up.dolgu&&fillBar(curBar)&&g.layout==='circle'){ctx.strokeStyle=hexA(th.cv.warn||'#ffb13f',0.35+0.3*Math.sin(clock*12));ctx.lineWidth=3;ctx.beginPath();ctx.arc(g.c,g.c,g.rOut+5,0,TAU);ctx.stroke()}
- if(D3){drawRings(dt,g,th);drawMarks(g,th);drawNeedle(g,th);drawExtraNeedles(g,th);ground3(g,th);gOut();marks3(g,th);depth3(dt,g,th)}
+ if(D3&&sv>=0){gOut();soloStage3(dt,sgeom(),g,th,sv)}
+ else if(D3){drawRings(dt,g,th);drawMarks(g,th);drawNeedle(g,th);drawExtraNeedles(g,th);ground3(g,th);gOut();marks3(g,th);depth3(dt,g,th)}
  else if(sv>=0){drawSoloStage(dt,sgeom(),th,sv);if(g.layout!=='strip')drawCoreS(dt,g,th)}
  else if(g.layout==='strip'){drawStrip(dt,g,th)}
  else{drawRings(dt,g,th);drawMarks(g,th);drawNeedle(g,th);drawExtraNeedles(g,th);drawCoreS(dt,g,th)}
@@ -653,7 +685,7 @@ function hitTest(e){
  const sUp=()=>{if(!sDrag)return;sDrag=null;const si=soloView();const so=si>=0&&S.solos[si];if(so){const selN=so.notes[soloSel];so.notes.sort((a,b)=>a.t-b.t);soloSel=selN?so.notes.indexOf(selN):-1}recalc();updUI();renderSoloBox();renderPads()};
  el.addEventListener('pointerup',sUp);el.addEventListener('pointercancel',sUp);
  el.addEventListener('pointerleave',()=>{hover=null;hintFor(null)});
- el.addEventListener('click',e=>{if(orbHit(e)){startStop();updUI();return}if(soloView()>=0){const hs=soloStageHit(e);if(hs&&hs.core)tap();return}const h=hitTest(e);if(!h||h.core){tap();return}if(PH()){eSel=h.i}cellClick(h.i,h.s);if(PH())renderPads()});
+ el.addEventListener('click',e=>{if(orbHit(e)){startStop();updUI();return}if(soloView()>=0){if(D3){tap();return}const hs=soloStageHit(e);if(hs&&hs.core)tap();return}const h=hitTest(e);if(!h||h.core){tap();return}if(PH()){eSel=h.i}cellClick(h.i,h.s);if(PH())renderPads()});
  el.addEventListener('pointerdown',e=>{if(!playing&&orbHit(e))orbP=1});
  document.addEventListener('pointerdown',()=>{if(ac&&ac.state==='suspended')ac.resume()},{passive:true});
 })();

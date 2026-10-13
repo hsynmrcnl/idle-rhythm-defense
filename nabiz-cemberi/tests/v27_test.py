@@ -153,6 +153,31 @@ with sync_playwright() as pw:
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     ctx.close()
 
+    # ---------- solo sahnesi: çalarken 3D, düzenlerken 2D ----------
+    print('solo')
+    ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); p = ctx.new_page(); errs = []
+    p.on('pageerror', lambda e: errs.append(str(e)))
+    p.goto(URL); p.wait_for_timeout(300)
+    p.evaluate("""()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.nota=1e6;S.muted=true;S.slots=['davul','trampet','gitar',null];S.lv={davul:3,trampet:2,gitar:3};
+      S.up.solo=1;S.up.sdevir=1;S.up.suzun=1;S.up.sef=1;S.plan=Array(8).fill('solo');S.solo={2:1};
+      S.solos={2:{notes:[{t:0,len:4,r:0,art:'none'},{t:8,len:6,r:5,art:'vib'},{t:20,len:4,r:3,art:'none'}],style:'hendrix'}};localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}""")
+    p.reload(); p.wait_for_timeout(400)
+    cv = p.locator('#cv').bounding_box(); cx, cy = cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2
+    p.mouse.click(cx, cy); p.wait_for_timeout(1800)
+    st = p.evaluate("()=>({sv:window.__nb.soloView(),now:window.__nb.soloNow,d3:window.__nb.D3})")
+    check(st['sv'] == 2 and st['now'] == 2 and st['d3'], 'solo çalarken solo sahnesi 3D (%s)' % st)
+    check(p.evaluate(INK) > 0.05 and p.is_visible('#v3d'), 'solo sahnesi çiziliyor, 3D düğmesi yerinde')
+    p.locator('#cv').screenshot(path=os.path.join(OUT, 'v27_solo3d.png'))
+    n0 = p.evaluate("()=>JSON.stringify(window.__nb.S.solos[2].notes)")
+    p.mouse.click(cv['x'] + cv['width'] * 0.8, cy); p.wait_for_timeout(150)
+    check(p.evaluate("()=>JSON.stringify(window.__nb.S.solos[2].notes)") == n0 and p.evaluate("()=>window.__nb.playing"), '3D solo sahnesine dokunmak nota koymuyor, müzik sürüyor')
+    p.evaluate("()=>window.__nb.setEdit('S')"); p.wait_for_timeout(250)
+    check(not p.evaluate("()=>window.__nb.D3") and p.is_visible('#soloChip') and not p.is_visible('#v3d'), 'solo düzenlerken sahne 2D, Solodan çık çipi var')
+    p.click('#soloChip'); p.wait_for_timeout(250)
+    check(p.evaluate("()=>window.__nb.S.edit") != 'S' and p.evaluate("()=>window.__nb.D3"), 'Solodan çıkınca 3D geri geliyor')
+    check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
+    ctx.close()
+
     # ---------- İngilizce ----------
     print('EN')
     ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); p = ctx.new_page()
