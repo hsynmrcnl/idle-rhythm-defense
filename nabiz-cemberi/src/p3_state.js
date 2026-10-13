@@ -34,7 +34,9 @@ const b64dec=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 async function exportCode(){const json=JSON.stringify(S);try{if(window.CompressionStream){const cs=new CompressionStream('deflate-raw'),w=cs.writable.getWriter();w.write(new TextEncoder().encode(json));w.close();const buf=await new Response(cs.readable).arrayBuffer();return 'NB2.'+b64enc(new Uint8Array(buf))}}catch(e){}return 'NB1.'+b64enc(new TextEncoder().encode(json))}
 async function parseCode(code){code=(code||'').replace(/\s+/g,'');if(!/^NB[12]\./.test(code))throw new Error('Bu bir Nabız Çemberi kayıt kodu değil');const body=code.slice(4);let bytes;if(code.startsWith('NB2.')){const ds=new DecompressionStream('deflate-raw'),w=ds.writable.getWriter();w.write(b64dec(body));w.close();bytes=new Uint8Array(await new Response(ds.readable).arrayBuffer())}else bytes=b64dec(body);const d=JSON.parse(new TextDecoder().decode(bytes));if(!(d&&d.v===3&&d.pat&&Array.isArray(d.pat.A)&&Array.isArray(d.slots)))throw new Error('Kod bozuk ya da eksik');return d}
 let demoMode=false,demoSnap=null;
-function save(){if(demoMode)return;S.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+/* wiping: sıfırlama sırasında (sayfa yeniden açılırken) hiçbir şey yazılmaz */
+let wiping=false;
+function save(){if(demoMode||wiping)return;S.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 let MI=null;
 function meterInfo(){const m=METERS[S.meter];const gs=[],grp=[],pos=[];let a=0;m.g.forEach((len,gi)=>{gs.push(a);for(let k=0;k<len;k++){grp.push(gi);pos.push(k)}a+=len});return{N:a,g:m.g,gs,gsSet:new Set(gs),grp,pos,mids:gs.map(s=>s+2)}}

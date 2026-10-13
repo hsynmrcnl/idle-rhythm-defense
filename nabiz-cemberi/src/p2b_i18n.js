@@ -166,6 +166,7 @@ const EN={
 '10 saniyede bir, harcama sınırını aşmadan en verimli geliştirmeyi alır; neyi alacağını Stüdyo’daki Otomatik bölümünde sen seçersin':'Every 10 seconds it buys the most efficient upgrade within the spending limit; you choose what it buys in the Studio’s Automatic section',
 'Akorlar otomatik':'Chords automatic','Akorlar elle: Şarkı planı kartından seç':'Chords by hand: pick them on the Song plan card','Otomatik nakarat':'Auto chorus','Otomatik solo':'Auto solo',
 'Solo düzenleme kapandı':'Solo editing closed',
+'Sıfırla':'Reset','Oyunu sıfırla':'Reset the game','Sıfırlanıyor…':'Resetting…','Emin misin? Her şey silinir · tekrar bas':'Sure? Everything is erased · tap again','Her şey silinir: ilerleme, albümler, menajer, ayarlar ve öğretici. Oyun ilk kez açılıyormuş gibi baştan başlar.':'Everything is erased: progress, albums, manager, settings and the tutorial. The game starts over as if you were opening it for the first time.',
 'Albümden albüme kalır. Açık olanlar sen yokken de çalışır (çevrimdışı değil, sekme açıkken). Hepsi Stüdyo’daki Otomatik bölümünde de açılıp kapanır.':'Stays from album to album. Jobs that are on keep working while you are away (not offline, while the tab is open). All of them can also be switched in the Studio’s Automatic section.'
 };
 let EN_RE=null,EN_CACHE=new Map();

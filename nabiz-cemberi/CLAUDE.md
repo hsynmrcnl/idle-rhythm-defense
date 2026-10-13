@@ -24,7 +24,7 @@ src/            kaynak parçalar; build.py bunları SIRAYLA tek dosyaya yapışt
   p7_canvas.js  sahne çizimi (çember/şerit), solo sahnesi (drawSoloStage, sürükleme), WebGL son işlem, boot, window.__nb
 sf/             örnek ses paketleri (JSON içinde base64 mp3): FluidR3 (0000.json…, drums.json; tools/build_sf.py) ve CC0 yeni set (c_*.json; tools/build_sf_cc0.py)
 assets/         PWA ikonları
-tests/          Playwright testleri (python tests/run_all.py): mobile_ui_test, sf_cc0_test, v16_test, v17_test, v18_test, v19_test, v20_test, v21_test, v22_test, v24_test
+tests/          Playwright testleri (python tests/run_all.py): mobile_ui_test, sf_cc0_test, v16_test, v17_test, v18_test, v19_test, v20_test, v21_test, v22_test, v24_test, v25_test
 tools/          build_sf.py (FluidR3 paketleri), build_sf_cc0.py (CC0 paketleri: kaynak, nota seçimi, oktav düzeltmesi, loop; ayrıntı dosyanın başında)
 build.py        → dist/ (site + PWA) ve build/artifact.html (claude.ai artifact için iskeletsiz sürüm), build/chk.js
 ```
@@ -66,7 +66,9 @@ python -m http.server -d dist   # yerelde oynamak için (örnek sesler file:// i
 - Ses: her yeni enstrümanın `v` nesnesi bir GEN üretecini seçer; örnek kaydı varsa `p4b_sf.js` SF_PROG/SF_NEW/SF_DRUM'a eşle, ses seviyesi SF_GAIN/SF_DGAIN ile dengelenir. Paket bölgelerinin `rms`'i ilk 0,5 sn'nin RMS'i, oyun ona göre normalize eder. Yeni örnek kaynağı yalnız CC0/kamu malı (ücretli kütüphanelerin deneme sürümleri dağıtılamaz); ney, zurna, tabla, gamelan, taiko için uygun kaynak bulunamadı, jRhodes3 BY-NC olduğu için alınmadı. Karşılaştırma laboratuvarı: https://claude.ai/artifact/AqBsuXhtymkUvY37UDKST6 · Müzik deneyleri (koma akordu, armoni, 12/8, hayalet nota; kararlar `deney` koleksiyonunda): https://claude.ai/artifact/MtAYigjhjf6d3dwahYaAKh
 
 - Tek Otomatik (v24, p6 `renderAuto`): Stüdyo'da her zaman açık “Otomatik” kartı (`data-sec="auto"`). Müzik: `S.am.yeni` (yeni enstrüman ritmi, `ezPlaced`), `S.am.nakarat` (`autoRows` B'yi de yazar), `S.progAuto` (akorlar), dolgu (`fillAuto`), `S.am.solo` (`soloAuto`). Kolay/Detaylı'dan bağımsız; yeni oyunda açık, `am`'si olmayan eski Detaylı kayıtta kapalı başlar (yükleme `am`'yi boşaltır, `normalizeS` taşır). Menajer işleri (`S.mn` alınınca) aynı yerde anahtarla (`amTog` `mn_<id>` → `S.auto`); Geliştirme için türler `S.am.k` (lv, rup, srup, tempo, def) ve harcama sınırı `S.am.b` (%25/50/90). `autoBuyPick`: seçilen gelir türlerinde `anlRank(f)` en kısa geri ödeme, Savunma seçiliyse nabız %60 altındayken ya da sırayla `def`. Anahtarlar `.swi` (role=switch, `data-v` basınca olacak değer). `S.am` albüm/turne/demo `keep` listelerinde.
+- Sıfırla (v25): Ayarlar → “Oyunu sıfırla”, iki dokunuş. `wiping=true` (`save()` artık yazmaz), kayıt silinir, `location.reload()`: modül durumları (öğretici, açılan bölümler, sekme hafızası) dahil her şey ilk açılıştaki gibi. Dil de Türkçeye döner.
+- Aşamalı açılış önerisi: `docs/asamali_acilis.md` (onay bekliyor).
 - Başka öneri (v24): Sahne kartında Hepsini düzenle'nin yanında; `autoSeed` ile `rolePrio` uyumu tutan başı korur (davul vuruş başları, trampet 2-4, hi-hat grup ortaları…), kuyruğu karıştırır; mesajda yeni gelir ve değişim yüzdesi.
 
 ## Sürüm notu
-Üst köşedeki etiket `p6_panels.js` içinde (`'v24 · '`); yayınlarken artır. Telefonda Ayarlar'ın en altında görünür.
+Üst köşedeki etiket `p6_panels.js` içinde (`'v25 · '`); yayınlarken artır. Telefonda Ayarlar'ın en altında görünür.

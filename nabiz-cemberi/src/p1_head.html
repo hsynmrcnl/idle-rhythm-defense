@@ -66,6 +66,8 @@ h3.fam.locked{color:var(--dim)}
 .btn.primary{font-family:var(--f-d);font-weight:600;font-size:13px;padding:11px 20px;background:var(--acc);border-color:var(--acc);color:var(--onacc)}
 .btn.ghost{background:transparent;color:var(--muted)}
 .btn.ready{border-color:var(--hot);color:var(--fg)}
+.btn.danger{border-color:var(--hot);color:var(--hot)}
+.btn.danger:hover{background:color-mix(in srgb,var(--hot) 14%,var(--panel2))}
 .btn:focus-visible,.tab:focus-visible,select:focus-visible,input:focus-visible,.seg button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .own{font-family:var(--f-m);font-size:11px;color:var(--acc);border:1px solid var(--acc);border-radius:6px;padding:5px 8px;white-space:nowrap}
 .cnt{font-family:var(--f-m);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -677,9 +679,9 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         <section class="block"><h2>Örnek şarkılar</h2><p class="note">Hazır kurulmuş bir şarkıyı dinle. Kendi kaydın bozulmaz; çıkınca kaldığın yerden devam edersin.</p><div class="tb" id="demoBox"></div></section>
         <section class="block"><h2>Nasıl oynanır?</h2><p class="note">Sessizlik A.Ş. şehri susturmaya geliyor. Tek savunma senin döngün: her vuruş hem nota kazandırır hem de sahneye yaklaşan susturuculara ateş eder. 42 enstrüman, roller, dalgalar, patronlar, albümler ve altı tema.</p><div class="tb"><button class="btn" data-act="tutRestart">Öğreticiyi başlat</button></div></section>
         <section class="block"><h2>Kayıt</h2><p class="note">Kayıt bu tarayıcıda durur. Başka cihaza taşımak için kodu üret ve kopyala; orada yapıştırıp yükle. Yükleme buradaki kaydın yerine geçer.</p><div class="tb"><button class="btn" data-act="saveCode">Kodu üret ve kopyala</button><button class="btn ghost" data-act="loadCode" id="loadBtn">Koddan yükle</button><span class="cnt" id="saveInfo"></span></div><textarea id="saveCode" rows="3" aria-label="Kayıt kodu" placeholder="Kayıt kodu burada görünür; yüklemek için kodu buraya yapıştır" spellcheck="false"></textarea></section>
+        <section class="block"><h2>Sıfırla</h2><p class="note">Her şey silinir: ilerleme, albümler, menajer, ayarlar ve öğretici. Oyun ilk kez açılıyormuş gibi baştan başlar.</p><div class="tb"><button class="btn danger" data-act="reset" id="resetBtn">Oyunu sıfırla</button></div></section>
         <div class="dev">
           <button class="btn ghost" data-act="cheat">Test: +10 dk gelir</button>
-          <button class="btn ghost" data-act="reset" id="resetBtn">Kaydı sıfırla</button>
         </div>
         <p class="cnt" id="verTag"></p>
       </div>
