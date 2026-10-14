@@ -210,6 +210,7 @@ function drawWall(dt,g,th){
  }
  const {R,c,rOut}=g,rb=rOut+0.012*R,maxL=0.27*R;
  ctx.fillStyle=hexA(th.cv.ink,0.5);for(let k=0;k<dots;k++){const a=k/dots*TAU;ctx.beginPath();ctx.arc(c+Math.cos(a)*rb,c+Math.sin(a)*rb,0.8,0,TAU);ctx.fill()}
+ if(D3){ctx.lineCap='butt';return}/* 3D'de çubuklar dikey: wallItems3 */
  for(let k=0;k<WN;k++){const E=Math.min(1.6,wallE[k]),sh=live?fData[Math.floor(4+Math.pow(k<WN/2?k:WN-1-k,1.5))%fData.length]/255*0.08:0,len=Math.min(1,E)*maxL+sh*maxL;if(len<1)continue;const ang=(k+0.5)/WN*TAU-Math.PI/2,t=Math.min(1,E),da=TAU/WN*0.3;ctx.strokeStyle='rgb('+ca.map((q,j)=>Math.round(q+(cb[j]-q)*t)).join(',')+')';ctx.lineWidth=1.3;ctx.globalAlpha=0.95;
   [[-da,0.62],[0,1],[da,0.62]].forEach(([o,f])=>{const cs=Math.cos(ang+o),sn=Math.sin(ang+o);ctx.beginPath();ctx.moveTo(c+cs*rb,c+sn*rb);ctx.lineTo(c+cs*(rb+len*f),c+sn*(rb+len*f));ctx.stroke()})}
  ctx.globalAlpha=1;ctx.lineCap='butt';
@@ -541,6 +542,11 @@ function core3(dt,g,th){const c=g.c,U=g.rOut,P3=(x,y,z)=>pj(c+x*U,c+y*U,z*U),zc=
  if(tapFx&&tapFx.life>0){tapFx.life-=dt*1.3;ctx.globalAlpha=clamp(tapFx.life*1.5,0,1);ctx.fillStyle=tapFx.c;ctx.font=(th.id==='punk'?'':'600 ')+Math.round(g.r0*0.36)+'px '+th.font.d;ctx.fillText(tapFx.t,top[0],top[1]-g.r0*0.22);ctx.fillStyle=hexA(th.cv.ink,0.7);ctx.font='500 '+fs+'px '+th.font.m;ctx.fillText(tapFx.sub,top[0],top[1]+g.r0*0.08);ctx.globalAlpha=1}
  else{const es=effSeri();ctx.font='500 '+fs+'px '+th.font.m;ctx.fillStyle=hexA(th.cv.ink,0.6);ctx.fillText(Math.round(curBpm(curBar))+' BPM'+(bActive()?' · '+playPk:'')+(es>0?' · seri '+es:''),top[0],top[1])}
  tapP=Math.max(0,tapP-dt*2.5)}
+/* ses duvarı 3D'de dikey: halkanın dış kenarından yukarı uzanan çubuklar (zemine yatık çizilince yanlardan kadrajın dışına taşıyordu); zemindeki nokta halkası drawWall'da */
+function wallItems3(g,th,items){if(!S.stage.wall)return;const live=playing&&analyser;if(live)analyser.getByteFrequencyData(fData);const ca=rgbOf(th.cv.acc),cb=rgbOf(th.cv.hot),{R,c,rOut}=g,rb=rOut+0.012*R,maxL=0.27*R,da=TAU/WN*0.3;
+ for(let k=0;k<WN;k++){const E=Math.min(1.6,wallE[k]),sh=live?fData[Math.floor(4+Math.pow(k<WN/2?k:WN-1-k,1.5))%fData.length]/255*0.08:0,len=Math.min(1,E)*maxL+sh*maxL;if(len<1)continue;
+  const ang=(k+0.5)/WN*TAU-Math.PI/2,t=Math.min(1,E),colr='rgb('+ca.map((q,j)=>Math.round(q+(cb[j]-q)*t)).join(',')+')';
+  items.push({y:c+Math.sin(ang)*rb,d:()=>{ctx.strokeStyle=colr;ctx.lineWidth=1.5;ctx.lineCap='round';ctx.globalAlpha=0.95;[[-da,0.62],[0,1],[da,0.62]].forEach(([o,f])=>{const x=c+Math.cos(ang+o)*rb,y=c+Math.sin(ang+o)*rb,p=pj(x,y,0),q=pj(x,y,len*f);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke()});ctx.globalAlpha=1;ctx.lineCap='butt'}})}}
 /* sütunlar, düşmanlar ve merkez: zemindeki y'ye göre arkadan öne */
 function depth3(dt,g,th){const pat=S.pat[S.edit],ns=S.slots.length,now=nowT(),U=g.rOut,c=g.c,sec=planAt(curBar).sec,items=[];
  for(let i=0;i<ns;i++){const x=slotIns(i);if(!x)continue;const col=insColor(x,th),muted=muteUntil[i]>now,solo=isSolo(i),soloOn=solo&&soloNow===i,dim=muted||(S.edit==='S'&&!solo)||(S.edit==='F'&&x.fam!=='vur')||(playing&&!soloOn&&!allowed(sec,x,i)),rm=g.rIn+(i+0.5)*g.t,boost=x.role==='alan';
@@ -548,7 +554,7 @@ function depth3(dt,g,th){const pat=S.pat[S.edit],ns=S.slots.length,now=nowT(),U=
    const p=pz3[i][s],gl=dim?0:Math.min(1,p),h=U*((v===2?0.09:0.05)+0.36*p*(dim?0.6:1)+(playing?0.01*Math.sin(clock*7+i*1.7+s):0)),am=midAng(s);
    items.push({y:c+Math.sin(am)*rm,d:()=>{if(dim)ctx.globalAlpha=0.45;column3(g,th,i,s,col,h,gl);ctx.globalAlpha=1}})}}
  enemies.forEach(e=>items.push({y:enemyGround(e,g)[1],d:()=>drawEnemy(e,th,g)}));
- items.push({y:c+0.001,d:()=>core3(dt,g,th)});
+ items.push({y:c+0.001,d:()=>core3(dt,g,th)});wallItems3(g,th,items);
  items.sort((a,b)=>a.y-b.y).forEach(it=>it.d())}
 /* 3D solo sahnesi: solo sahnesi zemine yatar (perde halkaları, ölçü çizgileri, ibre); notalar zeminden yükselen kavisli duvarlar, uzun notada her adım
    sesin o andaki gücü (tickPow) kadar; çalan adım yükselip parlar (sp3). Düet eşinin notaları alçak ve soluk. Düzenlerken (S.edit==='S') sahne 2D kalır. */
@@ -572,7 +578,7 @@ function soloStage3(dt,g,gg,th,si){const x=slotIns(si),col=insColor(x,th),ink=th
  const dp=duetPart(si);if(dp>=0){const ss=soloSlots().filter(s=>{const y=slotIns(s);return y&&y.fam!=='vur'}),other=ss[1-dp];if(other!=null&&other!==si){const y=slotIns(other);seg(soloNotesOf(other),insColor(y,th),0.4,y,false)}}
  seg(so.notes,col,1,x,true);
  enemies.forEach(e=>items.push({y:enemyGround(e,gg)[1],d:()=>drawEnemy(e,th,gg)}));
- items.push({y:c+0.001,d:()=>core3(dt,gg,th)});
+ items.push({y:c+0.001,d:()=>core3(dt,gg,th)});wallItems3(gg,th,items);
  items.sort((a,b)=>a.y-b.y).forEach(it=>it.d());
  /* seyir rozetleri ve DORUK, 2D'deki gibi ekranda */
  if(S.up.sseyir){const A=analyzeSolo(si),items2=[[A.karar,T('KARAR')],[A.doruk,T('DORUK')],[A.sc,T('SORU-CEVAP')]],y=pj(c,c+g.rOut+0.14*g.R,0)[1];ctx.font='600 9px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='middle';const ws=items2.map(([,l])=>ctx.measureText(l).width),gap=Math.max(8,g.r0*0.35);let bx=c-(ws[0]+ws[1]+ws[2]+gap*2)/2;items2.forEach(([on,l],i)=>{ctx.fillStyle=hexA(on?th.cv.acc:ink,on?0.95:0.3);ctx.fillText(l,bx+ws[i]/2,y);bx+=ws[i]+gap});if(A.mg){ctx.fillStyle=hexA(th.cv.hot,0.9);ctx.fillText(T('MAKİNELİ')+' −'+A.mg,c,y+12)}}
