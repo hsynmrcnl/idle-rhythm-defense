@@ -145,7 +145,9 @@ with sync_playwright() as pw:
     p.evaluate("()=>window.__nb.ff(6)")
     check(p.evaluate("()=>window.__nb.charge") == 0, 'geliştirme yokken şarj işlemiyor')
     p.evaluate("()=>{window.__nb.S.d3.own=1}")
-    # masaüstünde düğme sahnenin sağ üstünde; patlama karesi
+    # masaüstünde düğme sahnenin sağ üstünde (arayüz 150 ms'de bir yenilenir); patlama karesi
+    try: p.wait_for_selector('#v3d', state='visible', timeout=2000)
+    except Exception: pass
     check(p.is_visible('#v3d'), 'masaüstünde 3D düğmesi sahnede')
     cv = p.locator('#cv').bounding_box(); p.mouse.click(cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2); p.wait_for_timeout(1500)
     p.evaluate("()=>{window.__nb.charge=0.99}"); p.wait_for_timeout(2500)

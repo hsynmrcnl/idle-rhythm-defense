@@ -75,7 +75,9 @@ with sync_playwright() as pw:
     # dalga 4: Analiz
     p.evaluate("()=>{window.__nb.S.bestWave=4}"); p.wait_for_timeout(400)
     check(card() == 'Yeni: Analiz' and p.locator('#d-stage.tut-hi').count() == 1, 'dalga 4’te Analiz kartı; başka sekmedeyken Sahne simgesi parlıyor')
-    p.tap('#d-stage'); p.wait_for_timeout(300)
+    p.tap('#d-stage')
+    try: p.wait_for_selector('#stats.tut-hi', timeout=2000)  # vurgu tutCheck aralığında gelir; ağır çizimde 300 ms yetmeyebiliyor
+    except Exception: pass
     check(p.locator('#stats.tut-hi').count() == 1, 'Sahne’de üst bilgi parlıyor')
     p.tap('#stats'); p.wait_for_timeout(300)
     check(p.evaluate("()=>window.__nb.anlOn") and card() == '', 'üst bilgiye dokununca Analiz açıldı, kart kapandı')
