@@ -472,7 +472,7 @@ function drawOverlay(dt,g,th){
 /* izdüşüm: zemin noktası (x,y kare koordinatında), yükseklik z → ekran. Gerçek izometri (35,26°): zemin y'si sinE kadar basık, yükseklik cosE kadar yukarı.
    Zemin (halkalar, ibre, menzil, katmanlar) 2D çizimin aynısı, gIn() ile zemine yatırılır; sütunlar, düşmanlar ve merkez zemindeki y'ye göre arkadan öne çizilir. */
 const EL3=Math.asin(Math.tan(Math.PI/6)),LX3=-0.55,LY3=0.83;
-let D3=false,sinE=1,cosE=0,C3Y=0;const K3=1.2;/* K3: zemin basık olduğu için sahne 3D'de %20 büyük çizilir, düşmanlar yanlardan kadraja girer */
+let D3=false,sinE=1,cosE=0,C3Y=0;const K3=1;/* K3: 3D sahne ölçeği; 1,2 iken dalga halkası, numaralar ve kenardaki düşmanlar yanlardan taşıyordu, 2D ile aynı boyda */
 const pz3=Array.from({length:MAXSLOTS},()=>new Float32Array(18)),pf3=Array.from({length:MAXSLOTS},()=>new Float32Array(18));
 const pj=(x,y,z)=>[L/2+(x-L/2)*K3,C3Y+((y-L/2)*sinE-z*cosE)*K3];
 function gIn(){ctx.save();ctx.translate(L/2,C3Y);ctx.scale(K3,K3*sinE);ctx.translate(-L/2,-L/2)}
