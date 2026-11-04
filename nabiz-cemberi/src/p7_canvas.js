@@ -447,9 +447,15 @@ function drawFrags(dt,th){if(!frags.length)return;ctx.save();
  for(let k=frags.length-1;k>=0;k--){const f=frags[k];f.x+=f.vx*dt;f.y+=f.vy*dt;if(f.g)f.vy+=140*dt;f.vx*=0.98;f.rot+=f.vr*dt;f.life-=dt*1.25;if(f.life<=0){frags.splice(k,1);continue}
   const c=Math.cos(f.rot),sn=Math.sin(f.rot),sc=0.6+0.4*f.life;ctx.globalAlpha=Math.min(1,f.life*1.5);ctx.beginPath();f.rel.forEach((p,i)=>{const x=f.x+(p[0]*c-p[1]*sn)*sc,y=f.y+(p[0]*sn+p[1]*c)*sc;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.closePath();ctx.fillStyle=gTone(f.col,0.75+0.6*f.lit);ctx.fill()}
  ctx.restore()}
+function spawnFx(e,th,g,sz,ap){const col=GEO_COL[e.ty]||th.cv.acc,k=1-ap;ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';
+ let b;if(D3){const gp=enemyGround(e,g);b=pj(gp[0],gp[1],0);const h=sz*7*k,gr=ctx.createLinearGradient(0,b[1]-h,0,b[1]);gr.addColorStop(0,hexA(col,0));gr.addColorStop(1,hexA(col,0.7*k));ctx.fillStyle=gr;ctx.fillRect(b[0]-sz*0.45,b[1]-h,sz*0.9,h)}else b=enemyPos(e,g);
+ const R=sz*(0.6+2.4*ap);ctx.strokeStyle=hexA(col,0.9*k);ctx.lineWidth=1+2.5*k;ctx.beginPath();ctx.ellipse(b[0],b[1],R,R*(D3?sinE:1),0,0,TAU);ctx.stroke();
+ ctx.fillStyle=hexA('#ffffff',0.8*k);ctx.beginPath();ctx.arc(b[0],b[1]-(D3?sz:0),sz*0.35*k+0.5,0,TAU);ctx.fill();ctx.restore()}
 function drawEnemy(e,th,g){
  const [x,y]=enemyPos(e,g),T=ETYPES[e.ty],sz=0.022*g.R*T.r*(e.boss?1.4:1)*GEO_K;
- drawGeo(e,th,g,sz);
+ /* doğma: ilk 0,55 sn küçükten sekerek büyür, altında halka açılır (3D'de yerden ışık sütunu); kenarda birden belirmesin */
+ if(e.sp0==null)e.sp0=clock;const ap=RM?1:Math.min(1,(clock-e.sp0)/0.55);
+ if(ap<1){spawnFx(e,th,g,sz,ap);const t1=ap-1;drawGeo(e,th,g,sz*Math.max(0.05,1+2.7*t1*t1*t1+1.7*t1*t1))}else drawGeo(e,th,g,sz);
  ctx.save();ctx.translate(x,y-(D3?sz*0.9:0));
  if(e.slowT>0||e.dotT>0){ctx.strokeStyle=e.dotT>0?th.cv.warn:th.cv.acc;ctx.lineWidth=1;ctx.setLineDash([2,3]);ctx.beginPath();ctx.arc(0,0,sz*1.5,0,TAU);ctx.stroke();ctx.setLineDash([])}
  if(e.stun>0){ctx.fillStyle=th.cv.warn;for(let k=0;k<3;k++){const a=clock*8+k*TAU/3;ctx.fillRect(Math.cos(a)*sz*1.6-1,Math.sin(a)*sz*1.6-1-sz*0.6,2,2)}}
