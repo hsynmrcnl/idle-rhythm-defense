@@ -45,6 +45,7 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v21: otomatik geliştir menajere bağlandı, sahne katmanı ×1,1, bir dalga geri
 - v22: küçük temizlik (Kolay öğretici, Uygula, ped seviye düğmeleri, terimler)
 - v23: telefonda Sahne aşağı kayıyordu, düzeldi
+- v31: düşmanlar içi dolu neon geometrik cisimler (döner, vuruşta zıplar, ölünce parçalara ayrılır)
 - v30: 3D sahne 2D ile aynı boyda (büyütülmüşken kenarlardan taşıyordu)
 - v29: ses duvarı 3D'de dikey çubuklar (kadrajdan taşmıyor)
 - v28: 3D solo sahnesi (solo çalarken notalar yükselen duvarlar; düzenlerken 2D)
