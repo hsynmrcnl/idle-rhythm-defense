@@ -35,8 +35,8 @@ with sync_playwright() as pw:
     check(p.locator('#slotList [data-act=alvl]').count() == 12, 'her satırda Sade · Hareketli · Yoğun')
     n0 = p.evaluate("()=>window.__nb.S.nota")
     p.click('#slotList [data-act=alvl][data-i="0"][data-v="3"]'); p.wait_for_timeout(50)
-    check(row(p, 'A', 0) == '1000100010001000' and p.evaluate("()=>window.__nb.S.rowm.A0") == 3 and p.evaluate("()=>window.__nb.S.nota") < n0,
-          'davul Yoğun: dört vuruş başı, bedel ödendi (%s)' % row(p, 'A', 0))
+    check(row(p, 'A', 0) == '2000100010001000' and p.evaluate("()=>window.__nb.S.rowm.A0") == 3 and p.evaluate("()=>window.__nb.S.nota") < n0,
+          'davul Yoğun: dört vuruş başı, ölçü başı vurgulu (v35), bedel ödendi (%s)' % row(p, 'A', 0))
     check(p.evaluate("()=>document.querySelector('#slotList [data-act=alvl][data-i=\"0\"][data-v=\"3\"]').getAttribute('aria-pressed')") == 'true', 'seçili seviye işaretli')
 
     # Hepsini düzenle: uyumlar kendiliğinden
@@ -44,7 +44,7 @@ with sync_playwright() as pw:
     rows = [row(p, 'A', i) for i in range(4)]
     syn = p.text_content('#synChips')
     check(rows[1] == '0000100000001000', 'trampet 2 ve 4 (%s)' % rows[1])
-    check(all(rows[3][s] == '0' or rows[0][s] == '1' for s in range(16)) and rows[3].count('1') >= 2, 'bas yalnız davulla aynı adımlarda (%s)' % rows[3])
+    check(all(rows[3][s] == '0' or rows[0][s] != '0' for s in range(16)) and rows[3].count('1') >= 2, 'bas yalnız davulla aynı adımlarda (%s)' % rows[3])
     check(all(x in syn for x in ['Grup başları', 'Backbeat', 'Ofbit', 'Kilit']), 'Grup başları, Backbeat, Ofbit ve Kilit tutuyor')
     nf = p.evaluate("()=>[0,1,2,3].map(i=>window.__nb.S.pat.A[i].slice(0,16).filter(v=>v).length)")
     check(nf[2] <= 8 and nf[0] <= 4, 'nefes aşılmıyor (%s)' % nf)

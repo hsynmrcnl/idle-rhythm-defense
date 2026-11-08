@@ -159,7 +159,7 @@ function renderPanels(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v34 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v35 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'));i18n($('tut'))}
  updUI();
@@ -235,7 +235,10 @@ function renderAuto(){const el=$('autoBox');if(!el)return;const A=S.am;
 let autoFlip=false;
 function autoBuyPick(){const K=S.am.k||{},lim=S.nota*(S.am.b||0.5),incA=['lv','rup','srup','tempo'].filter(a=>K[a]),ok=k=>k&&k.cost>0&&k.cost<=lim;
  const inc=incA.length?anlRank(k=>incA.includes(k.act)).inc:null,def=K.def?anlRank(k=>k.act==='def').def:null;
- const wantDef=def&&(core.hp/hpMax()<0.6||autoFlip);let k=wantDef&&ok(def)?def:ok(inc)?inc:ok(def)?def:null;if(k)autoFlip=k!==def;return k}
+ const wantDef=def&&(core.hp/hpMax()<0.6||autoFlip);let k=wantDef&&ok(def)?def:ok(inc)?inc:ok(def)?def:null;if(k)autoFlip=k!==def;
+ /* v35: bütün yerler doluysa ve yeni yer, önerilen geliştirmenin üç katından ucuzsa sahneye yer açar (yer açılmayınca 45. dk'da tıkanıyordu); menajerin enstrüman koyma işi doldurur */
+ if(K.lv&&!wantDef&&S.slots.length<MAXSLOTS&&!S.slots.includes(null)){const sc=slotCost();if(sc<=lim&&(!k||sc<=k.cost*3))k={act:'addslot',n:'Yeni sahne yeri',cost:sc}}
+ return k}
 function renderMn(){const el=$('mnBox');if(!el)return;if(albUnl()<1){el.innerHTML='<p class="note">Menajer ilk albümle gelir: seviye alma, sipariş teslimi, sahne kurma ve albüm çıkarma kademe kademe otomatikleşir; her kademe ayrı alınır ve istediğin an kapatılır.</p>';return}
  el.innerHTML='<p class="note">Albümden albüme kalır. Açık olanlar sen yokken de çalışır (çevrimdışı değil, sekme açıkken). Hepsi Stüdyo’daki Otomatik bölümünde de açılıp kapanır.</p>'+AUTO.map(u=>{const own=!!S.mn[u.id],lock=albUnl()<u.al;return '<div class="row noicon'+(lock?' locked':'')+'"><span><span class="nm">'+u.n+'</span><span class="ds">'+u.d+(lock?' · <b style="color:var(--fg);font-weight:500">'+u.al+'. albümle</b>':'')+'</span></span>'+(own?'<span class="seg"><button data-act="mnTog" data-id="'+u.id+'" data-v="1" aria-pressed="'+(S.auto[u.id]!==false)+'">Açık</button><button data-act="mnTog" data-id="'+u.id+'" data-v="0" aria-pressed="'+(S.auto[u.id]===false)+'">Kapalı</button></span>':lock?'<span class="cnt">kilitli</span>':'<button class="btn" data-act="mnBuy" data-id="'+u.id+'" data-cost="'+u.c+'">♪ '+fmt(u.c)+'</button>')+'</div>'}).join('')}
 function renderTour(){const el=$('tourBox');if(!el)return;const c=cityOf(),nx=CITIES[(S.city+1)%CITIES.length],vis=Object.keys(S.cities).length;
@@ -586,6 +589,8 @@ function autoPicks(si,pk,lv){const x=slotIns(si);if(!x)return[];const p=S.pat[pk
  let n=x.role==='alan'?1:Math.min(nf,Math.max(keep,Math.round(nf*frac)));
  const out=[];for(const s of pr){if(out.length>=n)break;let c=0;for(let i=0;i<S.slots.length;i++)if(i!==si&&p[i][s])c++;if(c>=5)continue;out.push(s)}return out}
 const rowOf=st=>{const r=Array(18).fill(0);st.forEach(s=>r[s]=1);return r};
+/* v35: otomatik desende vuruş enstrümanının (Darbe rolü, ör. davul) ölçü başı vurgulu: şarj kendiliğinden dolar (ekonomi_sim: vurgusuz desenle 60 dk'da 0 patlama) */
+const rowOfA=(si,st)=>{const r=rowOf(st),x=slotIns(si);if(x&&x.role==='darbe'&&r[0])r[0]=2;return r};
 /* sis: yazılacak satırlar (null = elle düzenlenmemiş hepsi), lv: seviye (0 = satırın son seviyesi ya da Yoğun). Bağımlılık sırası: davul → trampet → … → bas → melodi.
    Bedel ödenir; nota yetmezse en kalabalık satırdan başlayarak kısaltır. Kolay'da ve B açıksa nakarat da yazılır. */
 function autoRows(sis,lv){const pks=['A'].concat(hasB()&&S.am.nakarat?['B']:[]),skipped=[];let spent=0,wrote=0;
@@ -593,9 +598,9 @@ function autoRows(sis,lv){const pks=['A'].concat(hasB()&&S.am.nakarat?['B']:[]),
  for(const pk of pks){const order=S.slots.map((id,si)=>si).filter(si=>want(si,pk)).sort((a,b)=>{const ra=AUTO_ORDER.indexOf(slotIns(a).role),rb=AUTO_ORDER.indexOf(slotIns(b).role);return (ra<0?99:ra)-(rb<0?99:rb)});if(!order.length)continue;
   const sv=JSON.parse(JSON.stringify(S.pat[pk])),lvs={},picks={};
   order.forEach(si=>{S.pat[pk][si]=Array(18).fill(0)});
-  order.forEach(si=>{const L=lv||(+S.rowm['A'+si]>0?+S.rowm['A'+si]:3);lvs[si]=L;picks[si]=autoPicks(si,pk,L);S.pat[pk][si]=rowOf(picks[si])});
+  order.forEach(si=>{const L=lv||(+S.rowm['A'+si]>0?+S.rowm['A'+si]:3);lvs[si]=L;picks[si]=autoPicks(si,pk,L);S.pat[pk][si]=rowOfA(si,picks[si])});
   const target=JSON.parse(JSON.stringify(S.pat[pk]));for(let i=0;i<sv.length;i++)S.pat[pk][i]=sv[i];
-  const rowsFor=()=>{const r={};order.forEach(si=>r[si]=rowOf(picks[si]));return r};
+  const rowsFor=()=>{const r={};order.forEach(si=>r[si]=rowOfA(si,picks[si]));return r};
   let rows=rowsFor(),c=planReplace(pk,rows),guard=200;
   while(c>S.nota&&guard-->0){const big=order.filter(si=>picks[si].length>1).sort((a,b)=>picks[b].length-picks[a].length)[0];if(big==null)break;picks[big].pop();rows=rowsFor();c=planReplace(pk,rows)}
   if(c>S.nota){msg('Yeterli nota yok · ♪ '+fmt(c)+' gerekli');break}
