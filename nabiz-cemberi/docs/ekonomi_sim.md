@@ -8,13 +8,13 @@ Yeni oyun, Kolay, otomatik müzik açık. Bot her 10 sn'de Analiz önerisiyle (a
 |---|---|---|---|---|---|---|---|---|
 | 1 | 3 (3) | 11 | 16 | 1/4 | 11 | 0 | 0 | 0 |
 | 2 | 5 (5) | 23 | 28 | 1/4 | 17 | 0 | 0 | 0 |
-| 5 | 11 (11) | 548 | 690 | 4/4 | 41 | 0 | 0 | 0 |
-| 10 | 23 (23) | 4,5 B | 5,0 B | 4/4 | 94 | 0 | 0 | 0 |
-| 15 | 34 (34) | 14,5 B | 8,6 B | 4/4 | 135 | 0 | 0 | 0 |
-| 20 | 44 (44) | 34,4 B | 19,3 B | 4/4 | 172 | 0 | 0 | 0 |
-| 30 | 48 (48) | 74,2 B | 34,5 B | 4/4 | 228 | 7 | 0 | 0 |
-| 45 | 50 (50) | 94,3 B | 60,9 B | 4/4 | 243 | 19 | 0 | 0 |
-| 60 | 52 (53) | 97,4 B | 76,4 B | 4/4 | 243 | 30 | 0 | 0 |
+| 5 | 11 (11) | 515 | 535 | 4/4 | 42 | 0 | 0 | 0 |
+| 10 | 23 (23) | 2,9 B | 3,5 B | 5/5 | 94 | 0 | 0 | 0 |
+| 15 | 34 (34) | 13,4 B | 12,5 B | 7/7 | 132 | 0 | 0 | 1 |
+| 20 | 45 (45) | 45,6 B | 31,2 B | 7/7 | 188 | 0 | 3 | 1 |
+| 30 | 53 (55) | 100,9 B | 78,6 B | 7/7 | 292 | 4 | 10 | 1 |
+| 45 | 61 (61) | 193,1 B | 172,5 B | 9/9 | 346 | 13 | 24 | 2 |
+| 60 | 64 (64) | 201,1 B | 216,3 B | 9/9 | 346 | 25 | 44 | 2 |
 
 ## Şarj kapalı
 
@@ -23,17 +23,16 @@ Yeni oyun, Kolay, otomatik müzik açık. Bot her 10 sn'de Analiz önerisiyle (a
 | 1 | 3 (3) | 11 | 16 | 1/4 | 11 | 0 | 0 | 0 |
 | 2 | 5 (5) | 23 | 28 | 1/4 | 17 | 0 | 0 | 0 |
 | 5 | 11 (11) | 541 | 535 | 4/4 | 42 | 0 | 0 | 0 |
-| 10 | 23 (23) | 3,0 B | 3,7 B | 4/4 | 93 | 0 | 0 | 0 |
-| 15 | 34 (34) | 11,9 B | 8,1 B | 4/4 | 127 | 0 | 0 | 0 |
-| 20 | 44 (44) | 28,0 B | 18,1 B | 4/4 | 160 | 0 | 0 | 0 |
-| 30 | 46 (48) | 60,5 B | 33,9 B | 4/4 | 221 | 8 | 0 | 0 |
-| 45 | 48 (48) | 79,8 B | 54,4 B | 4/4 | 243 | 21 | 0 | 0 |
-| 60 | 53 (53) | 86,5 B | 68,2 B | 4/4 | 243 | 31 | 0 | 0 |
+| 10 | 23 (23) | 3,1 B | 3,5 B | 5/5 | 94 | 0 | 0 | 0 |
+| 15 | 34 (34) | 18,1 B | 13,0 B | 7/7 | 136 | 0 | 0 | 1 |
+| 20 | 45 (45) | 49,4 B | 32,0 B | 7/7 | 193 | 0 | 0 | 1 |
+| 30 | 54 (54) | 108,8 B | 79,7 B | 7/7 | 295 | 3 | 0 | 1 |
+| 45 | 58 (59) | 194,4 B | 172,5 B | 9/9 | 346 | 13 | 0 | 2 |
+| 60 | 60 (61) | 200,0 B | 216,3 B | 9/9 | 346 | 25 | 0 | 2 |
 
-Sayfa hatası: yok · ölçüm 14 sn
+Sayfa hatası: yok · ölçüm 19 sn
 
-## Bulgular (60 dk)
-- **Şarj hiç dolmuyor:** Otomatik desenlerde (Kolay, Hepsini düzenle, menajerin koyduğu enstrümanlar) hiç vurgulu adım yok, Alan rolündeki enstrümanlar da ucuz değil. Patlama 60 dakikada 0 kez oldu; iki koşu aynı. Oyuncu elle vurgu koymadıkça özellik görünmüyor.
-- **Hızlı başlangıç:** 5. dk dalga 11, 10. dk dalga 23, 20. dk dalga 44. İlk 20 dakikada hiç geri çekilme yok.
-- **Duvar dalga 48–53'te:** 30. dakikadan sonra dakikada yaklaşık bir geri çekilme; 60. dakikada en iyi dalga 53. Dalga 50 CEO dalgası.
-- **Satın alma 45. dakikada tıkanıyor:** Toplam seviye 243'te donuyor. Bot sahne yeri (5.–8. yer) almıyor; otomatik geliştirmede yer açma yok, enstrüman sayısı 4'te kalıyor.
+## v35 kararları ve sonrası
+- Otomatik desen, Darbe rolündeki vuruş enstrümanının (ör. davul) ölçü başını vurgulu yazar. Şarj artık kendiliğinden doluyor: 60 dakikada 44 patlama, dakikada yaklaşık bir; en iyi dalga 61'den 64'e çıktı.
+- Otomatik geliştirme, bütün yerler doluyken ve yeni yer önerilen geliştirmenin üç katından ucuzsa sahneye yer açar. 45. dakikada 9 yer dolu; dakika 30'da gelir iki katı (100 B'ye karşı 74 B).
+- Duvar dalga ~50'den ~60'a kaydı. Tıkanma şimdi 45. dakikada (toplam seviye 346): bütün yerler dolu, seviyeler sınırda. Bundan sonrası albüm (yeni dönem) kararı, bot albüm çıkarmıyor.
