@@ -45,6 +45,7 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v21: otomatik geliştir menajere bağlandı, sahne katmanı ×1,1, bir dalga geri
 - v22: küçük temizlik (Kolay öğretici, Uygula, ped seviye düğmeleri, terimler)
 - v23: telefonda Sahne aşağı kayıyordu, düzeldi
+- v34: düşman ölünce ritimli nota (akordan, on altılığa oturur; boss'ta gümbürtü)
 - v33: bosslara büyük doğma efekti (ışık havuzu, üç halka, yüksek sütun, sarsıntı)
 - v32: düşmanlara doğma animasyonu (büyüyerek belirir, halka ve ışık sütunu)
 - v31: düşmanlar içi dolu neon geometrik cisimler (döner, vuruşta zıplar, ölünce parçalara ayrılır)
