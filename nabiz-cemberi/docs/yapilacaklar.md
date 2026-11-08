@@ -22,7 +22,7 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - [x] Kolay'da sade albüm ve turne metni
 
 ## 4. Oyun dengesi (önce ölçüm)
-- [ ] **Ekonomi simülasyonu:** hızlı ileri saran bot; Kolay + otomatik özelliklerle dalga süreleri, ilk satın almalar, tıkanma noktaları — orta. Otomatik özellikler geldiği için öncelikli
+- [x] **Ekonomi simülasyonu:** `tools/ekonomi_sim.py`, sonuç `docs/ekonomi_sim.md` (şarj hiç dolmuyor, duvar dalga ~50, bot yer açmıyor). Eski not: hızlı ileri saran bot; Kolay + otomatik özelliklerle dalga süreleri, ilk satın almalar, tıkanma noktaları — orta. Otomatik özellikler geldiği için öncelikli
 - [ ] Idle–aktif denge: simülasyondan sonra
 - [ ] Kaybetme gerilimi (can azalınca müzik boğuklaşır, uyarı, kayıp cezası) — tasarım kararı Hüseyin'de
 - [ ] Aktif savunma (hedef seçme / bekleme süreli beceri) — tasarım kararı Hüseyin'de

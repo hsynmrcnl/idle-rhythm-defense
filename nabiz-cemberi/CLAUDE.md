@@ -24,8 +24,8 @@ src/            kaynak parçalar; build.py bunları SIRAYLA tek dosyaya yapışt
   p7_canvas.js  sahne çizimi (çember/şerit), solo sahnesi (drawSoloStage, sürükleme), WebGL son işlem, boot, window.__nb
 sf/             örnek ses paketleri (JSON içinde base64 mp3): FluidR3 (0000.json…, drums.json; tools/build_sf.py) ve CC0 yeni set (c_*.json; tools/build_sf_cc0.py)
 assets/         PWA ikonları
-tests/          Playwright testleri (python tests/run_all.py): mobile_ui_test, sf_cc0_test, v16_test, v17_test, v18_test, v19_test, v20_test, v21_test, v22_test, v24_test, v25_test, v26_test, v27_test
-tools/          build_sf.py (FluidR3 paketleri), build_sf_cc0.py (CC0 paketleri: kaynak, nota seçimi, oktav düzeltmesi, loop; ayrıntı dosyanın başında)
+tests/          Playwright testleri (python tests/run_all.py): mobile_ui_test, sf_cc0_test, v16_test, v17_test, v18_test, v19_test, v20_test, v21_test, v22_test, v24_test, v25_test, v26_test, v27_test, v31_test
+tools/          ekonomi_sim.py (bot: yeni oyun, otomatik geliştirmeyle hızlı ileri sarma, dakika dakika dalga/gelir → docs/ekonomi_sim.md), build_sf.py (FluidR3 paketleri), build_sf_cc0.py (CC0 paketleri: kaynak, nota seçimi, oktav düzeltmesi, loop; ayrıntı dosyanın başında)
 build.py        → dist/ (site + PWA) ve build/artifact.html (claude.ai artifact için iskeletsiz sürüm), build/chk.js
 ```
 

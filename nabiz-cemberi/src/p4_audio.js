@@ -126,8 +126,8 @@ function voice(x,t,v,s,solo,dyn){let a=(v===2?1.5:1)*(lvOf(x.id)>=25?1.1:1)*(sol
 function playStep(s,pk,t,b,k){const p=S.pat[pk],sa=soloActive(b),pa=planAt(b),dyn=dynAt(b);k=k||1;CUR_B=b;const fb=k===1&&fillBar(b);if(k===1&&s===0&&pa.barIn===0&&b>0&&fillBar(b-1)&&fillHits()>=4)crashVoice(t,0.9*dyn);for(let i=0;i<S.slots.length;i++){const x=slotIns(i);if(!x)continue;if(needleOf(i)!==k)continue;if(muteUntil[i]>t)continue;if(pa.sec.solo&&isSolo(i)){const dp=duetPart(i);if(dp<0&&sa!==i)continue;if(x.fam!=='vur'&&hasSoloNotes(i)){const sd=60/curBpm(b)/4,off=(pa.barIn%2)*MI.N+s;if(!duetPlays(i,off))continue;soloNotesOf(i).forEach(nt=>{if(nt.t!==off)return;soloPlay(x,t,nt,sd,dyn*(dp>=0?1.1:1))});continue}const vs=S.pat.S[i][s];if(!vs)continue;voice(x,t,vs,s,{win:Math.floor(b/SEC_BARS),pos:pa.barIn},dyn);continue}const v=(fb&&fillZone(s)&&x.fam==='vur')?S.pat.F[i][s]:p[i][s];if(!v)continue;if(!allowed(pa.sec,x,i))continue;voice(x,t,v,s,null,dyn);if(x.id==='davul'&&S.up.side)duck(t)}}
 
 /* v34 ölüm sesi (laboratuvar: https://claude.ai/artifact/ABQ8omJPkmRZsjeH6i3Hjg): o anki akordan kısa parlak nota, bir sonraki on altılıkta; aynı on altılıkta tek ses (sürü yığılmaz), ardışık ölümler akor içinde yürür; boss'ta altta derin gümbürtü */
-let killSlot=-1,killIdx=0;
-function killSfx(boss){if(!ac||!playing||Math.abs(lastLogic-ac.currentTime)>0.5)return;const now=ac.currentTime,g=grid.find(x=>x.t>now+0.008),t=g?g.t:now+0.02;if(Math.abs(t-killSlot)<0.004)return;killSlot=t;
+let killSlot=-1,killIdx=0,killSnd=0;
+function killSfx(boss){if(!ac||!playing||Math.abs(lastLogic-ac.currentTime)>0.5)return;const now=ac.currentTime,g=grid.find(x=>x.t>now+0.008),t=g?g.t:now+0.02;if(Math.abs(t-killSlot)<0.004)return;killSlot=t;killSnd++;
  let fs=[];try{fs=chordFreqsAt(curBar,g?g.s:0)}catch(err){}if(!fs||!fs.length)fs=[220,261.6,329.6];killIdx=(killIdx+1+Math.floor(Math.random()*2))%fs.length;let f=fs[killIdx];while(f<520)f*=2;while(f>1400)f/=2;
  O('square',f,t,0.12,0.09,music);O('triangle',f*2,t,0.18,0.07,music);
  if(boss){O('sine',110,t,1.1,0.85,drum,30);Nz(t,'lowpass',700,0,0.4,1,drum);O('triangle',f/2,t,0.6,0.18,music,f/4)}}
