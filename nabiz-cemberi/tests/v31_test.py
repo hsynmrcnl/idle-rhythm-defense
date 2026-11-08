@@ -43,6 +43,11 @@ with sync_playwright() as pw:
         check(1 <= s1 - s0 <= 2, 'aynı anda ölen %d düşman için tek ölüm sesi (%d ses; arada doğal bir ölüm olabilir)' % (k1 - k0, s1 - s0))
         p.evaluate("()=>window.__nb.ff(20)")
         check(p.evaluate("()=>window.__nb.killSnd") - s1 <= 1 and p.evaluate("()=>window.__nb.frags.length") < 500, 'hızlı ileri sarma ses ve parça biriktirmiyor')
+        if d3:
+            p.click('#t-set'); p.wait_for_timeout(100); p.click('#p-set [data-act=ksfx][data-v="0"]'); p.wait_for_timeout(100)
+            s2 = p.evaluate("()=>window.__nb.killSnd"); p.evaluate("()=>{const nb=window.__nb;nb.S.wave=12;nb.enemies.forEach(e=>e.hp=0.001);nb.blast()}"); p.wait_for_timeout(1500)
+            p.evaluate("()=>{window.__nb.enemies.forEach(e=>e.hp=0.001);window.__nb.blast()}"); p.wait_for_timeout(150)
+            check(p.evaluate("()=>window.__nb.S.ksfx") is False and p.evaluate("()=>window.__nb.killSnd") == s2, 'Ayarlar → Ölüm sesi kapalıyken ses çalmıyor')
         check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
         ctx.close()
     b.close()
