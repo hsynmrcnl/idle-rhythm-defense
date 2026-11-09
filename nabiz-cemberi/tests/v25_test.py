@@ -45,7 +45,7 @@ with sync_playwright() as pw:
           yeni:S.am.yeni,open:Object.keys(S.open).length,fam:Object.keys(S.famOpen),muted:S.muted,lv:S.lv,tut:S.tut,lang:S.lang}}""")
         check(st['al'] == 0 and st['amax'] == 0 and st['tot'] < 100 and st['kills'] == 0 and st['wave'] == 1, 'ilerleme sıfırlandı (%s)' % st)
         check(st['ui'] == 'kolay' and st['mn'] == 0 and st['yeni'] is True and st['open'] == 0 and st['fam'] == ['vur'] and st['muted'] is False and st['lv'] == {'davul': 1}, 'ayarlar ve açılanlar ilk açılıştaki gibi')
-        check(st['tut'] == {'s': 0, 'done': False} and p.is_visible('#tut') and 'Hoş geldin' in p.inner_text('#tutT'), 'öğretici baştan başlıyor')
+        check(st['tut'] == {'s': 0, 'done': False} and p.is_visible('#tutBub') and 'Hoş geldin' in p.inner_text('#tutLT'), 'öğretici baştan başlıyor')
         if mob:
             check(p.evaluate("()=>document.getElementById('app').dataset.tab") == 'stage', 'telefonda sahneyle açılıyor')
         p.wait_for_timeout(5500)

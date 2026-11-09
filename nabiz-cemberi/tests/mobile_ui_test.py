@@ -32,10 +32,10 @@ with sync_playwright() as pw:
         p = ctx.new_page(); errs = []
         p.on('pageerror', lambda e: errs.append(str(e)))
         p.goto(URL); p.wait_for_timeout(600)
-        tut = p.evaluate("()=>{const r=q=>document.querySelector(q).getBoundingClientRect().height;return {tut:r('#tut'),cv:r('#cv')}}")
-        check(tut['cv'] >= 240, 'öğretici açıkken de sahne yeterince büyük (kart %dpx, canvas %dpx)' % (tut['tut'], tut['cv']))
+        tut = p.evaluate("()=>{const r=q=>document.querySelector(q).getBoundingClientRect().height;return {tut:r('#tutBub'),cv:r('#cv')}}")
+        check(tut['cv'] >= 240, 'öğretici açıkken de sahne yeterince büyük (balon %dpx, canvas %dpx)' % (tut['tut'], tut['cv']))
         if w == 375: p.screenshot(path=os.path.join(OUT, 'v13_tutorial_375.png'))
-        p.click('#tut [data-act=tutSkip]'); p.wait_for_timeout(150)
+        p.evaluate("()=>{window.__nb.S.tut.done=true}"); p.wait_for_timeout(150)
         # v26: yeni oyunda dock'ta yalnız Sahne; geri kalan ölçümler için her şey açılır
         dk = p.evaluate("()=>[...document.querySelectorAll('.dk')].filter(d=>!d.hidden).map(d=>d.id)")
         check(dk == ['d-stage'], 'yeni oyunda dock’ta yalnız Sahne (%s)' % dk)
@@ -148,9 +148,9 @@ with sync_playwright() as pw:
             check(p.evaluate("()=>window.__nb.S.muted===true"), 'Ayarlar’dan ses kapanıyor')
             p.click('#setBox [data-act=mute][data-v="0"]')
             # öğretici: Savunma adımı dock simgesini vurguluyor
-            open_set(); p.click('#p-set [data-act=tutRestart]')
-            nq = p.evaluate("()=>window.__nb.S.tipq.length")
-            check(nq >= 10, 'öğreticiyi yeniden başlatınca açılmış yerlerin kartları sıraya giriyor (%d)' % nq)
+            open_set(); p.click('#p-set [data-act=tutRestart]'); p.wait_for_timeout(200)
+            check(p.evaluate("()=>window.__nb.tutSand") and p.is_visible('#tutBub'), 'öğreticiyi yeniden başlatınca geçici oyunda zorunlu öğretici açılıyor')
+            p.wait_for_timeout(5200); p.click('#tutSkipL'); p.wait_for_timeout(200)
             p.evaluate("()=>{const S=window.__nb.S;S.tut.done=true;S.tipq=['def']}")
             try: p.wait_for_selector('#d-def.tut-hi', state='attached', timeout=2000)
             except Exception: pass
@@ -169,7 +169,7 @@ with sync_playwright() as pw:
     print('masaüstü 1280x800')
     ctx = b.new_context(viewport={'width': 1280, 'height': 800}); p = ctx.new_page(); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
-    p.goto(URL); p.wait_for_timeout(600); p.evaluate("()=>window.__nb.unlockAll()"); p.wait_for_timeout(100)
+    p.goto(URL); p.wait_for_timeout(600); p.evaluate("()=>{window.__nb.S.tut.done=true;window.__nb.unlockAll()}"); p.wait_for_timeout(100)
     d = p.evaluate("()=>({dock:getComputedStyle(document.getElementById('dock')).display,tabs:getComputedStyle(document.querySelector('.tabs')).display,tap:!!document.getElementById('tap').offsetParent,h1:getComputedStyle(document.querySelector('.top h1')).display})")
     check(d['dock'] == 'none' and d['tabs'] != 'none' and d['tap'] and d['h1'] != 'none', 'masaüstü düzeni aynı (dock yok, sekmeler ve düğmeler yerinde)')
     p.click('#t-set'); p.wait_for_timeout(100)
