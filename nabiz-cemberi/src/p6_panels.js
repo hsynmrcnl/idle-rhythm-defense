@@ -162,7 +162,7 @@ function renderPanels(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v42 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v43 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'));i18n($('tut'))}
  updUI();
@@ -328,14 +328,16 @@ const tNota=()=>tNotaFor(Math.max(60,noteCost()*4));
 const tvis=el=>!!(el&&el.offsetParent!==null&&el.getBoundingClientRect().width>0);
 const tsel=(...q)=>{for(const k of q){const el=[...document.querySelectorAll(k)].find(tvis);if(el)return{el}}return null};
 const tel=id=>{const el=$(id);return tvis(el)?{el}:null};
+/* telefonda hücre adımı alttaki pedi gösterir (büyük ve yazılı); ped yoksa halkadaki hücre */
+const tpad=(si,s)=>()=>(isPhone()&&eSel===si&&tsel('[data-act=pad][data-s="'+s+'"]'))||tcell(si,s);
 const tcell=(si,s)=>({cv:()=>{const g=geom();const p=cellPos(si,s,g);return[p[0],p[1],Math.max(14,(g.t||g.rowH||20)*0.7)]}});
 const torb=()=>({cv:()=>{const o=orbAt();return[o.x,o.y,o.r0*1.1]}});
 const TUT=[
  {n:1,t:'Hoş geldin',p:'Sessizlik A.Ş. şehri susturmaya geliyor. Tek savunman kendi müziğin.',kind:'btn',btn:'Başla',prep:()=>{setTab(isPhone()?'stage':tab)},go:()=>{ensureAudio();if(!S.kills){S.pat.A[0].fill(0);recalc();renderPanels()}}},
- {n:2,t:'İlk vuruş',p:'Halkada parlayan hücreye dokun: davul vuruşu ekle.',kind:'tap',tgt:()=>tcell(0,0),prep:tNota,cond:()=>S.pat.A[0][0]>0},
- {n:3,t:'Ritmi kur',p:'Parlayan hücreye dokun: dörtlük ritim kuruluyor.',kind:'tap',tgt:()=>tcell(0,TSEQ()[0]),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[0]]>0},
- {n:3,t:'Ritmi kur',p:'Bir tane daha.',kind:'tap',tgt:()=>tcell(0,TSEQ()[1]),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[1]]>0},
- {n:3,t:'Ritmi kur',p:'Ve son vuruş.',kind:'tap',tgt:()=>tcell(0,TSEQ()[2]),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[2]]>0},
+ {n:2,t:'İlk vuruş',p:'Parlayan adıma dokun: davul vuruşu ekle.',kind:'tap',tgt:tpad(0,0),prep:tNota,cond:()=>S.pat.A[0][0]>0},
+ {n:3,t:'Ritmi kur',p:'Parlayan hücreye dokun: dörtlük ritim kuruluyor.',kind:'tap',tgt:()=>tpad(0,TSEQ()[0])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[0]]>0},
+ {n:3,t:'Ritmi kur',p:'Bir tane daha.',kind:'tap',tgt:()=>tpad(0,TSEQ()[1])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[1]]>0},
+ {n:3,t:'Ritmi kur',p:'Ve son vuruş.',kind:'tap',tgt:()=>tpad(0,TSEQ()[2])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[2]]>0},
  {n:4,t:'Başlat',p:'Ortadaki ▶’ye dokun. İbre döndükçe her vuruş çalar.',kind:'tap',tgt:torb,cond:()=>playing},
  {n:5,t:'Nota',p:'Her vuruş nota kazandırır. Notayla enstrümanlarını güçlendireceksin.',kind:'btn',btn:'Devam',tgt:()=>tel('stats')},
  {n:6,t:'İlk düşman',p:'Düşmanlar kenardan merkeze yürür; vuruşların onlara ateş eder. İzle…',kind:'auto',tgt:()=>tel('cvwrap'),cond:()=>S.kills>=1},
