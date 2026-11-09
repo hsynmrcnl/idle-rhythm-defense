@@ -1,5 +1,5 @@
 /* ================= audio ================= */
-let ac=null,drum,dShaper,music,musicLP,mShaper,side,comp,masterLP,analyser,master,send,delay,lfoG,crackleG,noise,fData,tData;
+let dangerLP,alertG,ac=null,drum,dShaper,music,musicLP,mShaper,side,comp,masterLP,analyser,master,send,delay,lfoG,crackleG,noise,fData,tData;
 const DIST={};
 function curve(k){const key=String(k);if(DIST[key])return DIST[key];const n=1024,c=new Float32Array(n);for(let i=0;i<n;i++){const x=i*2/n-1;c[i]=k==='crush'?Math.round(x*8)/8:k===0?x:(1+k)*x/(1+k*Math.abs(x))}return DIST[key]=c}
 function initAudio(){
@@ -12,7 +12,8 @@ function initAudio(){
  drum=ac.createGain();dShaper=ac.createWaveShaper();dShaper.curve=curve(0);
  music=ac.createGain();musicLP=ac.createBiquadFilter();musicLP.type='lowpass';musicLP.frequency.value=20000;mShaper=ac.createWaveShaper();mShaper.curve=curve(0);side=ac.createGain();
  drum.connect(dShaper);dShaper.connect(comp);music.connect(musicLP);musicLP.connect(mShaper);mShaper.connect(side);side.connect(comp);
- comp.connect(masterLP);masterLP.connect(analyser);analyser.connect(master);master.connect(ac.destination);
+ dangerLP=ac.createBiquadFilter();dangerLP.type='lowpass';dangerLP.frequency.value=20000;dangerLP.Q.value=0.8;alertG=ac.createGain();alertG.gain.value=0.9;alertG.connect(master);
+ comp.connect(dangerLP);dangerLP.connect(masterLP);masterLP.connect(analyser);analyser.connect(master);master.connect(ac.destination);
  send=ac.createGain();send.gain.value=0;delay=ac.createDelay(2);delay.delayTime.value=60/S.bpm*0.75;
  const fb=ac.createGain();fb.gain.value=0.38;const dlp=ac.createBiquadFilter();dlp.type='lowpass';dlp.frequency.value=2600;
  send.connect(delay);delay.connect(dlp);dlp.connect(fb);fb.connect(delay);const wet=ac.createGain();wet.gain.value=0.55;dlp.connect(wet);wet.connect(comp);
@@ -127,6 +128,17 @@ function playStep(s,pk,t,b,k){const p=S.pat[pk],sa=soloActive(b),pa=planAt(b),dy
 
 /* v34 ölüm sesi (laboratuvar: https://claude.ai/artifact/ABQ8omJPkmRZsjeH6i3Hjg): o anki akordan kısa parlak nota, bir sonraki on altılıkta; aynı on altılıkta tek ses (sürü yığılmaz), ardışık ölümler akor içinde yürür; boss'ta altta derin gümbürtü */
 let killSlot=-1,killIdx=0,killSnd=0;
+/* v37 kaybetme gerilimi: nabız %35 altında müzik boğulur (dangerLP), kalp atışı, %15 altında ölçü başı uyarı; %50'ye dönünce kurtuluş; sıfırda kaset durur gibi iniş (tapeStop). Ayarlar → Gerilim efektleri (S.tens) */
+const DNG=0.35,DNG_CRIT=0.15,DNG_OK=0.5;let tapeT=-9,dngSnd=0;
+const tensOn=()=>S.tens!==false&&!demoMode;
+function hpFrac(){return clamp(core.hp/hpMax(),0,1)}
+function dangerBeat(s,t){if(!tensOn()||S.muted||t<tapeT)return;const f=hpFrac();if(f>=DNG||f<=0)return;const crit=f<DNG_CRIT,gs=MI.gsSet.has(s),g=MI.grp[s],half=Math.floor(MI.g.length/2);
+ if(gs&&(crit||g===0||g===half)){O('sine',62,t,0.22,0.8,alertG,38);O('sine',58,t+0.16,0.2,0.55,alertG,36);dngSnd++}
+ if(crit&&s===0){O('square',1320,t,0.09,0.06,alertG);O('square',990,t+0.12,0.09,0.05,alertG)}}
+function dangerAudio(){if(!ac||!dangerLP)return;const now=ac.currentTime;if(now<tapeT)return;const f=hpFrac(),k=tensOn()&&playing&&f<DNG?f/DNG:1,fq=k>=1?20000:500*Math.pow(36,k);dangerLP.frequency.setTargetAtTime(fq,now,0.08)}
+function tapeStop(from,to){if(!tensOn()||!ac||!playing||ffOn)return;const t=ac.currentTime;tapeT=t+1.7;tapeGray=1.8;tapeLbl=T('Dalga')+' '+from+' → '+to;const f=dangerLP.frequency;f.cancelScheduledValues(t);f.setValueAtTime(Math.min(20000,f.value),t);f.exponentialRampToValueAtTime(160,t+0.9);f.setValueAtTime(160,t+1.3);f.exponentialRampToValueAtTime(20000,t+1.7);
+ if(!S.muted){O('sawtooth',220,t,0.95,0.16,music,30);O('triangle',110,t,0.95,0.3,drum,20)}}
+function recoverSfx(){if(!ac||!playing||S.muted)return;const t=ac.currentTime+0.01;O('sawtooth',220,t,0.6,0.05,music,880);Nz(t,'highpass',3000,0,0.08,0.5,drum)}
 function killSfx(boss){if(S.ksfx===false||!ac||!playing||Math.abs(lastLogic-ac.currentTime)>0.5)return;const now=ac.currentTime,g=grid.find(x=>x.t>now+0.008),t=g?g.t:now+0.02;if(Math.abs(t-killSlot)<0.004)return;killSlot=t;killSnd++;
  let fs=[];try{fs=chordFreqsAt(curBar,g?g.s:0)}catch(err){}if(!fs||!fs.length)fs=[220,261.6,329.6];killIdx=(killIdx+1+Math.floor(Math.random()*2))%fs.length;let f=fs[killIdx];while(f<520)f*=2;while(f>1400)f/=2;
  O('square',f,t,0.12,0.09,music);O('triangle',f*2,t,0.18,0.07,music);
@@ -141,7 +153,7 @@ function sched(){
  while(nextT<now+0.12){
   if(step>=MI.N){step=0;bar++}
   const sdb=60/curBpm(bar)/4;const s=step,pk=pkFor(bar),tp=nextT+((s%2===1&&S.up.swing)?sdb*0.2:0);
-  playStep(s,pk,tp,bar);queue.push({s,pk,t:tp,b:bar});grid.push({s,t:nextT,sd:sdb,N:MI.N});
+  playStep(s,pk,tp,bar);dangerBeat(s,nextT);queue.push({s,pk,t:tp,b:bar});grid.push({s,t:nextT,sd:sdb,N:MI.N});
   if(MI.gsSet.has(s)){beats.push(nextT);if(beats.length>10)beats.shift()}
   nextT+=sdb;step++;if(step>=MI.N){step=0;bar++}
  }

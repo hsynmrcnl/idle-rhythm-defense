@@ -119,7 +119,7 @@ with sync_playwright() as pw:
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(300); p.evaluate(SEED); p.reload(); p.wait_for_timeout(400)
     SET = """(o)=>{const nb=window.__nb,S=nb.S;S.slots=[o.id,null,null,null];S.lv={};S.lv[o.id]=3;S.edit='A';S.bpm=120;S.bmax=120;const P=S.pat.A;for(let i=0;i<P.length;i++)P[i].fill(0);
-      for(let s=0;s<16;s++)if(o.st.includes(s))P[0][s]=o.v;S.pat.B[0].fill(0);nb.recalc();nb.charge=0;return nb.blastN}"""
+      for(let s=0;s<16;s++)if(o.st.includes(s))P[0][s]=o.v;S.pat.B[0].fill(0);nb.recalc();nb.charge=0;nb.chReady=-1;return nb.blastN}"""
     n0 = p.evaluate(SET, {'id': 'davul', 'v': 1, 'st': list(range(0, 16, 2))})
     p.evaluate("()=>window.__nb.ff(8)")
     check(p.evaluate("()=>window.__nb.charge") == 0, 'vurgusuz davul şarj etmiyor')
@@ -128,7 +128,9 @@ with sync_playwright() as pw:
     c = p.evaluate("()=>window.__nb.charge")
     check(0.4 <= c <= 0.6 and p.evaluate("()=>window.__nb.blastN") == n0, 'vurgular şarj ediyor, ölçü başına en çok 1/12 (6 ölçüde %.2f)' % c)
     p.evaluate("()=>window.__nb.ff(14)")
-    check(p.evaluate("()=>window.__nb.blastN") == n0 + 1 and p.evaluate("()=>window.__nb.charge") < 0.35, 'şarj dolunca merkez patladı (en az 12 ölçüde bir)')
+    check(p.evaluate("()=>window.__nb.blastN") == n0 and p.evaluate("()=>window.__nb.chReady") >= 0, 'şarj doldu, dokunuş bekliyor (v37)')
+    p.evaluate("()=>window.__nb.ff(8)")
+    check(p.evaluate("()=>window.__nb.blastN") == n0 + 1 and p.evaluate("()=>window.__nb.charge") < 0.35 and p.evaluate("()=>window.__nb.chReady") < 0, 'dokunulmazsa 4 ölçü sonra kendisi patladı')
     n0 = p.evaluate(SET, {'id': 'zil', 'v': 1, 'st': [0, 8]})
     p.evaluate("()=>window.__nb.ff(4)")
     c = p.evaluate("()=>window.__nb.charge")
@@ -151,7 +153,7 @@ with sync_playwright() as pw:
     check(p.is_visible('#v3d'), 'masaüstünde 3D düğmesi sahnede')
     cv = p.locator('#cv').bounding_box(); p.mouse.click(cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2); p.wait_for_timeout(1500)
     p.evaluate("()=>{window.__nb.charge=0.99}"); p.wait_for_timeout(2500)
-    check(p.evaluate("()=>window.__nb.blastN") >= 1, 'çalarken şarj dolunca patlıyor')
+    check(p.evaluate("()=>window.__nb.chReady") >= 0 or p.evaluate("()=>window.__nb.blastN") >= 1, 'çalarken şarj doluyor (dokunuş bekliyor)')
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     ctx.close()
 

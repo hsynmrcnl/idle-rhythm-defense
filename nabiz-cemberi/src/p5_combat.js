@@ -13,7 +13,7 @@ function laneDist(a,b){const d=Math.abs(a-b);return S.layout==='circle'?Math.min
 function bounty(e){const T=ETYPES[e.ty];return(2*Math.pow(1.18,e.w-1)*T.b+rate()*0.4*T.b)*bountyM()}
 function kill(e,k,now){killSfx(e.boss);const g=bounty(e);earn(g);S.kills++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);if(S.dnum!==false&&pops.length<48)pops.push({e,t:'+♪ '+fmt(g),life:1,k:1});if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
 function leak(e,k,now){const T=ETYPES[e.ty];let dmg=T.dmg*(1+0.03*e.w);if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}core.hp-=dmg;retreatFlash=Math.max(retreatFlash,0.6);if(T.mute){const cands=S.slots.map((id,si)=>id?si:-1).filter(x=>x>=0);if(cands.length){const si=cands[Math.floor(Math.random()*cands.length)];muteUntil[si]=now+barDur();msg(slotIns(si).n+' bir ölçü susturuldu')}}enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;if(core.hp<=0)retreat(now)}
-function retreat(now){retreatCount++;const from=S.wave,to=Math.max(1,S.wave-1);enemies=[];core.hp=hpMax();core.sh=0;retreatFlash=1.5;msg('Sessizlik A.Ş. sahneyi bastı. Dalga '+from+' → '+to+'. Nabız tazelendi.');startWave(to,now)}
+function retreat(now){retreatCount++;dngIn=false;const from=S.wave,to=Math.max(1,S.wave-1);enemies=[];core.hp=hpMax();core.sh=0;retreatFlash=1.5;tapeStop(from,to);msg('Sessizlik A.Ş. sahneyi bastı. Dalga '+from+' → '+to+'. Nabız tazelendi.');startWave(to,now)}
 function wallHit(e){const k=Math.floor(e.a*WN)%WN;const E=wallE[k];if(E<=0.02)return 0;const b=wallBase(),top=b+Math.min(1,E)*wallSpan();if(e.d>=b&&e.d<=top)return E*wallD[k];return 0}
 function logic(now){
  const dt=clamp(now-lastLogic,0,0.1);lastLogic=now;if(dt<=0||!wave)return;
@@ -37,10 +37,13 @@ function logic(now){
  if(wave.done&&now>=wave.nextAt)startWave(wave.n+1,now);
 }
 /* v27 şarj: vurgulu adımlar ve Alan rolü merkezi doldurur (ölçü başına en çok CH_BAR); dolunca merkez patlar: tüm sahneye BLAST_S sn'lik hasar, patrona yarısı */
-let charge=0,chBar=0,novaT=-1,blastN=0;
-function chargeHit(si,s,v,x){if(!d3Own())return;const a=(v===2?CH_ACC:0)+(x.role==='alan'?CH_ALAN:0),add=Math.min(a,CH_BAR-chBar);if(add<=0)return;chBar+=add;charge=Math.min(1,charge+add);if(vfx.length<90)vfx.push({k:'charge',o:{si,s},life:1});if(charge>=1-1e-9)blast()}
-function blast(){charge=0;const th=dispTheme(),d=dps()*BLAST_S*globalMDmg(),col=goldOf(th);enemies.slice().forEach(e=>{if(enemies.includes(e))hit(e,d*(e.boss?0.5:1),col,null)});novaT=0;blastN++;kickP=1;
- if(ac&&playing&&!S.muted){const t=ac.currentTime+0.01;O('sine',90,t,1,0.9,drum,28,0.8);Nz(t,'lowpass',600,0,0.35,1,drum)}msg('Merkez patladı · tüm sahneye hasar')}
+let ffOn=false,charge=0,chBar=0,novaT=-1,blastN=0,chReady=-1,blastM=1;
+function chargeHit(si,s,v,x){if(!d3Own())return;const a=(v===2?CH_ACC:0)+(x.role==='alan'?CH_ALAN:0),add=Math.min(a,CH_BAR-chBar);if(add<=0)return;chBar+=add;charge=Math.min(1,charge+add);if(vfx.length<90)vfx.push({k:'charge',o:{si,s},life:1});if(charge>=1-1e-9&&chReady<0){chReady=curBar;if(!ffOn)msg('Şarj doldu · kristale dokun (ölçü başında ×1,5)')}}
+/* v37 elle patlat: dolu şarj CH_WAIT ölçü bekler, dokunulmazsa kendisi patlar; ölçünün ilk vuruşunda dokunmak ×CH_ON */
+function onBarBeat(){if(!ac||!grid.length)return false;const now=ac.currentTime-(ac.outputLatency||ac.baseLatency||0);return grid.some(x=>x.s===0&&Math.abs(now-x.t)<0.1)}
+function manualBlast(){if(chReady<0)return false;const on=onBarBeat();blast(on?CH_ON:1);msg(on?'Tam ölçü başında! Patlama ×1,5':'Merkez patladı · tüm sahneye hasar');return true}
+function blast(m){m=m||1;blastM=m;charge=0;chReady=-1;const th=dispTheme(),d=dps()*BLAST_S*globalMDmg()*m,col=goldOf(th);enemies.slice().forEach(e=>{if(enemies.includes(e))hit(e,d*(e.boss?0.5:1),col,null)});novaT=0;blastN++;kickP=1;
+ if(ac&&playing&&!S.muted){const t=ac.currentTime+0.01;O('sine',90,t,1,0.9,drum,28,0.8);Nz(t,'lowpass',600,0,0.35,1,drum)}if(m===1&&!ffOn)msg('Merkez patladı · tüm sahneye hasar')}
 function inRange(){const r=range();return enemies.filter(e=>e.d<=r)}
 function hit(e,dmg,col,origin,kind){e.dnA=(e.dnA||0)+Math.min(dmg,Math.max(0,e.hp));e.hp-=dmg;e.flash=1;const k=enemies.indexOf(e);if(origin)vfx.push({k:kind||'tracer',o:origin,e,col,life:1});if(e.hp<=0&&k>=0)kill(e,k,lastLogic)}
 function applySlow(e,amt,dur){if(ETYPES[e.ty].noSlow)return;e.slow=Math.max(e.slow,amt);e.slowT=Math.max(e.slowT,dur)}
@@ -75,7 +78,7 @@ function fire(si,s,v,pk,mult,art,raw){
 }
 function onStep(q){
  const nk=q.k||1;
- if(q.s===0&&nk===1){if(!hitBar)S.seri=Math.floor(S.seri/2);hitBar=false;playPk=q.pk;chBar=0;
+ if(q.s===0&&nk===1){if(!hitBar)S.seri=Math.floor(S.seri/2);hitBar=false;playPk=q.pk;chBar=0;if(chReady>=0&&(q.b||0)-chReady>=CH_WAIT)blast(1);
   if(S.stage.tower&&enemies.length){const tg=enemies.slice().sort((a,b)=>b.hp-a.hp)[0];const d=(DR[q.pk]*GC[q.pk]/MI.N)*4*globalMDmg();if(d>0){hit(tg,d,dispTheme().cv.hot,null);vfx.push({k:'bolt',e:tg,col:dispTheme().cv.hot,life:1})}}}
  const p=S.pat[q.pk],M=GC[q.pk]*globalM(),vis=q.pk===S.edit;let g=0;
  const b=q.b||0,sa=soloActive(b),pa=planAt(b);let dyn=dynAt(b);if(nk===1)curBar=b;const fb=nk===1&&fillBar(b);
@@ -93,5 +96,6 @@ function onStep(q){
 }
 const globalMDmg=()=>tourM();
 function setWave(n){n=clamp(n,1,Math.max(1,S.bestWave));S.wave=n;enemies=[];core.hp=hpMax();core.sh=0;if(playing)startWave(n,nowT());else wave=null;renderPanels();updUI()}
-function ffSim(sec){let t=lastLogic||0;if(!wave){startWave(S.wave,t);lastLogic=t}const end=t+sec;const nd={2:{nextT:t,step:0},3:{nextT:t,step:0}};while(t<end){if(step>=MI.N){step=0;bar++}onStep({s:step,pk:pkFor(bar),t,b:bar});step++;if(step>=MI.N){step=0;bar++}const sd=60/curBpm(bar)/4;t+=sd;for(let k=2;k<=3;k++){if(!needleOn(k))continue;const n=nd[k],spec=NEEDLES[k-1];while(n.nextT<t){const cell=spec.dir>0?n.step%MI.N:(MI.N-1-n.step%MI.N);onStep({s:cell,pk:pkFor(bar),t:n.nextT,b:bar,k});n.nextT+=sd/spec.speed;n.step++}}logic(t);vfx.length=0;parts.length=0;pops.length=0;frags.length=0}lastLogic=t}
+function ffSim(sec){ffOn=true;try{ffRun(sec)}finally{ffOn=false}}
+function ffRun(sec){let t=lastLogic||0;if(!wave){startWave(S.wave,t);lastLogic=t}const end=t+sec;const nd={2:{nextT:t,step:0},3:{nextT:t,step:0}};while(t<end){if(step>=MI.N){step=0;bar++}onStep({s:step,pk:pkFor(bar),t,b:bar});step++;if(step>=MI.N){step=0;bar++}const sd=60/curBpm(bar)/4;t+=sd;for(let k=2;k<=3;k++){if(!needleOn(k))continue;const n=nd[k],spec=NEEDLES[k-1];while(n.nextT<t){const cell=spec.dir>0?n.step%MI.N:(MI.N-1-n.step%MI.N);onStep({s:cell,pk:pkFor(bar),t:n.nextT,b:bar,k});n.nextT+=sd/spec.speed;n.step++}}logic(t);vfx.length=0;parts.length=0;pops.length=0;frags.length=0}lastLogic=t}
 
