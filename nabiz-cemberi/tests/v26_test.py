@@ -34,7 +34,7 @@ with sync_playwright() as pw:
     check(dock() == ['stage'] and p.is_visible('#t-set'), 'yeni oyunda dock’ta yalnız Sahne, Ayarlar dişlisi var (%s)' % dock())
     check(card() == 'Hoş geldin' and 'Öğretici 1 / 3' in p.text_content('#tutN'), 'öğretici 3 adım, ilk adım Hoş geldin')
     p.tap('#stats'); p.wait_for_timeout(150)
-    check(not p.evaluate("()=>window.__nb.anlOn") and 'Analiz 4' in p.inner_text('#msg'), 'Analiz henüz kapalı, ne zaman açılacağı yazıyor')
+    check(not p.evaluate("()=>window.__nb.anlOn") and 'Analiz 14' in p.inner_text('#msg'), 'Analiz henüz kapalı, ne zaman açılacağı yazıyor')
     p.screenshot(path=os.path.join(OUT, 'v26_start.png'))
     # örnek şarkıda her şey görünür, çıkınca geri gizlenir
     p.click('#t-set'); p.click('#p-set [data-act=demoGo][data-k="0"]'); p.wait_for_timeout(300)
@@ -65,7 +65,7 @@ with sync_playwright() as pw:
     sec = p.evaluate("()=>[...document.querySelectorAll('#secBar .sb')].map(e=>e.dataset.k)")
     check(sec == ['sahne', 'auto', 'syn'] and p.locator('[data-act=autoAll]').count() == 1, 'Otomatik, Uyum ve Hepsini düzenle geldi (%s)' % sec)
     # dalga 3: sırayla Ritme vur, Savunma, Tempo kartları
-    p.evaluate("()=>{window.__nb.S.bestWave=3}"); p.wait_for_timeout(400)
+    p.evaluate("()=>{window.__nb.S.bestWave=8}"); p.wait_for_timeout(400)
     seq = [card()]
     for k in range(3):
         p.tap('#tutNext'); p.wait_for_timeout(250); seq.append(card())
@@ -73,17 +73,20 @@ with sync_playwright() as pw:
     check(dock() == ['stage', 'studio', 'def'] and p.locator('#p-def [data-sec=ord]').is_hidden(), 'Savunma açıldı, Siparişler henüz kapalı (%s)' % dock())
     p.tap('#tutNext'); p.wait_for_timeout(200)
     # dalga 4: Analiz
-    p.evaluate("()=>{window.__nb.S.bestWave=4}"); p.wait_for_timeout(400)
+    p.evaluate("()=>{window.__nb.S.bestWave=14}"); p.wait_for_timeout(400)
+    for k in range(4):  # v40: dalga 14'e gelinceye kadar aile kartı da sırada olabilir
+        if card() in ('Yeni: Analiz', ''): break
+        p.tap('#tutNext'); p.wait_for_timeout(250)
     check(card() == 'Yeni: Analiz' and p.locator('#d-stage.tut-hi').count() == 1, 'dalga 4’te Analiz kartı; başka sekmedeyken Sahne simgesi parlıyor')
     p.tap('#d-stage')
     try: p.wait_for_selector('#stats.tut-hi', timeout=2000)  # vurgu tutCheck aralığında gelir; ağır çizimde 300 ms yetmeyebiliyor
     except Exception: pass
     check(p.locator('#stats.tut-hi').count() == 1, 'Sahne’de üst bilgi parlıyor')
     p.tap('#stats'); p.wait_for_timeout(300)
-    check(p.evaluate("()=>window.__nb.anlOn") and card() == '', 'üst bilgiye dokununca Analiz açıldı, kart kapandı')
+    check(p.evaluate("()=>window.__nb.anlOn") and card() != 'Yeni: Analiz', 'üst bilgiye dokununca Analiz açıldı, kart kapandı')
     p.tap('#stats'); p.wait_for_timeout(100)
     # dalga 8 ve albüm eşiğinin yarısı: Görünüm ve Albüm
-    p.evaluate("()=>{const S=window.__nb.S;S.bestWave=8;S.runEarned=1e9}"); p.wait_for_timeout(400)
+    p.evaluate("()=>{const S=window.__nb.S;S.bestWave=20;S.runEarned=1e9}"); p.wait_for_timeout(400)
     for k in range(8):
         if card() == '': break
         p.tap('#tutNext'); p.wait_for_timeout(150)
@@ -113,7 +116,7 @@ with sync_playwright() as pw:
     # ---------- eski kayıt: koşulu tutanlar sessiz açılır ----------
     print('eski kayıt')
     old = """{"v":3,"slots":["davul","trampet","hihat",null],"lv":{"davul":20,"trampet":10,"hihat":5},"pat":{"A":[[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0]],"B":[],"S":[],"F":[]},
-      "bestWave":12,"wave":10,"kills":500,"total":5e6,"albums":[{"n":"X","f":3,"b":100,"w":10}],"found":{"four":1},"famOpen":{"vur":1,"tel":1},"tut":{"s":9,"done":true},"open":{"syn":1,"rhy":1,"pat":1}}"""
+      "bestWave":20,"wave":10,"kills":500,"total":5e6,"albums":[{"n":"X","f":3,"b":100,"w":10}],"found":{"four":1},"famOpen":{"vur":1,"tel":1},"tut":{"s":9,"done":true},"open":{"syn":1,"rhy":1,"pat":1}}"""
     ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); p = ctx.new_page(); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.add_init_script("localStorage.setItem('nabiz-cemberi-v3', %s)" % repr(old))
