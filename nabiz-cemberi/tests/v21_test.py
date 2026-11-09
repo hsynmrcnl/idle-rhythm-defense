@@ -22,7 +22,7 @@ with sync_playwright() as pw:
     p = b.new_page(viewport={'width': 1280, 'height': 800}); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto('http://127.0.0.1:%d/' % PORT); p.wait_for_timeout(400)
-    p.evaluate("()=>{const S=window.__nb.S;S.tut={s:0,done:true};S.bestWave=12;S.wave=10;S.nota=1e12}")
+    p.evaluate("()=>{const S=window.__nb.S;S.tut={s:0,done:true};S.bestWave=14;S.wave=10;S.nota=1e12}")
     p.evaluate("()=>window.__nb.retreatNow()"); p.wait_for_timeout(50)
     check(p.evaluate("()=>window.__nb.S.wave") == 9, 'Nabız sıfırlanınca dalga 10 → 9')
     p.evaluate("()=>{window.__nb.S.wave=1;window.__nb.retreatNow()}")
