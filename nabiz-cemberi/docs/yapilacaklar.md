@@ -46,6 +46,8 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v22: küçük temizlik (Kolay öğretici, Uygula, ped seviye düğmeleri, terimler)
 - v23: telefonda Sahne aşağı kayıyordu, düzeldi
 - v36: Ayarlar → Ölüm sesi açık/kapalı
+- v40: açılışlar ilk 10 dakikaya yayıldı (UNL_W)
+- v39: şarkı paylaşma bağlantısı (#s=…)
 - v38: Ses masası (WAV/MIDI ücretsiz; yankı ♪250.000, ses karıştırıcı ♪100.000)
 - v37: kaybetme gerilimi + şarjı elle patlat; Ayarlar → Gerilim efektleri
 - v35: otomatik desende davul ölçü başı vurgulu (şarj dolar), otomatik geliştirme yer açar

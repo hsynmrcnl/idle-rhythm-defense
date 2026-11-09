@@ -26,15 +26,15 @@ with sync_playwright() as pw:
         p = ctx.new_page(); errs = []
         p.on('pageerror', lambda e: errs.append(str(e)))
         p.goto(URL); p.wait_for_timeout(300)
-        p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.wave=7;S.bestWave=7;S.nota=1e6;S.slots=['davul','bas',null,null];S.lv={davul:2,bas:2};localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
+        p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.wave=19;S.bestWave=19;S.nota=1e6;S.slots=['davul','bas',null,null];S.lv={davul:2,bas:2};localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
         p.reload(); p.wait_for_timeout(400)
-        check(p.evaluate("()=>document.querySelector('#p-studio [data-sec=desk]').hidden") is True, 'dalga 8 öncesi Ses masası kapalı')
-        p.evaluate("()=>{const S=window.__nb.S;S.bestWave=8}"); p.wait_for_timeout(400)
+        check(p.evaluate("()=>document.querySelector('#p-studio [data-sec=desk]').hidden") is True, 'dalga 20 öncesi Ses masası kapalı')
+        p.evaluate("()=>{const S=window.__nb.S;S.bestWave=20}"); p.wait_for_timeout(400)
         p.evaluate("()=>window.__nb.setTab('studio')")
         p.wait_for_timeout(200)
         if ph:
             p.click('#secBar [data-k=desk]'); p.wait_for_timeout(150)
-        check(p.is_visible('#deskBox [data-act=midi]') and p.is_visible('#deskBox [data-act=deskBuy][data-k=rv]'), 'dalga 8: Ses masası açık, dışa aktarma ücretsiz, yankı satılık')
+        check(p.is_visible('#deskBox [data-act=midi]') and p.is_visible('#deskBox [data-act=deskBuy][data-k=rv]'), 'dalga 20: Ses masası açık, dışa aktarma ücretsiz, yankı satılık')
         mb = p.evaluate("()=>Array.from(window.__nb.midiBytes())")
         hdr = bytes(mb[:4]).decode(); ntr = mb[10] * 256 + mb[11]; non = sum(1 for k in range(len(mb) - 2) if (mb[k] & 0xF0) == 0x90 and mb[k + 2] > 0)
         k = 14; ok = True
