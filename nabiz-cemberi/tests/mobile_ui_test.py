@@ -152,9 +152,9 @@ with sync_playwright() as pw:
             check(p.evaluate("()=>window.__nb.tutSand") and p.is_visible('#tutBub'), 'öğreticiyi yeniden başlatınca geçici oyunda zorunlu öğretici açılıyor')
             p.wait_for_timeout(5200); p.click('#tutSkipL'); p.wait_for_timeout(200)
             p.evaluate("()=>{const S=window.__nb.S;S.tut.done=true;S.tipq=['def']}")
-            try: p.wait_for_selector('#d-def.tut-hi', state='attached', timeout=2000)
-            except Exception: pass
-            check(p.locator('#d-def.tut-hi').count() == 1, 'Savunma kartında dock simgesi vurgulu')
+            p.wait_for_timeout(400)
+            check(p.is_visible('#tutBub') and 'Savunma' in p.inner_text('#tutLT'), 'Savunma kısa öğreticisi açılıyor')
+            p.evaluate("()=>{const S=window.__nb.S;S.tipq=[];S.tutm=0}"); p.wait_for_timeout(200)
             # İngilizce
             open_set()
             with p.expect_navigation(): p.click('#setBox [data-act=lang][data-v="en"]')

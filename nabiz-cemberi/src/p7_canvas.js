@@ -763,7 +763,7 @@ function hitTest(e){
 })();
 let lastF=performance.now(),kpLast=-1;
 function frame(ms){
- if(S.tut&&!S.tut.done)tutTick();else{const tl=$('tutL');if(tl&&!tl.hidden)tl.hidden=true}
+ tutTick();
  const dt=Math.min(0.05,Math.max(0,(ms-lastF)/1000));lastF=ms;clock+=dt;
  if(previewId&&ms>=previewUntil){previewId=null;applyTheme();msg('Önizleme bitti')}
  if(playing&&ac){const now=ac.currentTime;
