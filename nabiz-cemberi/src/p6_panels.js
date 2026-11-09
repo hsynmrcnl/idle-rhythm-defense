@@ -823,7 +823,9 @@ function songOf(){const D={v:1,bpm:S.bpm,meter:S.meter,scale:S.scale,slots:S.slo
  ['A','B','S','F'].forEach(k=>{const o={};(S.pat[k]||[]).forEach((row,si)=>{if(!S.slots[si])return;const a=[];row.forEach((v,s)=>{if(v)a.push([s,v])});if(a.length)o[si]=a});D[k]=o});return D}
 function songOk(D){const ids=new Set(INS.map(x=>x.id));if(!D||D.v!==1||!Array.isArray(D.slots)||D.slots.length>MAXSLOTS||!D.slots.every(x=>x===null||ids.has(x)))return false;if(!METERS[D.meter]||!SCALES[D.scale]||!(D.bpm>=40&&D.bpm<=300))return false;
  for(const k of ['A','B','S','F']){const o=D[k]||{};for(const si in o){if(!(+si>=0&&+si<D.slots.length)||!Array.isArray(o[si])||!o[si].every(c=>Array.isArray(c)&&c[0]>=0&&c[0]<32&&c[1]>=1&&c[1]<=3))return false}}return true}
-async function shareSong(){const url=location.origin+location.pathname+'#s='+(await zipJson(songOf()));const box=$('shareUrl');if(box){box.hidden=false;box.value=url}
+/* itch.io gibi başka bir sitede gömülüyken bağlantı yine asıl siteye gider */
+const SHARE_HOME='https://hsynmrcnl.github.io/idle-rhythm-defense/',shareBase=()=>/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname)?location.origin+location.pathname:SHARE_HOME;
+async function shareSong(){const url=shareBase()+'#s='+(await zipJson(songOf()));const box=$('shareUrl');if(box){box.hidden=false;box.value=url}
  if(navigator.share){try{await navigator.share({title:'Nabız Çemberi',text:T('Şarkımı dinle, sonra kendi şarkını kur'),url});return}catch(e){if(e&&e.name==='AbortError')return}}
  try{await navigator.clipboard.writeText(url);msg('Şarkı bağlantısı kopyalandı')}catch(e){if(box){box.select()}msg('Bağlantıyı kopyala ve gönder')}}
 async function openShared(){const m=/^#s=([12][A-Za-z0-9_-]+)$/.exec(location.hash||'');if(!m)return false;try{const D=await unzipJson(m[1]);if(!songOk(D))throw 0;D.name=T('Paylaşılan şarkı');playSong(D,-1);return true}catch(e){msg('Paylaşılan şarkı açılamadı');try{history.replaceState(null,'',location.pathname+location.search)}catch(err){}return false}}
