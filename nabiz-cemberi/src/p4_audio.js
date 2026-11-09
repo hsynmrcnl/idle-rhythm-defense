@@ -13,7 +13,8 @@ function initAudio(){
  music=ac.createGain();musicLP=ac.createBiquadFilter();musicLP.type='lowpass';musicLP.frequency.value=20000;mShaper=ac.createWaveShaper();mShaper.curve=curve(0);side=ac.createGain();
  drum.connect(dShaper);dShaper.connect(comp);music.connect(musicLP);musicLP.connect(mShaper);mShaper.connect(side);side.connect(comp);
  dangerLP=ac.createBiquadFilter();dangerLP.type='lowpass';dangerLP.frequency.value=20000;dangerLP.Q.value=0.8;alertG=ac.createGain();alertG.gain.value=0.9;alertG.connect(master);
- comp.connect(dangerLP);dangerLP.connect(masterLP);masterLP.connect(analyser);analyser.connect(master);master.connect(ac.destination);
+ comp.connect(dangerLP);dangerLP.connect(masterLP);
+ rvIn=ac.createBiquadFilter();rvIn.type='highpass';rvIn.frequency.value=250;rvConv=ac.createConvolver();rvWet=ac.createGain();rvWet.gain.value=0;{const rd=ac.createGain();rd.gain.value=0.15;dShaper.connect(rd);rd.connect(rvIn);const rm=ac.createGain();rm.gain.value=0.7;side.connect(rm);rm.connect(rvIn)}rvIn.connect(rvConv);rvConv.connect(rvWet);rvWet.connect(comp);masterLP.connect(analyser);analyser.connect(master);master.connect(ac.destination);
  send=ac.createGain();send.gain.value=0;delay=ac.createDelay(2);delay.delayTime.value=60/S.bpm*0.75;
  const fb=ac.createGain();fb.gain.value=0.38;const dlp=ac.createBiquadFilter();dlp.type='lowpass';dlp.frequency.value=2600;
  send.connect(delay);delay.connect(dlp);dlp.connect(fb);fb.connect(delay);const wet=ac.createGain();wet.gain.value=0.55;dlp.connect(wet);wet.connect(comp);
@@ -23,7 +24,7 @@ function initAudio(){
  const cs=ac.createBufferSource();cs.buffer=cb;cs.loop=true;crackleG=ac.createGain();crackleG.gain.value=0;cs.connect(crackleG);crackleG.connect(masterLP);cs.start();
  syncFx();
 }
-function ensureAudio(){if(!ac){initAudio();sfLoadStage()}if(ac.state==='suspended')ac.resume()}
+function ensureAudio(){if(!ac){initAudio();sfLoadStage();applyDesk()}if(ac.state==='suspended')ac.resume()}
 function syncFx(){
  if(!ac)return;const t=ac.currentTime,th=dispTheme(),k=th.kit;
  send.gain.setTargetAtTime(S.up.echo?0.4:0,t,0.05);
@@ -124,7 +125,7 @@ function duck(t){side.gain.setValueAtTime(1,t);side.gain.linearRampToValueAtTime
 function voice(x,t,v,s,solo,dyn){let a=(v===2?1.5:1)*(lvOf(x.id)>=25?1.1:1)*(solo?1.3:1)*(dyn||1);if(solo&&x.fam!=='vur')SOLO_F=soloFreq(solo.win,solo.pos,s);
  /* dört sesli akor üç sesli kadar yüksek: genlik √(3/n) */
  if(!SOLO_F&&(x.v.pitch==='chord'||x.v.chord||x.v.g==='pad'||x.v.g==='organ'||x.v.g==='vox')){const n=chordAt(s).length;if(n>3)a*=Math.sqrt(3/n)}if(!solo&&sfVoice(x,t,a,s)){SOLO_F=0;return}try{GEN[x.v.g](t,a,x.v,s)}catch(e){}SOLO_F=0;if(lvOf(x.id)>=25&&x.fam==='vur'&&x.v.g==='kick')O('sine',55,t,0.4,0.2*a,drum)}
-function playStep(s,pk,t,b,k){const p=S.pat[pk],sa=soloActive(b),pa=planAt(b),dyn=dynAt(b);k=k||1;CUR_B=b;const fb=k===1&&fillBar(b);if(k===1&&s===0&&pa.barIn===0&&b>0&&fillBar(b-1)&&fillHits()>=4)crashVoice(t,0.9*dyn);for(let i=0;i<S.slots.length;i++){const x=slotIns(i);if(!x)continue;if(needleOf(i)!==k)continue;if(muteUntil[i]>t)continue;if(pa.sec.solo&&isSolo(i)){const dp=duetPart(i);if(dp<0&&sa!==i)continue;if(x.fam!=='vur'&&hasSoloNotes(i)){const sd=60/curBpm(b)/4,off=(pa.barIn%2)*MI.N+s;if(!duetPlays(i,off))continue;soloNotesOf(i).forEach(nt=>{if(nt.t!==off)return;soloPlay(x,t,nt,sd,dyn*(dp>=0?1.1:1))});continue}const vs=S.pat.S[i][s];if(!vs)continue;voice(x,t,vs,s,{win:Math.floor(b/SEC_BARS),pos:pa.barIn},dyn);continue}const v=(fb&&fillZone(s)&&x.fam==='vur')?S.pat.F[i][s]:p[i][s];if(!v)continue;if(!allowed(pa.sec,x,i))continue;voice(x,t,v,s,null,dyn);if(x.id==='davul'&&S.up.side)duck(t)}}
+function playStep(s,pk,t,b,k){const p=S.pat[pk],sa=soloActive(b),pa=planAt(b),dyn0=dynAt(b);k=k||1;CUR_B=b;const fb=k===1&&fillBar(b);if(k===1&&s===0&&pa.barIn===0&&b>0&&fillBar(b-1)&&fillHits()>=4)crashVoice(t,0.9*dyn0);for(let i=0;i<S.slots.length;i++){const x=slotIns(i);if(!x)continue;if(needleOf(i)!==k)continue;if(muteUntil[i]>t)continue;const mv=mixV(i);if(mv<=0)continue;const dyn=dyn0*mv;if(pa.sec.solo&&isSolo(i)){const dp=duetPart(i);if(dp<0&&sa!==i)continue;if(x.fam!=='vur'&&hasSoloNotes(i)){const sd=60/curBpm(b)/4,off=(pa.barIn%2)*MI.N+s;if(!duetPlays(i,off))continue;soloNotesOf(i).forEach(nt=>{if(nt.t!==off)return;soloPlay(x,t,nt,sd,dyn*(dp>=0?1.1:1))});continue}const vs=S.pat.S[i][s];if(!vs)continue;voice(x,t,vs,s,{win:Math.floor(b/SEC_BARS),pos:pa.barIn},dyn);continue}const v=(fb&&fillZone(s)&&x.fam==='vur')?S.pat.F[i][s]:p[i][s];if(!v)continue;if(!allowed(pa.sec,x,i))continue;voice(x,t,v,s,null,dyn);if(x.id==='davul'&&S.up.side)duck(t)}}
 
 /* v34 ölüm sesi (laboratuvar: https://claude.ai/artifact/ABQ8omJPkmRZsjeH6i3Hjg): o anki akordan kısa parlak nota, bir sonraki on altılıkta; aynı on altılıkta tek ses (sürü yığılmaz), ardışık ölümler akor içinde yürür; boss'ta altta derin gümbürtü */
 let killSlot=-1,killIdx=0,killSnd=0;
@@ -132,17 +133,48 @@ let killSlot=-1,killIdx=0,killSnd=0;
 const DNG=0.35,DNG_CRIT=0.15,DNG_OK=0.5;let tapeT=-9,dngSnd=0;
 const tensOn=()=>S.tens!==false&&!demoMode;
 function hpFrac(){return clamp(core.hp/hpMax(),0,1)}
-function dangerBeat(s,t){if(!tensOn()||S.muted||t<tapeT)return;const f=hpFrac();if(f>=DNG||f<=0)return;const crit=f<DNG_CRIT,gs=MI.gsSet.has(s),g=MI.grp[s],half=Math.floor(MI.g.length/2);
+function dangerBeat(s,t){if(recOn||!tensOn()||S.muted||t<tapeT)return;const f=hpFrac();if(f>=DNG||f<=0)return;const crit=f<DNG_CRIT,gs=MI.gsSet.has(s),g=MI.grp[s],half=Math.floor(MI.g.length/2);
  if(gs&&(crit||g===0||g===half)){O('sine',62,t,0.22,0.8,alertG,38);O('sine',58,t+0.16,0.2,0.55,alertG,36);dngSnd++}
  if(crit&&s===0){O('square',1320,t,0.09,0.06,alertG);O('square',990,t+0.12,0.09,0.05,alertG)}}
-function dangerAudio(){if(!ac||!dangerLP)return;const now=ac.currentTime;if(now<tapeT)return;const f=hpFrac(),k=tensOn()&&playing&&f<DNG?f/DNG:1,fq=k>=1?20000:500*Math.pow(36,k);dangerLP.frequency.setTargetAtTime(fq,now,0.08)}
-function tapeStop(from,to){if(!tensOn()||!ac||!playing||ffOn)return;const t=ac.currentTime;tapeT=t+1.7;tapeGray=1.8;tapeLbl=T('Dalga')+' '+from+' → '+to;const f=dangerLP.frequency;f.cancelScheduledValues(t);f.setValueAtTime(Math.min(20000,f.value),t);f.exponentialRampToValueAtTime(160,t+0.9);f.setValueAtTime(160,t+1.3);f.exponentialRampToValueAtTime(20000,t+1.7);
+function dangerAudio(){if(!ac||!dangerLP)return;const now=ac.currentTime;if(now<tapeT)return;const f=hpFrac(),k=!recOn&&tensOn()&&playing&&f<DNG?f/DNG:1,fq=k>=1?20000:500*Math.pow(36,k);dangerLP.frequency.setTargetAtTime(fq,now,0.08)}
+function tapeStop(from,to){if(recOn||!tensOn()||!ac||!playing||ffOn)return;const t=ac.currentTime;tapeT=t+1.7;tapeGray=1.8;tapeLbl=T('Dalga')+' '+from+' → '+to;const f=dangerLP.frequency;f.cancelScheduledValues(t);f.setValueAtTime(Math.min(20000,f.value),t);f.exponentialRampToValueAtTime(160,t+0.9);f.setValueAtTime(160,t+1.3);f.exponentialRampToValueAtTime(20000,t+1.7);
  if(!S.muted){O('sawtooth',220,t,0.95,0.16,music,30);O('triangle',110,t,0.95,0.3,drum,20)}}
 function recoverSfx(){if(!ac||!playing||S.muted)return;const t=ac.currentTime+0.01;O('sawtooth',220,t,0.6,0.05,music,880);Nz(t,'highpass',3000,0,0.08,0.5,drum)}
-function killSfx(boss){if(S.ksfx===false||!ac||!playing||Math.abs(lastLogic-ac.currentTime)>0.5)return;const now=ac.currentTime,g=grid.find(x=>x.t>now+0.008),t=g?g.t:now+0.02;if(Math.abs(t-killSlot)<0.004)return;killSlot=t;killSnd++;
+function killSfx(boss){if(recOn||S.ksfx===false||!ac||!playing||Math.abs(lastLogic-ac.currentTime)>0.5)return;const now=ac.currentTime,g=grid.find(x=>x.t>now+0.008),t=g?g.t:now+0.02;if(Math.abs(t-killSlot)<0.004)return;killSlot=t;killSnd++;
  let fs=[];try{fs=chordFreqsAt(curBar,g?g.s:0)}catch(err){}if(!fs||!fs.length)fs=[220,261.6,329.6];killIdx=(killIdx+1+Math.floor(Math.random()*2))%fs.length;let f=fs[killIdx];while(f<520)f*=2;while(f>1400)f/=2;
  O('square',f,t,0.12,0.09,music);O('triangle',f*2,t,0.18,0.07,music);
  if(boss){O('sine',110,t,1.1,0.85,drum,30);Nz(t,'lowpass',700,0,0.4,1,drum);O('triangle',f/2,t,0.6,0.18,music,f/4)}}
+/* v38 ses masası (laboratuvar: https://claude.ai/artifact/Ti2Sdy89dF62nQEftLfqbw): yankı (ConvolverNode, darbe tepkisi tarayıcıda üretilir; davula az, müziğe çok gönderilir, 250 Hz altı kuru), kanal başına ses/susturma (yalnız ses: mixV playStep'te), WAV kaydı (gerçek zamanlı, analyser çıkışından, ölçü başından; kayıtta ölüm sesi ve gerilim susar), MIDI (anında) */
+let rvIn,rvConv,rvWet,rvKey='',recOn=false,recP=0,recNode=null,recN=0;
+const RVS={oda:[0.7,3.2,0.48],salon:[2.2,2.4,0.66],katedral:[5,1.8,0.84]};
+function rvImpulse(sec,damp){const sr=ac.sampleRate,n=Math.max(1,Math.floor(sr*sec)),b=ac.createBuffer(2,n,sr),pre=Math.floor(sr*0.012);for(let c=0;c<2;c++){const d=b.getChannelData(c);let lp=0;for(let i=0;i<n;i++){const u=i/n,x=i<pre?0:(Math.random()*2-1)*Math.pow(1-u,damp);lp+=(x-lp)*(0.25+0.6*(1-u));d[i]=lp}}return b}
+function applyDesk(){if(!ac||!rvConv)return;const D=S.desk,k=D&&D.rv&&!demoMode&&RVS[D.r]?D.r:'off',t=ac.currentTime;if(k==='off'){rvWet.gain.setTargetAtTime(0,t,0.05);return}if(rvKey!==k){rvConv.buffer=rvImpulse(RVS[k][0],RVS[k][1]);rvKey=k}rvWet.gain.setTargetAtTime(RVS[k][2],t,0.05)}
+const mixV=i=>{const D=S.desk;if(!D||!D.mx||demoMode)return 1;if(D.m[i])return 0;const v=D.v[i];return v==null?1:v/100};
+function dlBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)}
+function wavBlob(L,R,sr){const n=L.length,buf=new ArrayBuffer(44+n*4),v=new DataView(buf),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+n*4,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,2,true);v.setUint32(24,sr,true);v.setUint32(28,sr*4,true);v.setUint16(32,4,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*4,true);
+ for(let i=0;i<n;i++){v.setInt16(44+i*4,Math.max(-1,Math.min(1,L[i]))*32767,true);v.setInt16(46+i*4,Math.max(-1,Math.min(1,R[i]))*32767,true)}return new Blob([buf],{type:'audio/wav'})}
+function recWav(bars){if(recOn)return;ensureAudio();if(!playing){startStop();updUI()}const sr=ac.sampleRate,sd=60/S.bpm/4,N=MI.N,t0=nextT+((N-step)%N)*sd,need=Math.round(bars*N*sd*sr),Ls=[],Rs=[];let got=0;
+ recOn=true;recP=0;const sp=ac.createScriptProcessor(4096,2,2);recNode=sp;analyser.connect(sp);sp.connect(ac.destination);
+ sp.onaudioprocess=e=>{const ob=e.outputBuffer;ob.getChannelData(0).fill(0);ob.getChannelData(1).fill(0);if(!recOn)return;const n=e.inputBuffer.length,off=Math.max(0,Math.round((t0-e.playbackTime)*sr));if(off>=n)return;const take=Math.min(n-off,need-got),a=e.inputBuffer.getChannelData(0),b=e.inputBuffer.getChannelData(1);Ls.push(a.slice(off,off+take));Rs.push(b.slice(off,off+take));got+=take;recP=got/need;
+  if(got>=need){recOn=false;try{analyser.disconnect(sp);sp.disconnect()}catch(err){}recNode=null;const L=new Float32Array(got),R=new Float32Array(got);let o=0;Ls.forEach((x,k)=>{L.set(x,o);R.set(Rs[k],o);o+=x.length});recN++;dlBlob(wavBlob(L,R,sr),'nabiz-cemberi-'+S.bpm+'bpm.wav');msg('Kayıt bitti · WAV indirildi');renderDesk()}}}
+function recCancel(){if(!recNode)return;recOn=false;try{analyser.disconnect(recNode);recNode.disconnect()}catch(err){}recNode=null;renderDesk()}
+/* MIDI: her enstrüman ayrı iz ve kanal (davullar 10. kanal), şarkı planı boyunca (en çok 64 ölçü), akorlar ve sololar dahil */
+function midiBytes(){const N=MI.N,bars=Math.min(64,planLen()),Q=120,f2m=f=>clamp(Math.round(69+12*Math.log2(f/440)),0,127),vlq=n=>{const o=[n&127];while(n>>=7)o.unshift((n&127)|128);return o},str=s=>[...unescape(encodeURIComponent(s))].map(c=>c.charCodeAt(0));
+ const trk=ev=>{ev.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);let last=0,d=[];ev.forEach(e=>{d.push(...vlq(e[0]-last));last=e[0];d.push(...e[2])});d.push(0,0xFF,0x2F,0);return[...str('MTrk'),d.length>>>24&255,d.length>>16&255,d.length>>8&255,d.length&255,...d]};
+ const us=Math.round(60e6/S.bpm),tracks=[trk([[0,0,[0xFF,0x51,3,us>>16&255,us>>8&255,us&255]],[0,0,[0xFF,0x03,...vlq(str('Nabız Çemberi').length),...str('Nabız Çemberi')]]])];
+ const B0=CUR_B,F0=SOLO_F;let chn=0;
+ try{for(let i=0;i<S.slots.length;i++){const x=slotIns(i);if(!x)continue;const dr=x.fam==='vur',ch=dr?9:(chn===9?++chn:chn);if(!dr)chn=Math.min(15,chn+1);const ev=[],nm=str(T(x.n));ev.push([0,0,[0xFF,0x03,...vlq(nm.length),...nm]]);
+   const pg=SF_PROG[x.id]?Math.round(parseInt(SF_PROG[x.id],10)/10):({tel:25,tus:0,nef:73,ele:81,dun:108}[x.fam]||0);if(!dr)ev.push([0,0,[0xC0|ch,pg]]);
+   const on=(tk,len,no,vel)=>{ev.push([tk,1,[0x90|ch,no,vel]]);ev.push([tk+len,0,[0x80|ch,no,0]])};
+   for(let b=0;b<bars;b++){CUR_B=b;SOLO_F=0;const pa=planAt(b),pk=pkFor(b),p=S.pat[pk],bt=b*N*Q,sd=60/curBpm(b)/4;
+    if(pa.sec.solo&&isSolo(i)&&!dr&&hasSoloNotes(i)){const o0=(pa.barIn%2)*N;soloNotesOf(i).forEach(nt=>{if(nt.t<o0||nt.t>=o0+N)return;on(bt+(nt.t-o0)*Q,Math.max(1,noteLenEff(nt))*Q,f2m(soloFreq2(x,nr(nt))),100)});continue}
+    if(pa.sec.solo&&isSolo(i))continue;
+    for(let s=0;s<N;s++){const v=p[i][s];if(!v||!allowed(pa.sec,x,i))continue;const vel=v===2?112:84,tk=bt+s*Q;
+     if(dr){const d=SF_DRUM[x.id],no=Array.isArray(d)?d[v===2&&d[1]?1:0]:(d||37);on(tk,Q,no,vel);continue}
+     const fs=(x.v.pitch==='chord'||x.v.chord||['pad','organ','vox'].includes(x.v.g))?chordAt(s):[pitchOf(x.v,s)],len=clamp(Math.round((x.v.dur||0.3)/sd),1,16)*Q;fs.forEach(f=>on(tk,len,f2m(f),vel))}}
+   tracks.push(trk(ev))}}finally{CUR_B=B0;SOLO_F=F0}
+ const h=[...str('MThd'),0,0,0,6,0,1,0,tracks.length,Q*4>>8,Q*4&255];return new Uint8Array([].concat(h,...tracks))}
+function midiExport(){dlBlob(new Blob([midiBytes()],{type:'audio/midi'}),'nabiz-cemberi-'+S.bpm+'bpm.mid');msg('MIDI indirildi')}
 let playing=false,timer=0,nextT=0,step=0,bar=0,queue=[],grid=[],beats=[],hitBar=false,playPk='A',lastLogic=0;
 const NS=[null,{nextT:0,step:0,grid:[]},{nextT:0,step:0,grid:[]}];
 const muteUntil=Array(MAXSLOTS).fill(0);

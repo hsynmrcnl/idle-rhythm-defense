@@ -24,7 +24,7 @@ S.famOpen.vur=1;[['tel',5],['tus',12],['nef',20],['ele',30],['dun',45]].forEach(
 if(S.stage.crown){S.stage.wall=1;delete S.stage.crown}
 if(!S.themes[S.theme])S.theme='neon';
  if(!S.tut||typeof S.tut!=='object')S.tut={s:0,done:(S.kills>0||S.albums.length>0||Object.keys(S.lv).length>1||(S.total||0)>50)};
- if(S.sfx!==false)S.sfx=true;if(S.dnum!==false)S.dnum=true;if(S.ksfx!==false)S.ksfx=true;if(S.tens!==false)S.tens=true;if(S.harm!=='uclu')S.harm='zengin';if(S.ui!=='detay')S.ui='kolay';delete S.autoUp;if(S.lang!=='en')S.lang='tr';
+ if(S.sfx!==false)S.sfx=true;if(S.dnum!==false)S.dnum=true;if(S.ksfx!==false)S.ksfx=true;if(S.tens!==false)S.tens=true;if(!S.desk||typeof S.desk!=='object')S.desk={rv:0,mx:0,r:'salon',v:[],m:[]};if(!Array.isArray(S.desk.v))S.desk.v=[];if(!Array.isArray(S.desk.m))S.desk.m=[];if(S.harm!=='uclu')S.harm='zengin';if(S.ui!=='detay')S.ui='kolay';delete S.autoUp;if(S.lang!=='en')S.lang='tr';
  /* v24 tek Otomatik: müzik otomatikleri Kolay/Detaylı'dan bağımsız; eski Detaylı kayıtta kapalı başlar */
  if(!S.am||typeof S.am!=='object'){const on=S.ui!=='detay';S.am={yeni:on,nakarat:on,solo:on}}['yeni','nakarat','solo'].forEach(k=>{if(typeof S.am[k]!=='boolean')S.am[k]=true});if(!S.am.k||typeof S.am.k!=='object')S.am.k={lv:1,rup:1,srup:1,tempo:0,def:0};if(![0.25,0.5,0.9].includes(S.am.b))S.am.b=0.5;
  /* v26 aşamalı açılış: unl'si olmayan eski kayıtta koşulu tutanlar açılışta sessiz açılır (unlQuiet) */
