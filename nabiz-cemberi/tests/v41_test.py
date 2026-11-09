@@ -62,6 +62,20 @@ with sync_playwright() as pw:
         check(s['lv'] >= 2 and s['tr'] >= 1 and s['sl'] == 2 and s['rm'] == 3, 'Yükselt, Yoğun, Trampet ve Hepsini düzenle yapıldı (%s)' % s)
         p.click('#tutLBtn'); p.wait_for_timeout(300)
         check(p.evaluate("()=>window.__nb.S.tut.done") and p.is_hidden('#tutL'), 'Oyna ile öğretici bitti, katman kapandı')
+        # v42 kısa öğreticiler: dalga 6'da Savunma, sonra Tempo (dalga 8)
+        p.evaluate("()=>{const S=window.__nb.S;S.bestWave=8;S.nota=Math.max(S.nota,1e4)}"); p.wait_for_timeout(500)
+        lab = lambda: p.evaluate("()=>document.getElementById('tutL').hidden?'':document.getElementById('tutLN').textContent+' | '+document.getElementById('tutLT').textContent")
+        seen = []
+        for k in range(14):
+            l = lab()
+            if not l: break
+            seen.append(l)
+            if p.is_visible('#tutLBtn'): p.click('#tutLBtn')
+            else:
+                p.wait_for_timeout(350); x, y, w = hole(p); p.mouse.click(x, y)
+            p.wait_for_timeout(450)
+        check(any('Savunma' in x for x in seen) and any('Tempo' in x for x in seen) and lab() == '', 'Savunma ve Tempo kısa öğreticileri sırayla oynandı (%s)' % seen)
+        check(p.evaluate("()=>window.__nb.S.tipq.length") == 0 and p.is_hidden('#tut'), 'eski kart yok, sıra boş')
         # yeniden başlat: geçici oyunda, Atla ile kayıt geri gelir
         p.evaluate("()=>{const S=window.__nb.S;S.bestWave=9;S.wave=9}")
         p.evaluate("()=>window.__nb.tutSandbox()"); p.wait_for_timeout(300)

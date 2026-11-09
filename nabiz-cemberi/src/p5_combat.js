@@ -14,7 +14,7 @@ function bounty(e){const T=ETYPES[e.ty];return(2*Math.pow(1.18,e.w-1)*T.b+rate()
 function kill(e,k,now){killSfx(e.boss);const g=bounty(e);earn(g);S.kills++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);if(S.dnum!==false&&pops.length<48)pops.push({e,t:'+♪ '+fmt(g),life:1,k:1});if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
 function leak(e,k,now){const T=ETYPES[e.ty];let dmg=T.dmg*(1+0.03*e.w);if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}core.hp-=dmg;retreatFlash=Math.max(retreatFlash,0.6);if(T.mute){const cands=S.slots.map((id,si)=>id?si:-1).filter(x=>x>=0);if(cands.length){const si=cands[Math.floor(Math.random()*cands.length)];muteUntil[si]=now+barDur();msg(slotIns(si).n+' bir ölçü susturuldu')}}enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;if(core.hp<=0)retreat(now)}
 /* öğretici: ilk düşman ve Ritme vur'dan sonra arayüz adımlarında dalga durur */
-const tutHold=()=>!!(S.tut&&!S.tut.done&&!demoMode&&TUT[S.tut.s]&&TUT[S.tut.s].n>=8);
+const tutHold=()=>{if(ffOn)return false;const c=ovCur();return !!(c&&(!c.main||c.st.n>=8))};
 function retreat(now){retreatCount++;dngIn=false;const from=S.wave,to=Math.max(1,S.wave-1);enemies=[];core.hp=hpMax();core.sh=0;retreatFlash=1.5;tapeStop(from,to);msg('Sessizlik A.Ş. sahneyi bastı. Dalga '+from+' → '+to+'. Nabız tazelendi.');startWave(to,now)}
 function wallHit(e){const k=Math.floor(e.a*WN)%WN;const E=wallE[k];if(E<=0.02)return 0;const b=wallBase(),top=b+Math.min(1,E)*wallSpan();if(e.d>=b&&e.d<=top)return E*wallD[k];return 0}
 function logic(now){
@@ -80,7 +80,7 @@ function fire(si,s,v,pk,mult,art,raw){
 }
 function onStep(q){
  const nk=q.k||1;
- if(q.s===0&&nk===1){if(!hitBar)S.seri=Math.floor(S.seri/2);hitBar=false;playPk=q.pk;chBar=0;if(chReady>=0&&(q.b||0)-chReady>=CH_WAIT)blast(1);
+ if(q.s===0&&nk===1){if(!hitBar)S.seri=Math.floor(S.seri/2);hitBar=false;playPk=q.pk;chBar=0;if(chReady>=0&&(q.b||0)-chReady>=CH_WAIT&&!tutHold())blast(1);
   if(S.stage.tower&&enemies.length){const tg=enemies.slice().sort((a,b)=>b.hp-a.hp)[0];const d=(DR[q.pk]*GC[q.pk]/MI.N)*4*globalMDmg();if(d>0){hit(tg,d,dispTheme().cv.hot,null);vfx.push({k:'bolt',e:tg,col:dispTheme().cv.hot,life:1})}}}
  const p=S.pat[q.pk],M=GC[q.pk]*globalM(),vis=q.pk===S.edit;let g=0;
  const b=q.b||0,sa=soloActive(b),pa=planAt(b);let dyn=dynAt(b);if(nk===1)curBar=b;const fb=nk===1&&fillBar(b);

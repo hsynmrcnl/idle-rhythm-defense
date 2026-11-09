@@ -30,7 +30,16 @@ with sync_playwright() as pw:
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(500)
     dock = lambda: p.evaluate("()=>[...document.querySelectorAll('.dk')].filter(d=>!d.hidden).map(d=>d.id.slice(2))")
-    card = lambda: p.evaluate("()=>document.getElementById('tut').hidden?'':document.getElementById('tutT').textContent")
+    card = lambda: p.evaluate("()=>document.getElementById('tutL').hidden?'':document.getElementById('tutLT').textContent")
+    mk = lambda: p.evaluate("()=>window.__nb.S.tipq[0]||''")
+    drop = lambda: p.evaluate("()=>{const S=window.__nb.S;S.tipq=[];S.tutm=0}")
+    def hole_tap():
+        prev = None
+        for k in range(30):
+            r = p.evaluate("()=>{const h=document.getElementById('tutHole').getBoundingClientRect();return [Math.round(h.left+h.width/2),Math.round(h.top+h.height/2)]}")
+            if r == prev: break
+            prev = r; p.wait_for_timeout(120)
+        p.mouse.click(r[0], r[1]); p.wait_for_timeout(400)
     check(dock() == ['stage'] and p.is_visible('#t-set'), 'yeni oyunda dock’ta yalnız Sahne, Ayarlar dişlisi var (%s)' % dock())
     check('Hoş geldin' in p.text_content('#tutLT') and 'Öğretici 1 / 13' in p.text_content('#tutLN'), 'zorunlu öğretici 13 adım, ilk adım Hoş geldin')
     p.tap('#stats'); p.wait_for_timeout(150)
@@ -47,59 +56,47 @@ with sync_playwright() as pw:
     p.tap('#stats'); p.wait_for_timeout(150)
     check(not p.evaluate("()=>window.__nb.anlOn") and 'Analiz 14' in p.inner_text('#msg'), 'Analiz henüz kapalı, ne zaman açılacağı yazıyor')
     p.evaluate("()=>{const S=window.__nb.S;S.kills=1}"); p.wait_for_timeout(400)
-    check(card() == 'Yeni: Stüdyo' and dock() == ['stage', 'studio'] and p.locator('#d-studio.tut-hi').count() == 1, 'ilk susturucuyla Stüdyo açıldı, kart ve parlayan simge (%s)' % card())
+    check(mk() == 'studio' and card() == 'Yeni: Stüdyo' and dock() == ['stage', 'studio'], 'ilk susturucuyla Stüdyo açıldı, kısa öğretici başladı (%s)' % card())
     p.screenshot(path=os.path.join(OUT, 'v26_studio_card.png'))
-    p.tap('#d-studio'); p.wait_for_timeout(200)
+    hole_tap()
     st = p.evaluate("""()=>({tab:document.getElementById('app').dataset.tab,coll:!document.querySelector('#p-studio .subnav [data-tab=coll]').hidden,
-      hi:document.querySelector('.tut-hi')&&document.querySelector('.tut-hi').id,sec:[...document.querySelectorAll('#secBar .sb')].map(e=>e.dataset.k),
-      all:!!document.querySelector('[data-act=autoAll]'),inPanel:document.getElementById('tut').parentElement.id})""")
+      sec:[...document.querySelectorAll('#secBar .sb')].map(e=>e.dataset.k),all:!!document.querySelector('[data-act=autoAll]')})""")
     check(st['tab'] == 'studio' and not st['coll'] and st['sec'] == ['sahne'] and not st['all'], 'Stüdyo’da yalnız Sahne; Koleksiyon, Otomatik, Hepsini düzenle henüz yok (%s)' % st)
-    check(st['hi'] == 'lvb-davul' and st['inPanel'] == 'p-studio', 'kart Stüdyo’ya taşındı, Davul’un seviye düğmesini gösteriyor')
-    p.evaluate("()=>{window.__nb.S.nota=1e4}"); p.wait_for_timeout(200)
-    p.tap('#lvb-davul'); p.wait_for_timeout(400)
-    check(card() == '', 'seviye alınca kart kapandı')
-    # ♪ 150 → Koleksiyon
+    check(card() == 'Yükselt', 'ikinci adım Davul’un seviye düğmesi')
+    lv0 = p.evaluate("()=>window.__nb.S.lv.davul"); hole_tap()
+    check(p.evaluate("()=>window.__nb.S.lv.davul") > lv0 and card() == '', 'seviye alınca kısa öğretici bitti')
     p.evaluate("()=>{window.__nb.S.total=200}"); p.wait_for_timeout(400)
-    check(card() == 'Yeni: Koleksiyon' and p.is_visible('#p-studio .subnav [data-tab=coll]'), 'kazanç 150’yi geçince Koleksiyon açıldı')
+    check(mk() == 'coll' and p.is_visible('#p-studio .subnav [data-tab=coll]'), 'kazanç 150’yi geçince Koleksiyon açıldı')
+    drop(); p.wait_for_timeout(200)
     p.tap('#p-studio .subnav [data-tab=coll]'); p.wait_for_timeout(150)
-    p.tap('#collList [data-act=lv][data-id=trampet]'); p.wait_for_timeout(500)
-    check(card() == 'Yeni: Uyum ve Otomatik', 'ikinci enstrümanla Uyum ve Otomatik kartı (%s)' % card())
+    p.evaluate("()=>{window.__nb.S.nota=1e4}"); p.tap('#collList [data-act=lv][data-id=trampet]'); p.wait_for_timeout(500)
+    check(mk() == 'syn', 'ikinci enstrümanla Uyum kısa öğreticisi (%s)' % mk())
+    drop(); p.wait_for_timeout(200)
     p.tap('#p-coll .subnav [data-tab=studio]'); p.wait_for_timeout(150)
     sec = p.evaluate("()=>[...document.querySelectorAll('#secBar .sb')].map(e=>e.dataset.k)")
     check(sec == ['sahne', 'auto', 'syn'] and p.locator('[data-act=autoAll]').count() == 1, 'Otomatik, Uyum ve Hepsini düzenle geldi (%s)' % sec)
-    # dalga 3: sırayla Ritme vur, Savunma, Tempo kartları
     p.evaluate("()=>{window.__nb.S.bestWave=8}"); p.wait_for_timeout(400)
-    seq = [card()]
-    for k in range(3):
-        p.tap('#tutNext'); p.wait_for_timeout(250); seq.append(card())
-    check(seq == ['Yeni: Uyum ve Otomatik', 'Ritme vur', 'Yeni: Savunma', 'Yeni: Tempo'], 'kartlar sırayla geliyor (%s)' % seq)
+    q = p.evaluate("()=>window.__nb.S.tipq.slice()")
+    check(q[:3] == ['tap', 'def', 'rhy'], 'kısa öğreticiler sırada: Ritme vur, Savunma, Tempo (%s)' % q)
+    drop(); p.wait_for_timeout(200)
     check(dock() == ['stage', 'studio', 'def'] and p.locator('#p-def [data-sec=ord]').is_hidden(), 'Savunma açıldı, Siparişler henüz kapalı (%s)' % dock())
-    p.tap('#tutNext'); p.wait_for_timeout(200)
-    # dalga 4: Analiz
     p.evaluate("()=>{window.__nb.S.bestWave=14}"); p.wait_for_timeout(400)
-    for k in range(4):  # v40: dalga 14'e gelinceye kadar aile kartı da sırada olabilir
-        if card() in ('Yeni: Analiz', ''): break
-        p.tap('#tutNext'); p.wait_for_timeout(250)
-    check(card() == 'Yeni: Analiz' and p.locator('#d-stage.tut-hi').count() == 1, 'dalga 4’te Analiz kartı; başka sekmedeyken Sahne simgesi parlıyor')
-    p.tap('#d-stage')
-    try: p.wait_for_selector('#stats.tut-hi', timeout=2000)  # vurgu tutCheck aralığında gelir; ağır çizimde 300 ms yetmeyebiliyor
-    except Exception: pass
-    check(p.locator('#stats.tut-hi').count() == 1, 'Sahne’de üst bilgi parlıyor')
-    p.tap('#stats'); p.wait_for_timeout(300)
-    check(p.evaluate("()=>window.__nb.anlOn") and card() != 'Yeni: Analiz', 'üst bilgiye dokununca Analiz açıldı, kart kapandı')
+    p.evaluate("()=>{const S=window.__nb.S;S.tipq=S.tipq.filter(k=>k==='anl');S.tutm=0}"); p.wait_for_timeout(300)
+    check(card() == 'Yeni: Analiz', 'dalga 14’te Analiz kısa öğreticisi')
+    hole_tap(); hole_tap()
+    check(p.evaluate("()=>window.__nb.anlOn"), 'üst bilgiye dokununca Analiz açıldı')
+    p.click('#tutLBtn'); p.wait_for_timeout(300)
+    check(card() == '', 'Analiz öğreticisi bitti')
     p.tap('#stats'); p.wait_for_timeout(100)
-    # dalga 8 ve albüm eşiğinin yarısı: Görünüm ve Albüm
     p.evaluate("()=>{const S=window.__nb.S;S.bestWave=20;S.runEarned=1e9}"); p.wait_for_timeout(400)
-    for k in range(8):
-        if card() == '': break
-        p.tap('#tutNext'); p.wait_for_timeout(150)
+    drop(); p.wait_for_timeout(200)
     found = p.evaluate("()=>Object.keys(window.__nb.S.found).length")
     p.tap('#d-album'); p.wait_for_timeout(150)
     check(dock() == ['stage', 'studio', 'def', 'album', 'look'] and found > 0 and p.is_visible('#p-album .subnav [data-tab=book]'), 'Görünüm ve Albüm açıldı; kalıp bulunduğu için Kitap Albüm’le geldi (%s)' % dock())
     # kaydet, yeniden aç: açılanlar kalır
     p.evaluate("()=>{const S=window.__nb.S;S.tipq=['look'];localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
     p.reload(); p.wait_for_timeout(500)
-    check(dock() == ['stage', 'studio', 'def', 'album', 'look'] and card() == 'Yeni: Görünüm', 'yeniden açınca açılanlar ve bekleyen kart yerinde')
+    check(dock() == ['stage', 'studio', 'def', 'album', 'look'] and card() == 'Yeni: Görünüm', 'yeniden açınca açılanlar ve bekleyen öğretici yerinde (%s)' % card())
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     ctx.close()
 
@@ -111,7 +108,7 @@ with sync_playwright() as pw:
     tabs = lambda: p.evaluate("()=>[...document.querySelectorAll('.tabs .tab:not(.mob)')].filter(e=>!e.hidden).map(e=>e.dataset.tab)")
     check(tabs() == [] and p.is_visible('#p-lock') and not p.is_visible('#p-studio') and not p.is_visible('#tap'), 'yeni oyunda sekme yok, Stüdyo yerine bekleme notu, Ritme vur düğmesi yok')
     p.evaluate("()=>{window.__nb.S.tut.done=true;window.__nb.S.kills=1}"); p.wait_for_timeout(400)
-    check(tabs() == ['studio'] and p.is_visible('#p-studio') and not p.is_visible('#p-lock') and card() == 'Yeni: Stüdyo', 'ilk susturucuyla Stüdyo sekmesi açıldı')
+    check(tabs() == ['studio'] and p.is_visible('#p-studio') and not p.is_visible('#p-lock') and mk() == 'studio', 'ilk susturucuyla Stüdyo sekmesi açıldı, kısa öğretici sırada')
     p.screenshot(path=os.path.join(OUT, 'v26_desktop.png'))
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     p.close()
@@ -138,10 +135,10 @@ with sync_playwright() as pw:
     p.evaluate("()=>{const S=window.__nb.S;S.lang='en';S.tut={s:0,done:true};S.kills=1;S.tipq=[];localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
     p.reload(); p.wait_for_timeout(500)
     p.evaluate("()=>{window.__nb.S.tipq=['studio','fam_tel'];window.__nb.renderPanels()}"); p.wait_for_timeout(300)
-    t1 = card() + ' ' + p.text_content('#tutP')
-    p.tap('#tutNext'); p.wait_for_timeout(200)
-    t2 = card() + ' ' + p.text_content('#tutP')
-    check('New: Studio' in t1 and 'level up the Drum' in t1 and 'New family: Strings' in t2 and 'Collection' in t2, 'kartlar İngilizce: %s | %s' % (t1[:40], t2[:40]))
+    t1 = card() + ' ' + p.text_content('#tutLP')
+    p.evaluate("()=>{const S=window.__nb.S;S.tipq.shift();S.tutm=0}"); p.wait_for_timeout(300)
+    t2 = card() + ' ' + p.text_content('#tutLP')
+    check(('New: Studio' in t1 or 'Upgrade' in t1) and 'New family' in t2 and 'Collection' in t2, 'kartlar İngilizce: %s | %s' % (t1[:40], t2[:40]))
     check(not any(w in t1 + t2 for w in ('Yeni', 'Stüdyo', 'ailesi')), 'Türkçe kalmadı')
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     b.close()

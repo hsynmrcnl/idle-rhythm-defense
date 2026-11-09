@@ -85,9 +85,10 @@ with sync_playwright() as pw:
         # öğretici seviye adımı gizli bölümdeki düğmeyi vurguluyorsa o bölüme geçer
         p.tap('#secBar [data-k=auto]'); p.wait_for_timeout(80)
         p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=1;S.tipq=['studio'];window.__nb.renderPanels()}")
-        try: p.wait_for_selector('#lvb-davul.tut-hi', state='visible', timeout=2500)
+        try: p.wait_for_selector('#lvb-davul', state='visible', timeout=2500)
         except Exception: pass
         check(p.is_visible('#lvb-davul') and shown() == ['sahne'], 'öğretici vurguladığı düğmenin bölümünü açıyor (%s)' % shown())
+        p.evaluate("()=>{const S=window.__nb.S;S.tipq=[];S.tutm=0}"); p.wait_for_timeout(150)
         p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=30;S.tipq=[];window.__nb.renderPanels()}")
         # Koleksiyon: aile simgeleri, kilitli ailede koşullar, açık ailede sıkı satır
         p.click('#p-studio .subnav [data-tab=coll]'); p.wait_for_timeout(120)
