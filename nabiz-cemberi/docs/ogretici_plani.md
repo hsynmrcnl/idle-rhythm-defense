@@ -9,7 +9,8 @@ Amaç: yeni oyuncu ilk 3–4 dakikada oyunun çekirdeğini **eliyle yaparak** ö
 - **İlerleme eyleme bağlı:** adım ancak istenen iş yapılınca geçer (hücre dolar, müzik başlar, seviye artar…). Yalnız bilgi adımlarında “Devam” düğmesi var.
 - **Oyun öğreticiye göre akar:** öğretici dalgasında tek, yavaş düşman; satın alma adımlarından önce yetecek kadar nota verilir; düşmanlar adım beklerken durur.
 - **Dayanıklılık:** hedef başka sekmedeyse önce o sekmeye götüren adım gelir; ekran döner ya da boyut değişirse delik yeniden hesaplanır; sayfa yenilenirse kaldığı adımdan sürer (`S.tut.s`).
-- **Atla:** karar senin (aşağıda).
+- **Atla:** öğretici başladıktan 5 sn sonra sağ üstte küçük “Atla” belirir (Hüseyin'in kararı).
+- Laboratuvar (ilk 5 adım): https://claude.ai/artifact/4UDGi51ejgEPchz3DoULJz
 
 ## Adımlar (telefon ve masaüstü aynı sıra)
 **A · İlk ses**
@@ -43,6 +44,6 @@ Sonrası bugünkü gibi: açılış kartları (Savunma, Tempo…) serbest kalır
 - Test: her adım için “dışarı dokununca ilerlemiyor, hedefe dokununca ilerliyor”; telefon, masaüstü, 3D, EN; yenileyince kaldığı adımdan sürüyor.
 
 ## Kararlar (Hüseyin)
-1. Atla: hiç yok · 4. adımdan sonra küçük “Atla” · yalnız Ayarlar'dan.
-2. Uzunluk: 13 adım (~3 dk) uygun mu, kısaltılsın mı?
-3. Önce laboratuvarda spot ışığı ve ilk 5 adım gösterilsin mi?
+1. Atla: 5 sn sonra belirir.
+2. Uzunluk: 13 adım uygun.
+3. Önce laboratuvar: evet (yukarıdaki bağlantı).
