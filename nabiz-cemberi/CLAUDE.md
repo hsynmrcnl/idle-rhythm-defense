@@ -26,6 +26,7 @@ sf/             örnek ses paketleri (JSON içinde base64 mp3): FluidR3 (0000.js
 assets/         PWA ikonları
 tests/          Playwright testleri (python tests/run_all.py): mobile_ui_test, sf_cc0_test, v16_test, v17_test, v18_test, v19_test, v20_test, v21_test, v22_test, v24_test, v25_test, v26_test, v27_test, v31_test, v37_test, v38_test, v39_test, v41_test
 tools/          ekonomi_sim.py (bot: yeni oyun, otomatik geliştirmeyle hızlı ileri sarma, dakika dakika dalga/gelir → docs/ekonomi_sim.md), build_sf.py (FluidR3 paketleri), build_sf_cc0.py (CC0 paketleri: kaynak, nota seçimi, oktav düzeltmesi, loop; ayrıntı dosyanın başında)
+export/dusmanlar/ düşman görselleri başka oyunlar için: geo_enemies.py (Python), geo_enemies.js, geo_enemies.json (veri), png/ (dönüş ve patlama kareleri); oyundaki GEO değişirse yeniden üretilmeli
 build.py        → dist/ (site + PWA) ve build/artifact.html (claude.ai artifact için iskeletsiz sürüm), build/chk.js
 ```
 
