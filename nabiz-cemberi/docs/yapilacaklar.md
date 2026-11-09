@@ -46,6 +46,7 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v22: küçük temizlik (Kolay öğretici, Uygula, ped seviye düğmeleri, terimler)
 - v23: telefonda Sahne aşağı kayıyordu, düzeldi
 - v36: Ayarlar → Ölüm sesi açık/kapalı
+- v44: oyuncu turu düzeltmeleri (Şarj kısa öğretici kilidi, klavye, Ritme vur, Atla balonda, örnek şarkı dönüşü, kod yükleme bildirimi). Sırada: Kolay etiketleri (taşmış/nefes), yatay telefon düzeni, dalga 15 dengesi
 - v42: her yeni bölüm için kısa zorunlu öğretici (eski kartlar kalktı); baget kesilmiyor
 - v41: zorunlu öğretici (13 adım, spot ışığı, baget, Atla 5 sn)
 - v40: açılışlar ilk 10 dakikaya yayıldı (UNL_W)
