@@ -208,7 +208,9 @@ function tap(){
  const now=ac.currentTime-(ac.outputLatency||ac.baseLatency||0);
  let best=null;for(const b of beats)if(best===null||Math.abs(now-b)<Math.abs(now-best))best=b;
  if(best===null)return;const d=now-best;
- if(Math.abs(d)<(S.tut&&!S.tut.done?0.17:0.085)){S.seri++;hitBar=true;const g=Math.max(5,rate()*0.6);earn(g);tapFx={t:'Tam',c:dispTheme().cv.acc,life:1,sub:'+♪ '+fmt(g)};tapP=1}
+ const tv=(()=>{try{const c=ovCur();return !!(c&&c.st.rv)}catch(e){return false}})();
+ if(tv){const p=$('tutLP');if(p)p.textContent=T(Math.abs(d)<0.22?'Tam! Seri başladı.':d<0?'Biraz erken: ibre parlak bir vuruşun üstüne gelince dokun.':'Biraz geç: ibre parlak bir vuruşun üstüne gelince dokun.')}
+ if(Math.abs(d)<(tv?0.22:0.085)){S.seri++;hitBar=true;const g=Math.max(5,rate()*0.6);earn(g);tapFx={t:'Tam',c:dispTheme().cv.acc,life:1,sub:'+♪ '+fmt(g)};tapP=1}
  else{S.seri=0;tapFx={t:d<0?'Erken':'Geç',c:dispTheme().cv.hot,life:1,sub:'seri sıfırlandı'};tapP=0.6}
  updUI();
 }

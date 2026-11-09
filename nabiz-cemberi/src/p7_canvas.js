@@ -757,7 +757,7 @@ function hitTest(e){
  const sUp=()=>{if(!sDrag)return;sDrag=null;const si=soloView();const so=si>=0&&S.solos[si];if(so){const selN=so.notes[soloSel];so.notes.sort((a,b)=>a.t-b.t);soloSel=selN?so.notes.indexOf(selN):-1}recalc();updUI();renderSoloBox();renderPads()};
  el.addEventListener('pointerup',sUp);el.addEventListener('pointercancel',sUp);
  el.addEventListener('pointerleave',()=>{hover=null;hintFor(null)});
- el.addEventListener('click',e=>{if(chReady>=0&&playing&&orbHit(e)){manualBlast();return}if(orbHit(e)){startStop();updUI();return}if(soloView()>=0){if(D3){tap();return}const hs=soloStageHit(e);if(hs&&hs.core)tap();return}const h=hitTest(e);if(!h||h.core){tap();return}if(PH()){eSel=h.i}cellClick(h.i,h.s);if(PH())renderPads()});
+ el.addEventListener('click',e=>{{const oc=ovCur();if(oc&&oc.st.rv){if(!orbHit(e))tap();return}}if(chReady>=0&&playing&&orbHit(e)){manualBlast();return}if(orbHit(e)){startStop();updUI();return}if(soloView()>=0){if(D3){tap();return}const hs=soloStageHit(e);if(hs&&hs.core)tap();return}const h=hitTest(e);if(!h||h.core){tap();return}if(PH()){eSel=h.i}cellClick(h.i,h.s);if(PH())renderPads()});
  el.addEventListener('pointerdown',e=>{if(!playing&&orbHit(e))orbP=1});
  document.addEventListener('pointerdown',()=>{if(ac&&ac.state==='suspended')ac.resume()},{passive:true});
 })();
