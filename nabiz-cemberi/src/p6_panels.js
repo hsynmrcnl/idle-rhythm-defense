@@ -162,7 +162,7 @@ function renderPanels(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v45 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v46 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'));i18n($('tut'))}
  updUI();
@@ -395,7 +395,10 @@ function tutTick(){const L=$('tutL');if(!L)return;const c=ovCur();const on=!!c;i
  if(r){h.style.cssText='left:'+r.x+'px;top:'+r.y+'px;width:'+r.w+'px;height:'+r.h+'px';h.classList.toggle('round',!!r.round);bd.toggleAttribute('hidden',st.kind!=='tap');bd.style.left=(r.x+r.w*0.62)+'px';bd.style.top=(r.y+r.h*0.62)+'px'}
  else{h.style.cssText='left:50%;top:40%;width:0;height:0';bd.toggleAttribute('hidden',true)}
  bd.style.setProperty('--bt',(60/(S.bpm||100)).toFixed(3)+'s');
- const vh=innerHeight,bh=bb.offsetHeight||120;let top=r?r.y+r.h+16:vh*0.3;if(top+bh>vh-12)top=Math.max(12,(r?r.y:vh*0.3)-bh-16);if(r&&top<r.y+r.h&&top+bh>r.y)top=Math.max(12,vh-bh-12);bb.style.top=top+'px';
+ const vh=innerHeight,vw=innerWidth,bh=bb.offsetHeight||120;let top=r?r.y+r.h+16:vh*0.3;if(top+bh>vh-12)top=Math.max(12,(r?r.y:vh*0.3)-bh-16);
+ if(r&&top<r.y+r.h&&top+bh>r.y&&vw>vh*1.3){/* yatay ekran: balon hedefin yanına */const w=Math.min(380,vw*0.42),lx=r.x+r.w/2<vw/2?Math.min(vw-w-12,r.x+r.w+16):Math.max(12,r.x-w-16);bb.style.left=lx+'px';bb.style.right='auto';bb.style.width=w+'px';bb.style.margin='0';top=Math.min(Math.max(12,r.y+r.h/2-bh/2),vh-bh-12)}
+ else{bb.style.left='';bb.style.right='';bb.style.width='';bb.style.margin='';if(r&&top<r.y+r.h&&top+bh>r.y)top=Math.max(12,vh-bh-12)}
+ bb.style.top=top+'px';
  const done=st.cond?st.cond():(st.kind==='tap'&&tClicked);if(done)ovAdvance()}
 function tutShowL(st,lab){$('tutLN').textContent=lab;$('tutLT').textContent=T(st.t);$('tutLP').textContent=T(st.p);const b=$('tutLBtn');b.hidden=st.kind!=='btn';b.textContent=T(st.btn||'Devam');try{(b.hidden?$('tutBub'):b).focus({preventScroll:true})}catch(e){}}
 function tutShake(){const h=$('tutHole');h.classList.remove('shake');void h.offsetWidth;h.classList.add('shake');const c=ovCur();if(!c)return;const st=c.st;$('tutLP').textContent=T(st.kind==='btn'?'Balondaki düğmeye dokun.':st.kind==='auto'?'Biraz bekle: düşman yaklaşıyor.':'Parlayan yere dokun.')}

@@ -629,6 +629,21 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 @keyframes sotpIn{from{transform:scaleX(.35);opacity:0}to{transform:none;opacity:1}}
 @media (max-width:940px) and (max-height:520px) and (orientation:landscape){.stats{display:flex}.stats .sn{font-size:16px}}
 @media (prefers-reduced-motion: reduce){.sotg,.sotp,.pulse.danger .hp{animation:none}.pulse i{transition:none}}
+/* v46 yatay telefon: sayfa kaymaz; solda sahne (yükseklik kadar kare), sağda kayan panel; başlık yerine sağ üstte küçük dil + dişli */
+@media (max-width:940px) and (max-height:520px) and (orientation:landscape){
+ html,body{height:100%;overflow:hidden}
+ body{padding-block:0!important}
+ .app{height:100dvh;display:flex;flex-direction:column}
+ .top{position:fixed;top:calc(env(safe-area-inset-top) + 4px);right:max(8px,env(safe-area-inset-right));z-index:20;padding:0;border:0;gap:6px;align-items:center;flex-wrap:nowrap}
+ .top>div,.top #ledeBtn,.top #tag{display:none}
+ .top .gear{width:34px;height:34px}.top #langBtn{min-height:34px;padding:4px 8px}
+ .grid{flex:1;min-height:0;padding-top:0!important;grid-template-columns:auto minmax(0,1fr)!important;align-items:stretch}
+ .stage{position:relative!important;top:auto!important;height:100%;display:flex!important;flex-direction:column;min-height:0;width:min(58vw,calc(100dvh + 8px))}
+ .cvwrap{flex:1;min-height:0;max-width:100%!important;width:auto;aspect-ratio:auto}
+ .cvwrap canvas,#cv{width:100%!important;height:100%!important;aspect-ratio:auto!important}
+ .rack{height:100%;overflow-y:auto;overscroll-behavior:contain;padding-top:44px}
+ .hint,.stage .controls{display:none!important}
+}
 </style>
 
 <div class="app" lang="tr" id="app" data-tab="studio">
