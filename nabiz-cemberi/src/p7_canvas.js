@@ -8,7 +8,7 @@ let L=600,DPR=1,W=600,WH=600,CW=600,CH=600,OX=0,OY=0,phase=0,phase2=0,phase3=0,c
 const flash=Array.from({length:MAXSLOTS},()=>new Float32Array(18));
 const parts=[],waves=[],stars=[],pops=[];
 for(let k=0;k<64;k++)stars.push({x:Math.random()*2.2-1.1,y:Math.random()*2.2-1.1,vx:(Math.random()-0.5)*0.035,vy:(Math.random()-0.5)*0.035});
-const CN=72,HALF=36,peaks=new Float32Array(CN),SK=48,skPeaks=new Float32Array(SK),crownCache={},wv=new Float32Array(201);
+const CN=72,HALF=36,peaks=new Float32Array(CN),SK=48,skPeaks=new Float32Array(SK),wv=new Float32Array(201);
 const VS='attribute vec2 p;varying vec2 vUv;void main(){vUv=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}';
 const PREC='#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n';
 const FS_BLUR=PREC+'varying vec2 vUv;uniform sampler2D t;uniform vec2 dir;uniform float th;vec3 S(vec2 uv){vec3 c=texture2D(t,uv).rgb;if(th>0.0){float l=max(c.r,max(c.g,c.b));c*=smoothstep(th,th+0.35,l);}return c;}void main(){vec3 c=S(vUv)*0.227;c+=(S(vUv+dir*1.385)+S(vUv-dir*1.385))*0.316;c+=(S(vUv+dir*3.231)+S(vUv-dir*3.231))*0.07;gl_FragColor=vec4(c,1.0);}';
@@ -196,7 +196,6 @@ function drawTunnel(dt,g,th){
   for(let k=0;k<60;k++){const a=k*TAU/60;ctx.fillRect(c+Math.cos(a)*(rr+7)-1,c+Math.sin(a)*(rr+7)-1,2,2)}
  }
 }
-function crownCols(th){if(crownCache[th.id])return crownCache[th.id];const st=[rgbOf(th.fam.tel),rgbOf(th.fam.vur),rgbOf(th.fam.dun)],out=[];for(let k=0;k<HALF;k++){const t=k/(HALF-1),a=t<0.5?st[0]:st[1],b=t<0.5?st[1]:st[2],u=t<0.5?t*2:(t-0.5)*2;out.push('rgb('+a.map((v,j)=>Math.round(v+(b[j]-v)*u)).join(',')+')')}return crownCache[th.id]=out}
 function drawWall(dt,g,th){
  const live=playing&&analyser;if(live)analyser.getByteFrequencyData(fData);
  const ca=rgbOf(th.cv.acc),cb=rgbOf(th.cv.hot),dots=96;

@@ -75,7 +75,7 @@ with sync_playwright() as pw:
                 p.wait_for_timeout(350); x, y, w = hole(p); p.mouse.click(x, y)
             p.wait_for_timeout(450)
         check(any('Savunma' in x for x in seen) and any('Tempo' in x for x in seen) and lab() == '', 'Savunma ve Tempo kısa öğreticileri sırayla oynandı (%s)' % seen)
-        check(p.evaluate("()=>window.__nb.S.tipq.length") == 0 and p.is_hidden('#tut'), 'eski kart yok, sıra boş')
+        check(p.evaluate("()=>window.__nb.S.tipq.length") == 0, 'eski kart yok, sıra boş')
         # yeniden başlat: geçici oyunda, Atla ile kayıt geri gelir
         p.evaluate("()=>{const S=window.__nb.S;S.bestWave=9;S.wave=9}")
         p.evaluate("()=>window.__nb.tutSandbox()"); p.wait_for_timeout(300)
