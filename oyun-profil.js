@@ -7,7 +7,7 @@ module.exports = {
   boylar: { masaustu: "1366x768", telefon: "390x844m", yatay: "844x390m" },
   cikti: "nabiz-cemberi/build/oyuncu",                     /* git dışı (build/ yok sayılır) */
   derle: "python3 nabiz-cemberi/build.py",                 /* depo kökünden */
-  rapor: { artifact: null },                               /* tek kalıcı rapor sayfası (ilk turda yazılır) */
+  rapor: { artifact: "https://claude.ai/artifact/Fp3XbHeVZbA3HUnKKJXu7b" },                             /* tek kalıcı rapor sayfası (ilk turda yazılır) */
   kayitSifirla: "localStorage.clear()",                    /* her persona yeni oyuncu olarak başlar (zorunlu öğreticiyle) */
   hazir: "() => !!window.__nb && document.readyState === 'complete'",
   /* oyun bilgisi (gözlemin OYUN satırı): sekme, nota, dalga, nabız, çalıyor mu, öğretici adımı, son mesaj */
