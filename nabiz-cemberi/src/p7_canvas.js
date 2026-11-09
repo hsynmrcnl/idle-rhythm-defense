@@ -283,7 +283,7 @@ function drawRings(dt,g,th){
    if(ghost&&eSel===i&&ghost[s]){ctx.setLineDash([3,3]);ctx.strokeStyle=hexA(th.cv.ink,0.8);ctx.lineWidth=1.2;cellPath(c,ri+1,ro-1,a0+0.01,a1-0.01);ctx.stroke();ctx.setLineDash([])}
    if(hover&&hover.i===i&&hover.s===s){ctx.strokeStyle=th.cv.ink;ctx.lineWidth=1.4;cellPath(c,ri,ro,a0,a1);ctx.stroke()}
   }
-  if(muted||over||solo){ctx.fillStyle=soloOn?th.cv.hot:muted||over?th.cv.hot:hexA(th.cv.ink,0.5);ctx.font='600 10px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(muted?T('SUS'):over?T('NEFES'):soloOn?'SOLO!':'solo',c,c-(ri+ro)/2)}
+  if(muted||over||solo){ctx.fillStyle=soloOn?th.cv.hot:muted||over?th.cv.hot:hexA(th.cv.ink,0.5);ctx.font='600 10px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(muted?T('SUS'):over?T('FAZLA'):soloOn?'SOLO!':'solo',c,c-(ri+ro)/2)}
  }
 }
 function drawMarks(g,th){
@@ -380,7 +380,7 @@ function drawStrip(dt,g,th){
  const ry=g.fieldTop+(1-range())*(gridTop-g.fieldTop);ctx.setLineDash([2,6]);ctx.strokeStyle=hexA(th.cv.hot,0.3);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,ry);ctx.lineTo(x1,ry);ctx.stroke();ctx.setLineDash([]);
  for(let i=0;i<ns;i++){const x=slotIns(i),y=gridTop+i*rowH,col=x?insColor(x,th):th.cv.dim,muted=x&&muteUntil[i]>now,over=x&&(NF[S.edit][i]||1)<1,solo=x&&isSolo(i),soloOn=solo&&soloNow===i,dimS=(S.edit==='S'&&x&&!solo)||(x&&playing&&!soloOn&&!allowed(planAt(curBar).sec,x,i));
   if(soloOn){ctx.strokeStyle=hexA(th.cv.hot,0.55+0.35*Math.sin(clock*9));ctx.lineWidth=2;ctx.strokeRect(x0-2,y+0.5,x1-x0+4,rowH-1)}
-  ctx.fillStyle=hexA(th.cv.ink,x?0.75:0.35);ctx.font='500 '+Math.max(9,Math.min(12,Math.round(rowH*0.42)))+'px '+th.font.m;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(muted?'SUS':over?'NEFES':soloOn?'SOLO!':solo?'solo':x?x.n:'boş',x0-8,y+rowH/2);
+  ctx.fillStyle=hexA(th.cv.ink,x?0.75:0.35);ctx.font='500 '+Math.max(9,Math.min(12,Math.round(rowH*0.42)))+'px '+th.font.m;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(muted?T('SUS'):over?T('FAZLA'):soloOn?'SOLO!':solo?'solo':x?x.n:'boş',x0-8,y+rowH/2);
   if(muted){ctx.fillStyle=hexA(th.cv.hot,0.12);ctx.fillRect(x0,y,x1-x0,rowH)}
   for(let s=0;s<N;s++){const v=x?pat[i][s]:0,f=flash[i][s]=Math.max(0,flash[i][s]-dt*3.5),cx=x0+s*colW,gsx=MI.gsSet.has(s),hl=playing&&s===curOf(i),pad=1.5;
    if(!x){ctx.strokeStyle=hexA(th.cv.dim,0.5);ctx.setLineDash([2,4]);ctx.strokeRect(cx+pad,y+pad,colW-2*pad,rowH-2*pad);ctx.setLineDash([]);continue}
