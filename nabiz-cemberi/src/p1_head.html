@@ -167,6 +167,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 @keyframes tutbag{0%{transform:rotate(-26deg)}55%{transform:rotate(-26deg)}85%{transform:rotate(0)}100%{transform:rotate(-8deg)}}
 @keyframes tutrip{0%,80%{opacity:0;transform:scale(.4)}85%{opacity:1;transform:scale(.6)}100%{opacity:0;transform:scale(1.6)}}
 #tutBub{position:fixed;left:max(14px,env(safe-area-inset-left));right:max(14px,env(safe-area-inset-right));max-width:420px;margin:0 auto;background:var(--panel,#15132a);border:1px solid var(--acc);border-radius:12px;padding:12px 14px;pointer-events:auto;transition:top .3s;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+#tutLN{display:block;font:500 11px/1.2 var(--f-m);letter-spacing:.1em;text-transform:uppercase;color:var(--acc)}
+#tutBag[hidden]{display:none}
 #tutBub h3{margin:4px 0 4px;font-family:var(--f-d)}#tutBub p{margin:0 0 8px}#tutBub .tb{display:flex;justify-content:flex-end}
 #tutSkipL{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:max(12px,env(safe-area-inset-right));pointer-events:auto;font-size:12px;padding:5px 10px}
 @media (prefers-reduced-motion: reduce){#tutHole i,#tutBag .stk,#tutBag .rip{animation:none}}

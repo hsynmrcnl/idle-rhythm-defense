@@ -32,19 +32,22 @@ with sync_playwright() as pw:
     dock = lambda: p.evaluate("()=>[...document.querySelectorAll('.dk')].filter(d=>!d.hidden).map(d=>d.id.slice(2))")
     card = lambda: p.evaluate("()=>document.getElementById('tut').hidden?'':document.getElementById('tutT').textContent")
     check(dock() == ['stage'] and p.is_visible('#t-set'), 'yeni oyunda dock’ta yalnız Sahne, Ayarlar dişlisi var (%s)' % dock())
-    check(card() == 'Hoş geldin' and 'Öğretici 1 / 3' in p.text_content('#tutN'), 'öğretici 3 adım, ilk adım Hoş geldin')
+    check('Hoş geldin' in p.text_content('#tutLT') and 'Öğretici 1 / 13' in p.text_content('#tutLN'), 'zorunlu öğretici 13 adım, ilk adım Hoş geldin')
     p.tap('#stats'); p.wait_for_timeout(150)
-    check(not p.evaluate("()=>window.__nb.anlOn") and 'Analiz 14' in p.inner_text('#msg'), 'Analiz henüz kapalı, ne zaman açılacağı yazıyor')
+    check(not p.evaluate("()=>window.__nb.anlOn"), 'öğretici sürerken üst bilgiye dokunmak bir şey açmıyor')
     p.screenshot(path=os.path.join(OUT, 'v26_start.png'))
+    # öğretici atlanır (Atla 5 sn sonra); sonra açılış kartları eskisi gibi
+    p.wait_for_timeout(5200); p.tap('#tutSkipL'); p.wait_for_timeout(200)
+    check(p.evaluate("()=>window.__nb.S.tut.done") is True and p.is_hidden('#tutL'), 'Atla ile öğretici kapandı')
     # örnek şarkıda her şey görünür, çıkınca geri gizlenir
     p.click('#t-set'); p.click('#p-set [data-act=demoGo][data-k="0"]'); p.wait_for_timeout(300)
     check(len(dock()) == 5, 'örnek şarkıda bütün sekmeler görünüyor')
     p.click('#demoChip'); p.wait_for_timeout(200)
-    check(dock() == ['stage'] and card() == 'Hoş geldin', 'örnek şarkıdan çıkınca yine yalnız Sahne, öğretici yerinde (%s)' % dock())
-    # öğreticinin son adımı: ilk susturucu → Stüdyo açılır, kart gelir, dock simgesi parlar
-    p.evaluate("()=>{const S=window.__nb.S;S.tut.s=2;S.kills=1}"); p.wait_for_timeout(400)
+    check(dock() == ['stage'], 'örnek şarkıdan çıkınca yine yalnız Sahne (%s)' % dock())
+    p.tap('#stats'); p.wait_for_timeout(150)
+    check(not p.evaluate("()=>window.__nb.anlOn") and 'Analiz 14' in p.inner_text('#msg'), 'Analiz henüz kapalı, ne zaman açılacağı yazıyor')
+    p.evaluate("()=>{const S=window.__nb.S;S.kills=1}"); p.wait_for_timeout(400)
     check(card() == 'Yeni: Stüdyo' and dock() == ['stage', 'studio'] and p.locator('#d-studio.tut-hi').count() == 1, 'ilk susturucuyla Stüdyo açıldı, kart ve parlayan simge (%s)' % card())
-    check(p.evaluate("()=>window.__nb.S.tut.done") is True, 'baştaki öğretici bitti')
     p.screenshot(path=os.path.join(OUT, 'v26_studio_card.png'))
     p.tap('#d-studio'); p.wait_for_timeout(200)
     st = p.evaluate("""()=>({tab:document.getElementById('app').dataset.tab,coll:!document.querySelector('#p-studio .subnav [data-tab=coll]').hidden,

@@ -331,7 +331,7 @@ const tel=id=>{const el=$(id);return tvis(el)?{el}:null};
 const tcell=(si,s)=>({cv:()=>{const g=geom();const p=cellPos(si,s,g);return[p[0],p[1],Math.max(14,(g.t||g.rowH||20)*0.7)]}});
 const torb=()=>({cv:()=>{const o=orbAt();return[o.x,o.y,o.r0*1.1]}});
 const TUT=[
- {n:1,t:'Hoş geldin',p:'Sessizlik A.Ş. şehri susturmaya geliyor. Tek savunman kendi müziğin.',kind:'btn',btn:'Başla',prep:()=>{setTab(isPhone()?'stage':tab);if(!S.kills&&!tutSand||tutSand){S.pat.A[0].fill(0);recalc();renderPanels()}},go:()=>{ensureAudio()}},
+ {n:1,t:'Hoş geldin',p:'Sessizlik A.Ş. şehri susturmaya geliyor. Tek savunman kendi müziğin.',kind:'btn',btn:'Başla',prep:()=>{setTab(isPhone()?'stage':tab)},go:()=>{ensureAudio();if(!S.kills){S.pat.A[0].fill(0);recalc();renderPanels()}}},
  {n:2,t:'İlk vuruş',p:'Halkada parlayan hücreye dokun: davul vuruşu ekle.',kind:'tap',tgt:()=>tcell(0,0),prep:tNota,cond:()=>S.pat.A[0][0]>0},
  {n:3,t:'Ritmi kur',p:'Parlayan hücreye dokun: dörtlük ritim kuruluyor.',kind:'tap',tgt:()=>tcell(0,TSEQ()[0]),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[0]]>0},
  {n:3,t:'Ritmi kur',p:'Bir tane daha.',kind:'tap',tgt:()=>tcell(0,TSEQ()[1]),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[1]]>0},
@@ -357,8 +357,8 @@ function tutTick(){const L=$('tutL');if(!L)return;const on=tutActive();if(L.hidd
  const st=TUT[S.tut.s];if(tutPrep!==S.tut.s){tutPrep=S.tut.s;try{st.prep&&st.prep()}catch(e){}tutShowL(st);if(!tutT0)tutT0=performance.now()}
  const sk=$('tutSkipL'),sv=performance.now()-tutT0>5000;if(sk.hidden===sv)sk.hidden=!sv;
  const r=tutTarget(st);tutRect=r;const h=$('tutHole'),bd=$('tutBag'),bb=$('tutBub');
- if(r){h.style.cssText='left:'+r.x+'px;top:'+r.y+'px;width:'+r.w+'px;height:'+r.h+'px';h.classList.toggle('round',!!r.round);bd.hidden=st.kind!=='tap';bd.style.left=(r.x+r.w*0.62)+'px';bd.style.top=(r.y+r.h*0.62)+'px'}
- else{h.style.cssText='left:50%;top:40%;width:0;height:0';bd.hidden=true}
+ if(r){h.style.cssText='left:'+r.x+'px;top:'+r.y+'px;width:'+r.w+'px;height:'+r.h+'px';h.classList.toggle('round',!!r.round);bd.toggleAttribute('hidden',st.kind!=='tap');bd.style.left=(r.x+r.w*0.62)+'px';bd.style.top=(r.y+r.h*0.62)+'px'}
+ else{h.style.cssText='left:50%;top:40%;width:0;height:0';bd.toggleAttribute('hidden',true)}
  bd.style.setProperty('--bt',(60/(S.bpm||100)).toFixed(3)+'s');
  const vh=innerHeight,bh=bb.offsetHeight||120;let top=r?r.y+r.h+16:vh*0.3;if(top+bh>vh-12)top=Math.max(12,(r?r.y:vh*0.3)-bh-16);if(r&&top<r.y+r.h&&top+bh>r.y)top=Math.max(12,vh-bh-12);bb.style.top=top+'px';
  if(st.cond&&st.cond())tutAdvance()}

@@ -46,6 +46,7 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v22: küçük temizlik (Kolay öğretici, Uygula, ped seviye düğmeleri, terimler)
 - v23: telefonda Sahne aşağı kayıyordu, düzeldi
 - v36: Ayarlar → Ölüm sesi açık/kapalı
+- v41: zorunlu öğretici (13 adım, spot ışığı, baget, Atla 5 sn)
 - v40: açılışlar ilk 10 dakikaya yayıldı (UNL_W)
 - v39: şarkı paylaşma bağlantısı (#s=…)
 - v38: Ses masası (WAV/MIDI ücretsiz; yankı ♪250.000, ses karıştırıcı ♪100.000)
