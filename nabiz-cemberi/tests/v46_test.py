@@ -31,9 +31,14 @@ with sync_playwright() as pw:
         st = lambda: p.evaluate("()=>window.__nb.tutStep")
         p.click('#tutLBtn'); p.wait_for_timeout(400)
         for k in range(5):
-            r = p.evaluate("()=>{const h=document.getElementById('tutHole').getBoundingClientRect();return [h.left+h.width/2,h.top+h.height/2]}")
-            p.wait_for_timeout(350); r = p.evaluate("()=>{const h=document.getElementById('tutHole').getBoundingClientRect();return [h.left+h.width/2,h.top+h.height/2]}")
-            p.mouse.click(r[0], r[1]); p.wait_for_timeout(450)
+            prev = None  # delik kayarken tıklanmasın: yerine oturana kadar bekle
+            for j in range(30):
+                r = p.evaluate("()=>{const h=document.getElementById('tutHole').getBoundingClientRect();return [Math.round(h.left+h.width/2),Math.round(h.top+h.height/2)]}")
+                if r == prev: break
+                prev = r; p.wait_for_timeout(120)
+            s0 = st(); p.mouse.click(r[0], r[1])
+            try: p.wait_for_function("s=>window.__nb.tutStep>s", arg=s0, timeout=3000)
+            except Exception: pass
         check(st() >= 6 and p.evaluate("()=>window.__nb.playing"), 'yatayda öğretici dört hücre ve ▶ ile ilerliyor (adım %d)' % st())
         p.evaluate("()=>{const nb=window.__nb;nb.S.tut.done=true;nb.unlockAll();nb.S.tipq=[]}"); p.wait_for_timeout(300)
         check(p.is_visible('#t-set'), 'dişli görünüyor')
