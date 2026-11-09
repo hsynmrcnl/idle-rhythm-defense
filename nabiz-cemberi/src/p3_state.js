@@ -41,7 +41,7 @@ async function parseCode(code){code=(code||'').replace(/\s+/g,'');if(!/^NB[12]\.
 let demoMode=false,demoSnap=null;
 /* wiping: sıfırlama sırasında (sayfa yeniden açılırken) hiçbir şey yazılmaz */
 let wiping=false;
-function save(){if(demoMode||wiping)return;S.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){if(demoMode||wiping||tutSand)return;S.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 let MI=null;
 function meterInfo(){const m=METERS[S.meter];const gs=[],grp=[],pos=[];let a=0;m.g.forEach((len,gi)=>{gs.push(a);for(let k=0;k<len;k++){grp.push(gi);pos.push(k)}a+=len});return{N:a,g:m.g,gs,gsSet:new Set(gs),grp,pos,mids:gs.map(s=>s+2)}}
