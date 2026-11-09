@@ -28,10 +28,10 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - [x] Aktif savunma: şarjı elle patlat (v37; ölçü başında ×1,5, 4 ölçüde kendisi patlar)
 
 ## 5. Yapımcı araçları
-- [ ] Reverb (oda/salon) gönderimi — küçük
-- [ ] MIDI dışa aktarma (.mid): desen + plan + akor + solo — orta
-- [ ] WAV kaydı: çalarken ana çıkış kaydı (gerçek zamanlı) — orta
-- [ ] Basit mikser: enstrüman başına ses + pan (ses yolu değişir) — orta-büyük
+- [x] Reverb (oda/salon) gönderimi — küçük
+- [x] MIDI dışa aktarma (.mid): desen + plan + akor + solo — orta
+- [x] WAV kaydı: çalarken ana çıkış kaydı (gerçek zamanlı) — orta
+- [x] Basit mikser: enstrüman başına ses + susturma (v38; pan yok)
 
 ## Şimdilik yapılamaz
 - Ney, zurna, tabla, gamelan, taiko için kaliteli kayıt: CC0 kaynak yok. Seçenek: sentezleri laboratuvarda iyileştirmek.
@@ -46,6 +46,7 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v22: küçük temizlik (Kolay öğretici, Uygula, ped seviye düğmeleri, terimler)
 - v23: telefonda Sahne aşağı kayıyordu, düzeldi
 - v36: Ayarlar → Ölüm sesi açık/kapalı
+- v38: Ses masası (WAV/MIDI ücretsiz; yankı ♪250.000, ses karıştırıcı ♪100.000)
 - v37: kaybetme gerilimi + şarjı elle patlat; Ayarlar → Gerilim efektleri
 - v35: otomatik desende davul ölçü başı vurgulu (şarj dolar), otomatik geliştirme yer açar
 - v34: düşman ölünce ritimli nota (akordan, on altılığa oturur; boss'ta gümbürtü)
