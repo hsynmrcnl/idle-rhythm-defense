@@ -24,8 +24,8 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 ## 4. Oyun dengesi (önce ölçüm)
 - [x] **Ekonomi simülasyonu:** `tools/ekonomi_sim.py`, sonuç `docs/ekonomi_sim.md` (şarj hiç dolmuyor, duvar dalga ~50, bot yer açmıyor). Eski not: hızlı ileri saran bot; Kolay + otomatik özelliklerle dalga süreleri, ilk satın almalar, tıkanma noktaları — orta. Otomatik özellikler geldiği için öncelikli
 - [ ] Idle–aktif denge: simülasyondan sonra
-- [ ] Kaybetme gerilimi (can azalınca müzik boğuklaşır, uyarı, kayıp cezası) — tasarım kararı Hüseyin'de
-- [ ] Aktif savunma (hedef seçme / bekleme süreli beceri) — tasarım kararı Hüseyin'de
+- [x] Kaybetme gerilimi (v37: kırmızı nabız, boğuk müzik, kalp atışı, kritik uyarısı, kurtuluş, geri çekilme)
+- [x] Aktif savunma: şarjı elle patlat (v37; ölçü başında ×1,5, 4 ölçüde kendisi patlar)
 
 ## 5. Yapımcı araçları
 - [ ] Reverb (oda/salon) gönderimi — küçük
@@ -46,6 +46,7 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v22: küçük temizlik (Kolay öğretici, Uygula, ped seviye düğmeleri, terimler)
 - v23: telefonda Sahne aşağı kayıyordu, düzeldi
 - v36: Ayarlar → Ölüm sesi açık/kapalı
+- v37: kaybetme gerilimi + şarjı elle patlat; Ayarlar → Gerilim efektleri
 - v35: otomatik desende davul ölçü başı vurgulu (şarj dolar), otomatik geliştirme yer açar
 - v34: düşman ölünce ritimli nota (akordan, on altılığa oturur; boss'ta gümbürtü)
 - v33: bosslara büyük doğma efekti (ışık havuzu, üç halka, yüksek sütun, sarsıntı)
