@@ -43,6 +43,8 @@ function insRowC(x,th){const L=lvOf(x.id),col=insColor(x,th),on=S.slots.includes
  const eff=ez?'<span class="role">'+ezRole(x.role)+'</span> '+x.d:'<span class="role">'+roleName(x.role)+'</span> '+(L?ROLES[x.role].d:x.d)+' · nefes '+x.nf+((isWeapon(x.role)||x.role==='titresim')?' · ♪ '+x.b+' · hasar '+x.dmg:' · ♪ '+x.b*(x.role==='gelir'?3:1));
  const st=!L?'<button class="btn" data-act="lv" data-id="'+x.id+'" data-cost="'+x.u+'">'+(x.u?'Aç · ♪ '+fmt(x.u):'Aç')+'</button>':on?'<span class="own">Sahnede</span>':S.slots.includes(null)?'<button class="btn" data-act="place" data-id="'+x.id+'">Sahneye koy</button>':'<span class="cnt">Yedekte</span>';
  return '<div class="irow'+(L?'':' locked')+'"><span class="dot" style="--c:'+col+'"></span><span class="it"><span class="nm">'+x.n+'</span>'+(L?'<span class="lvl">Sv '+L+'</span>':'')+' <span class="ie">'+eff+'</span></span>'+st+'</div>'}
+/* v53: dil değişince sayfa yenilenir; açık sekme korunur (Ayarlar'dayken Sahne/Stüdyo'ya atlıyordu) */
+function langReload(){save();try{sessionStorage.setItem('nb-tab',tab)}catch(e){}location.reload()}
 function setTab(t){if(t==='stage'&&!isPhone())t='studio';if(!tabOn(t)&&isPhone())t='stage';if(anlOn&&isPhone()&&t!=='stage')anlToggle(false);const rk=$('rack');if(tab==='studio'&&t!=='studio'&&Object.keys(secNew).length){secNew={};secVis()}if(t==='studio')$('studBadge').hidden=true;if(rk)scrollMem[tab]=rk.scrollTop;if(tab!=='set')prevTab=tab;tab=t;const g=DOCK[t];if(g&&dockLast[g])dockLast[g]=t;const lk=!tabOn(t);TABS.forEach(k=>{$('p-'+k).hidden=lk||k!==t;$('t-'+k).setAttribute('aria-selected',String(k===t))});{const pl=$('p-lock');if(pl)pl.hidden=!lk}$('t-stage').setAttribute('aria-selected',String(t==='stage'));$('app').dataset.tab=t;if(t==='book'){bookNew=false;$('bookBadge').hidden=true}if(t==='def')$('defBadge').hidden=true;if(t==='coll')$('collBadge').hidden=true;const tb=$('t-'+t);if(tb&&tb.scrollIntoView){try{tb.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}if(t==='stage'){window.scrollTo(0,0);renderPads()}if(t==='set')renderSet();if(rk)rk.scrollTop=scrollMem[t]||0;placeMsg();syncDock();}
 /* telefon: mesaj satırı sahnenin altında yüzer, canvas zıplamaz; masaüstü: düğmelerin altında */
 function placeMsg(){const m=$('msg'),cw=$('cvwrap');if(!m||!cw)return;if(isPhone()){if(m.parentNode!==cw)cw.appendChild(m)}else{const st=cw.closest('.stage');if(st&&m.parentNode!==st)st.appendChild(m)}}
@@ -162,7 +164,7 @@ function renderPanels(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v52 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v53 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -283,13 +285,15 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
  hintK=k;if(!k){if(!el.hidden)el.hidden=true;return}
  el.innerHTML=T('Öneri')+': <b>'+T(k.n)+'</b> · ♪ '+fmt(k.cost);el.title=T('Nota birikti ama ilerleme durdu: dokun, en verimli adımı al');if(el.hidden)el.hidden=false}
 /* öneri: nabız düşükse en ucuz hayatta kalma (nabız/kalkan/tamir), değilse Analiz'in gelir önerisi; elde ≥3 katı nota yoksa yok */
-function hintPick(){try{const low=core.hp/hpMax()<0.6&&S.unl.def;let c=null;if(low)c=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)).sort((x,y)=>x.cost-y.cost)[0]||null;if(!c){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));c=r.inc||r.def}return c&&c.cost>0&&S.nota>=c.cost*3?c:null}catch(e){return null}}
+/* v53: boş sahne yeri varken en ucuz açılabilir enstrüman (öneri çipi ve Asistan; Idle oyuncu 2. enstrümanı 25 dk açmadı, Uyum ve Asistan ona bağlı) */
+function newInsCand(){if(!S.slots.includes(null))return null;const x=INS.filter(x=>!lvOf(x.id)&&famOpen(x.fam)).sort((a,b)=>a.u-b.u)[0];return x?{act:'lv',id:x.id,n:(S.lang==='en'?'New: ':'Yeni: ')+x.n,cost:x.u}:null}
+function hintPick(){try{const low=core.hp/hpMax()<0.6&&S.unl.def;let c=null;if(!low){const ni=newInsCand();if(ni&&S.nota>=ni.cost*3)return ni}if(low)c=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)).sort((x,y)=>x.cost-y.cost)[0]||null;if(!c){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));c=r.inc||r.def}return c&&c.cost>0&&S.nota>=c.cost*3?c:null}catch(e){return null}}
 const hintApply=k=>rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});
 function hintBuy(){const k=hintK;if(!k||S.nota<k.cost)return;hintApply(k);msg(T('Alındı')+': '+T(k.n)+' · ♪ '+fmt(k.cost));hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300)}
 /* v49 Asistan (docs/denge_d15.md seçenek 2): dalga 15'te ücretsiz açılır; menajerin otomatik geliştirmesi alınana kadar 20 sn'de bir notanın en çok %25'iyle en verimli geliştirmeyi alır. Nabız %60 altındaysa önce hayatta kalma, değilse gelir ve savunma sırayla (Analiz sıralaması). */
-const ASST_T=20000,ASST_B=0.25;let asstT=0,asstFlip=false;
+const ASST_T=20000,ASST_B=0.25;let asstT=Date.now(),asstFlip=false;
 const asstOn=own=>!!(S.unl&&S.unl.asst&&!(S.mn&&S.mn.lv)&&(own||S.auto&&S.auto.asst!==false));
-function asstPick(){const lim=S.nota*ASST_B,ok=k=>k&&k.cost>0&&k.cost<=lim;let k=null;
+function asstPick(){const lim=S.nota*ASST_B,ok=k=>k&&k.cost>0&&k.cost<=lim;let k=null;if(core.hp/hpMax()>=0.6){const ni=newInsCand();if(ok(ni))return ni}
  if(core.hp/hpMax()<0.6&&S.unl.def)k=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)&&ok(x)).sort((x,y)=>x.cost-y.cost)[0]||null;
  if(!k){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));k=asstFlip&&ok(r.def)?r.def:ok(r.inc)?r.inc:ok(r.def)?r.def:null;if(k)asstFlip=k!==r.def}
  return k}
@@ -524,7 +528,7 @@ function rackAct(b){const act=b.dataset.act;
  if(act==='sec'){stSec=b.dataset.k;renderSecBar();const rk=$('rack');if(rk)rk.scrollTop=0;return}
  if(act==='fam'){famSel=b.dataset.f;renderColl(dispTheme());if(S.lang==='en')i18n($('p-coll'));return}
  if(act==='ordx'){const k=b.dataset.t;if(ordOpen.has(k))ordOpen.delete(k);else ordOpen.add(k);const ul=b.parentNode.querySelector('ul');if(ul)ul.hidden=!ordOpen.has(k);return}
- if(act==='lang'){if(S.lang!==b.dataset.v){S.lang=b.dataset.v;save();location.reload()}return}
+ if(act==='lang'){if(S.lang!==b.dataset.v){S.lang=b.dataset.v;langReload()}return}
  if(act==='tens'){S.tens=b.dataset.v==='1';save();renderSet();msg(S.tens?'Gerilim efektleri açık':'Gerilim efektleri kapalı');return}
  if(act==='share'){shareSong();return}
  if(act==='shareOwn'){exitDemo();return}
@@ -861,7 +865,7 @@ $('demo').addEventListener('click',()=>{if(demoMode)exitDemo();else enterDemo(de
 $('demo2').addEventListener('click',()=>{if(demoMode)enterDemo((demoIdx+1)%DEMOS.length);$('demo2').blur()});
 $('play').addEventListener('click',()=>{startStop();$('play').blur()});
 $('mPlay').addEventListener('click',()=>{startStop();updUI();$('mPlay').blur()});
-$('langBtn').addEventListener('click',()=>{S.lang=S.lang==='en'?'tr':'en';save();location.reload()});
+$('langBtn').addEventListener('click',()=>{S.lang=S.lang==='en'?'tr':'en';langReload()});
 $('ledeBtn').addEventListener('click',()=>{const o=$('top').classList.toggle('open');$('ledeBtn').setAttribute('aria-expanded',String(o))});
 $('pads').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const act=b.dataset.act;if(act==='undo'){undo();return}if(act==='alvl'){autoRows([+b.dataset.i],+b.dataset.v);return}if(act==='pad'){cellClick(eSel,+b.dataset.s);renderPads()}else if(act==='padPrev'){eSel=(eSel-1+S.slots.length)%S.slots.length;renderPads()}else if(act==='padNext'){eSel=(eSel+1)%S.slots.length;renderPads()}else if(soloAct(act,b)){recalc();updUI();renderSoloBox();renderPads()}});
 $('mini').addEventListener('click',e=>{const b=e.target.closest('[data-act=tab]');if(b)setTab(b.dataset.tab)});
