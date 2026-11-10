@@ -75,7 +75,9 @@ with sync_playwright() as pw:
     p.tap('#p-coll .subnav [data-tab=studio]'); p.wait_for_timeout(150)
     sec = p.evaluate("()=>[...document.querySelectorAll('#secBar .sb')].map(e=>e.dataset.k)")
     check(sec == ['sahne', 'auto', 'syn'] and p.locator('[data-act=autoAll]').count() == 1, 'Otomatik, Uyum ve Hepsini düzenle geldi (%s)' % sec)
-    p.evaluate("()=>{window.__nb.S.bestWave=8}"); p.wait_for_timeout(400)
+    p.evaluate("()=>{window.__nb.S.bestWave=8}")
+    try: p.wait_for_function("()=>window.__nb.S.tipq.length>=3", timeout=4000)
+    except Exception: pass
     q = p.evaluate("()=>window.__nb.S.tipq.slice()")
     check(q[:3] == ['tap', 'def', 'rhy'], 'kısa öğreticiler sırada: Ritme vur, Savunma, Tempo (%s)' % q)
     drop(); p.wait_for_timeout(200)
