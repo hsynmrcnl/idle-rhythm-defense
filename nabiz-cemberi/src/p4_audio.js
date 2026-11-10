@@ -203,6 +203,7 @@ function startStop(){
  $('play').textContent=T(playing?'Durdur':'Başlat');
 }
 let tapFx=null,tapP=0,kickP=0,bassP=0;
+let tvMiss=0; /* v54: öğreticinin Ritme vur adımında 3 ıskadan sonra her dokunuş sayılır (Acemi 15 denemede geçemedi) */
 function tap(){
  if(!playing){msg('Önce ortadaki ▶ ile müziği başlat');return}
  const now=ac.currentTime-(ac.outputLatency||ac.baseLatency||0);
@@ -210,7 +211,8 @@ function tap(){
  if(best===null)return;const d=now-best;
  const tv=(()=>{try{const c=ovCur();return !!(c&&c.st.rv)}catch(e){return false}})();
  if(tv){const p=$('tutLP');if(p)p.textContent=T(Math.abs(d)<0.22?'Tam! Seri başladı.':d<0?'Biraz erken: ibre parlak bir vuruşun üstüne gelince dokun.':'Biraz geç: ibre parlak bir vuruşun üstüne gelince dokun.')}
- if(Math.abs(d)<(tv?0.22:0.085)){S.seri++;hitBar=true;const g=Math.max(5,rate()*0.6);earn(g);tapFx={t:'Tam',c:dispTheme().cv.acc,life:1,sub:'+♪ '+fmt(g)};tapP=1}
+ if(tv&&Math.abs(d)>=0.22&&++tvMiss>3){const p=$('tutLP');if(p)p.textContent=T('Tam! Seri başladı.')}
+ if(Math.abs(d)<(tv?(tvMiss>3?9:0.22):0.085)){tvMiss=0;S.seri++;hitBar=true;const g=Math.max(5,rate()*0.6);earn(g);tapFx={t:'Tam',c:dispTheme().cv.acc,life:1,sub:'+♪ '+fmt(g)};tapP=1}
  else{S.seri=0;tapFx={t:d<0?'Erken':'Geç',c:dispTheme().cv.hot,life:1,sub:'seri sıfırlandı'};tapP=0.6}
  updUI();
 }
