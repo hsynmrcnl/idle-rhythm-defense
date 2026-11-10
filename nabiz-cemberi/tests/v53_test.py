@@ -27,7 +27,7 @@ with sync_playwright() as pw:
     n = p.evaluate("()=>window.__nb.hintSim()")
     check('Yeni' in n and p.evaluate("()=>window.__nb.S.slots.filter(Boolean).length") == 2, 'öneri: boş yer varken yeni enstrüman açıldı ve sahneye kondu (%s)' % n)
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.unl.asst=1;S.unl.syn=1;nb.unlCheck(true);S.tipq=[];S.tutm=0;S.auto.asst=true;S.nota=1e5;nb.asstReset();nb.autoTick()}")
-    check(p.evaluate("()=>window.__nb.S.slots.filter(Boolean).length") == 3, 'Asistan: boş yere yeni enstrüman koydu')
+    check(p.evaluate("()=>window.__nb.S.slots.filter(Boolean).length") >= 3, 'Asistan: boş yere yeni enstrüman koydu')
     p.evaluate("()=>{const S=window.__nb.S;S.slots=S.slots.map(x=>x||'davul');window.__nb.recalc()}")
     n = p.evaluate("()=>{window.__nb.S.nota=1e5;return window.__nb.hintSim()}")
     check(n and 'Yeni' not in n, 'yer doluyken eski öneri (%s)' % n)

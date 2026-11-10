@@ -300,8 +300,8 @@ function asstPick(lim0){const lim=lim0==null?S.nota*ASST_B:lim0,ok=k=>k&&k.cost>
  if(!k){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));k=asstFlip&&ok(r.def)?r.def:ok(r.inc)?r.inc:ok(r.def)?r.def:null;if(k)asstFlip=k!==r.def}
  return k}
 function autoTick(){if(demoMode||!S.mn)return;const now=Date.now();let ch=false;
- /* v54: bir turda tek alım yerine tur başındaki notanın %25'i bitene kadar (en çok 12 alım): büyük birikimde tek ucuz alım yetmiyordu (Idle: ♪442 B birikti) */
- if(asstOn()&&!ovCur()&&now-asstT>ASST_T){asstT=now;try{let left=S.nota*ASST_B,n=0,sum=0,last=null;for(let i=0;i<12;i++){const k=asstPick(left);if(!k)break;const n0=S.nota;rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});const sp=n0-S.nota;if(sp<=0)break;left-=sp;sum+=sp;n++;last=k}
+ /* v54: bir turda tek alım yerine tur başındaki notanın %25'i bitene kadar (en çok 40 alım): büyük birikimde tek ucuz alım yetmiyordu (Idle: ♪442 B birikti) */
+ if(asstOn()&&!ovCur()&&now-asstT>ASST_T){asstT=now;try{let left=S.nota*ASST_B,n=0,sum=0,last=null;for(let i=0;i<40;i++){const k=asstPick(left);if(!k)break;const n0=S.nota;rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});const sp=n0-S.nota;if(sp<=0)break;left-=sp;sum+=sp;n++;last=k}
   if(n)msg(T('Asistan')+': '+(n===1?T(last.n):n+' '+T('geliştirme'))+' · ♪ '+fmt(sum))}catch(e){console.warn(e)}}
  /* Menajer: otomatik geliştir (v21) — Analiz'in gelir önerisi; yalnız seviye, ritim ve solo geliştirmesi, notanın yarısını aşmadan */
  if(S.mn.lv&&S.auto.lv!==false&&now-autoT>10000){autoT=now;try{const k=autoBuyPick();if(k){rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});msg('Menajer: '+k.n+' · ♪ '+fmt(k.cost))}}catch(e){console.warn(e)}}
