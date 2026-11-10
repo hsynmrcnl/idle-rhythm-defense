@@ -78,6 +78,8 @@ const INS=[
 ];
 const IDX={};const famCounter={};
 INS.forEach((x,i)=>{x.i=i;x.lb=Math.max(12,x.u);x.fi=famCounter[x.fam]=(famCounter[x.fam]||0)+1;IDX[x.id]=x});
+/* v58 Baskın: her RAID_EVERY dalgada (patron dalgası hariç) tek koldan kurye akını. Toplam canı oyuncunun RAID_T saniyelik hasarı kadar (güce göre ölçeklenir: güçlü oyuncuda da nabız düşer), sızan her akıncı nabzın RAID_DMG'si kadar vurur, geri çekilmeye yol açmaz (taban RAID_FLOOR). Hiç sızdırmazsan RAID_BONUS sn'lik gelir. */
+const RAID_EVERY=5,RAID_T=24,RAID_DMG=0.06,RAID_FLOOR=0.05,RAID_BONUS=15;
 const GROW=1.19,MS=[25,50,100,200,300,400,500],MAXSLOTS=10;
 const SHADES=[0,0.18,-0.2,0.36,-0.36,0.09,-0.1,0.27,-0.28,0.45,-0.45,0.14];
 

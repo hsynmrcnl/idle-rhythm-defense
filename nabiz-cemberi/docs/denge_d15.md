@@ -52,3 +52,13 @@ Sıradan oyuncu modeli: dalga 15'e kadar 10 sn'de bir en verimli geliştirme (no
 - Denenen tek ayar: Denetçi (10'luk dalga patronu) canı 14 → 40 ve 70. Dalga 10/20/30'da nabız yine %100; tek başına patron canı gerilim yaratmıyor.
 
 Sonuç: tehdit ikili (ya hiç yok ya duvar); düşman can artışını (×1,19) oynatmak yalnız duvarın yerini kaydırır, arada “nabız düşüp toparlanan” bir bant oluşturmaz. Bu bir sayı ayarı değil tasarım kararı (ör. sızıntı hasarını küçültüp sızıntıyı sıklaştırmak, patronların yanında koruma dalgası, dalga içi “baskın” anları). Karar Hüseyin'de; sayılar değiştirilmedi.
+
+## Ölçüm 4 — Baskın (v58, `tools/tehdit_olc.py 14`)
+Her 5 dalgada (patron dalgası hariç) tek koldan kurye akını; toplam canı oyuncunun `RAID_T` saniyelik hasarı kadar. Sızan akıncı nabzın %6'sını alır, geri çekilme olmaz.
+
+| RAID_T | dalga 5 | dalga 15 | dalga 25* | geri çekilme (14 dk) | en iyi dalga |
+|---|---|---|---|---|---|
+| 5, 10, 16 | %100 | %100 | %100 | 0 | 33 |
+| **24 (seçilen)** | %94 | %52 | %70 | 0 | 33 |
+
+\* Dalga 25 patron (Müdür) dalgası, baskın yok; %70 dalga 15'teki baskından kalan nabızdı (nabız kendiliğinden dolmuyor). Bunun üzerine baskının aldığı nabız dalga bitince geri veriliyor. İlerleme hızı değişmedi (14 dk'da yine dalga 33).
