@@ -32,7 +32,8 @@ with sync_playwright() as pw:
     p.goto(URL); p.wait_for_timeout(400); p.evaluate(SEED); p.wait_for_timeout(50)
 
     # tek satır: davul Yoğun → her vuruş başı
-    check(p.locator('#slotList [data-act=alvl]').count() == 12, 'her satırda Sade · Hareketli · Yoğun')
+    nb = p.evaluate("()=>[...document.querySelectorAll('#slotList .ezopts')].map(e=>e.querySelectorAll('[data-act=alvl]').length)")
+    check(len(nb) == 4 and all(n in (1, 3) for n in nb) and nb[0] == 1, 'her satırda Sade · Hareketli · Yoğun ya da tek Otomatik ritim (v55: %s)' % nb)
     n0 = p.evaluate("()=>window.__nb.S.nota")
     p.click('#slotList [data-act=alvl][data-i="0"][data-v="3"]'); p.wait_for_timeout(50)
     check(row(p, 'A', 0) == '2000100010001000' and p.evaluate("()=>window.__nb.S.rowm.A0") == 3 and p.evaluate("()=>window.__nb.S.nota") < n0,

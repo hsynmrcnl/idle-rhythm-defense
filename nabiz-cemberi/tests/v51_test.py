@@ -40,12 +40,13 @@ with sync_playwright() as pw:
         else:
             p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;S.tipq=[];nb.unlockAll();S.tipq=[];S.nota=1e5;nb.renderPanels()}")
         for lv, name in ((3, 'Yoğun'), (2, 'Hareketli'), (1, 'Sade')):
-            p.evaluate("v=>{const b=document.querySelector('[data-act=alvl][data-i=\"0\"][data-v=\"'+v+'\"]');window.__nb.S.nota=1e5;b.click()}", lv); p.wait_for_timeout(150)
+            p.evaluate("v=>{const b=document.querySelector('[data-act=alvl][data-i=\"0\"][data-v=\"'+v+'\"]')||document.querySelector('[data-act=alvl][data-i=\"0\"]');window.__nb.S.nota=1e5;b.click()}", lv); p.wait_for_timeout(150)
             ld = p.evaluate(LOAD)
             check(ld <= 5 and p.evaluate("()=>window.__nb.S.pat.A[0][0]") >= 1, 'Davul %s: yük %d ≤ nefes 5' % (name, ld))
         p.evaluate("()=>document.querySelector('[data-act=alvl][data-i=\"0\"][data-v=\"3\"]').click()"); p.wait_for_timeout(150)
         check(p.evaluate("()=>window.__nb.S.pat.A[0][0]") == 2, 'Yoğun davulda ölçü başı vurgulu (şarj dolar)')
         check(p.locator('#p-studio .nb.over').count() == 0, 'Stüdyo’da “çok yoğun” uyarısı yok')
+        check(p.locator('#slotList [data-act=alvl][data-i="0"]').count() == 1 and 'Otomatik ritim' in p.text_content('#slotList [data-act=alvl][data-i="0"]'), 'Davul’da tek “Otomatik ritim” düğmesi (v55)')
         check(not errs, 'sayfa hatası yok %s' % errs[:2])
         ctx.close()
     b.close()
