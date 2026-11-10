@@ -9,6 +9,8 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - [ ] **Telefonda dene (v27):** 3D sahne (sağ üstteki 3D düğmesi), şarj ve patlama, Görünüm'de merkezler; akıcı mı, ısınma var mı
 - [x] 3D deneme bitti (v50): `D3_TEST=false`, Görünüm'de ♪ 500.000; denemede oynayanlarda açık kalır
 
+- [ ] **İkon (sonra):** eski ikon duruyor. Denenenler laboratuvarda (https://claude.ai/artifact/LZxJ2gUYpB76nptLeRAZng): soyut (Nabız çizgisi, kristal, baget, kuşatma), parlak ritim (nota, vuruş anı, ekolayzer), karakter ve sade karakter (çocuksu bulundu), geometrik logo; en çok yaklaşılan: V6 vuruş halkası pembe zeminde, izometrik + merkez kristal, 45° ve sırayla yükselen vuruşlar — açı tutmadı. Sonraki denemede önce Hüseyin'den kaba bir çizim ya da örnek görsel iste.
+
 ## 2. Kararlar (v21'de uygulandı)
 - [x] Otomatik geliştir menajerle gelir: "Menajer: otomatik geliştir" (1. albüm), Sahne kartından açılıp kapanır
 - [x] Sahne katmanları gelire gerçekten ×1,1 ekler (Analiz'de de görünür)

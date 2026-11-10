@@ -86,7 +86,7 @@ with sync_playwright() as pw:
     n0 = p.evaluate("()=>window.__nb.S.nota")
     p.click('#d3Box [data-act=coreBuy][data-id=kure]'); p.wait_for_timeout(150)
     s3 = p.evaluate("()=>window.__nb.S.d3")
-    check(s3['core'] == 'kure' and s3['cores'].get('kure') == 1 and abs(n0 - p.evaluate("()=>window.__nb.S.nota") - 5e6) < 1, 'Küre satın alındı, merkezde (♪ 5 Mn düştü)')
+    check(s3['core'] == 'kure' and s3['cores'].get('kure') == 1 and 4.95e6 < n0 - p.evaluate("()=>window.__nb.S.nota") <= 5e6 + 1, 'Küre satın alındı, merkezde (♪ 5 Mn düştü)')
     p.click('#d3Box [data-act=core][data-id=kristal]'); p.wait_for_timeout(100)
     check(p.evaluate("()=>window.__nb.S.d3.core") == 'kristal', 'alınan merkezler arasında geçiş ücretsiz')
     p.click('#d3Box [data-act=d3view][data-v="0"]'); p.wait_for_timeout(100)

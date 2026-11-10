@@ -33,7 +33,7 @@ const ROLES={
  destek:{n:'Destek',d:'Ateş etmez; aynı adımda vuran her silah ×1,5'}
 };
 const INS=[
-{id:'davul',nf:4,n:'Davul',fam:'vur',b:1,dmg:2,role:'darbe',u:0,v:{g:'kick',f0:165,f1:44,dur:0.4,click:1},d:'Döngünün temeli'},
+{id:'davul',nf:5,n:'Davul',fam:'vur',b:1,dmg:2,role:'darbe',u:0,v:{g:'kick',f0:165,f1:44,dur:0.4,click:1},d:'Döngünün temeli'},
 {id:'trampet',nf:2,n:'Trampet',fam:'vur',b:2,dmg:3,role:'keskin',u:150,v:{g:'noise',ft:'highpass',f:1400,a:0.42,dur:0.16,tone:210,gate:1},d:'Arka vuruş'},
 {id:'shaker',nf:8,n:'Shaker',fam:'vur',b:1,dmg:0.4,role:'destek',u:400,v:{g:'noise',ft:'bandpass',f:6000,q:1.2,a:0.14,dur:0.06},d:'Kuru tıkırtı, aynı adımdaki silahları güçlendirir'},
 {id:'hihat',nf:8,n:'Hi-hat',fam:'vur',b:1,dmg:0.6,role:'seri',u:800,v:{g:'noise',ft:'highpass',f:7600,a:0.15,dur:0.045,open:0.14},d:'Aralardaki tıs, aksanlı açık'},
