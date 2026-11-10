@@ -23,7 +23,7 @@ src/            kaynak parçalar; build.py bunları SIRAYLA tek dosyaya yapışt
   p6_panels.js  paneller (renderPanels), sekmeler, telefon pedleri, öğretici, menajer, turne, demo, tıklama işleyicileri (data-act)
   p7_canvas.js  sahne çizimi (çember/şerit), solo sahnesi (drawSoloStage, sürükleme), WebGL son işlem, boot, window.__nb
 sf/             örnek ses paketleri (JSON içinde base64 mp3): FluidR3 (0000.json…, drums.json; tools/build_sf.py) ve CC0 yeni set (c_*.json; tools/build_sf_cc0.py)
-assets/         PWA ikonları (icon.svg kaynak; v51 “Nabız” ikonu, laboratuvar https://claude.ai/artifact/LZxJ2gUYpB76nptLeRAZng; PNG'ler tarayıcıda SVG'den çekildi)
+assets/         PWA ikonları (yeni ikon arayışı: laboratuvar https://claude.ai/artifact/LZxJ2gUYpB76nptLeRAZng; soyut adaylar beğenilmedi, yön karakter/maskot)
 tests/          Playwright testleri (python tests/run_all.py): mobile_ui_test, sf_cc0_test, v16_test, v17_test, v18_test, v19_test, v20_test, v21_test, v22_test, v24_test, v25_test, v26_test, v27_test, v31_test, v37_test, v38_test, v39_test, v41_test, v44_test, v46_test, v48_test, v49_test, v51_test
 tools/          i18n_tara.py (EN modunda görünür Türkçe metin tarayıcı; yeni metin ekleyince çalıştır, 0 olmalı), perf_olc.py (kare süresi + CPU profili, 2D/3D/telefon), ekonomi_sim.py (bot: yeni oyun, otomatik geliştirmeyle hızlı ileri sarma, dakika dakika dalga/gelir → docs/ekonomi_sim.md), build_sf.py (FluidR3 paketleri), build_sf_cc0.py (CC0 paketleri: kaynak, nota seçimi, oktav düzeltmesi, loop; ayrıntı dosyanın başında)
 export/dusmanlar/ düşman görselleri başka oyunlar için: geo_enemies.py (Python), geo_enemies.js, geo_enemies.json (veri), png/ (dönüş ve patlama kareleri); oyundaki GEO değişirse yeniden üretilmeli
