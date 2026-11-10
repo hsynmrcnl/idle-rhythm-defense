@@ -26,7 +26,7 @@ with sync_playwright() as pw:
         p = ctx.new_page(); errs = []
         p.on('pageerror', lambda e: errs.append(str(e)))
         p.goto(URL); p.wait_for_timeout(300)
-        p.evaluate("v=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.muted=true;S.d3.on=v;S.wave=10;S.bestWave=10;localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}", d3)
+        p.evaluate("v=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.muted=true;S.d3.own=1;S.d3.on=v;S.wave=10;S.bestWave=10;localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}", d3)
         p.reload(); p.wait_for_timeout(400)
         if d3:
             g = p.evaluate("()=>{const G=window.__nb.GEO;return Object.fromEntries(Object.entries(G).map(([k,v])=>[k,[v.V.length,v.F.length]]))}")

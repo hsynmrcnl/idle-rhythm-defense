@@ -7,7 +7,7 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - [ ] Karar: Stüdyo bölüm düğmelerinde küçük yazı kalsın mı (Koleksiyon'daki gibi yalnız simge de olabilir)
 - [ ] **Telefonda dene (v26):** Ayarlar → Oyunu sıfırla, sonra baştan oyna: açılış sırası ve kartlar
 - [ ] **Telefonda dene (v27):** 3D sahne (sağ üstteki 3D düğmesi), şarj ve patlama, Görünüm'de merkezler; akıcı mı, ısınma var mı
-- [ ] Karar: 3D deneme bitince geliştirme olarak kapat (`D3_TEST=false`, Görünüm'de ♪ 500.000) — fiyat ve açılış zamanı
+- [x] 3D deneme bitti (v50): `D3_TEST=false`, Görünüm'de ♪ 500.000; denemede oynayanlarda açık kalır
 
 ## 2. Kararlar (v21'de uygulandı)
 - [x] Otomatik geliştir menajerle gelir: "Menajer: otomatik geliştir" (1. albüm), Sahne kartından açılıp kapanır
