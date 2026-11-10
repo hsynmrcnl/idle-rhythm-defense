@@ -29,3 +29,17 @@
 | 30 | 20 (20) | 221,3 B | 11 | 31 (32) | 2,5 Mn | 11 | 71 |
 
 Sonuç: harcamayan oyuncu dalga 20'de duvara takılıyor (♪221 B kullanılmadan duruyor); yalnız öneriye dokunan dalga 32'ye çıkıyor. B'de de 25. dakikadan sonra ilerleme yavaşlıyor → seçenek 2 (asistan) o boşluğu doldurmalı.
+
+## Ölçüm 2 — Asistan (v49, `tools/harcamayan_sim.py 30`)
+İlk 3 dk aynı; sonra A) hiç harcamaz, B) yalnız öneri çipine dokunur, C) hiç dokunmaz, Asistan açık (dalga 15'ten sonra 20 sn'de bir, notanın en çok %25'i).
+
+| dk | A: dalga (en iyi) | A: geri | B: dalga (en iyi) | B: geri | B: öneri alımı | C: dalga (en iyi) | C: nota | C: geri |
+|---|---|---|---|---|---|---|---|---|
+| 10 | 19 (19) | 0 | 22 (22) | 0 | 0 | 19 (19) | 60,6 B | 0 |
+| 15 | 20 (20) | 2 | 28 (28) | 1 | 82 | 24 (25) | 168,2 B | 1 |
+| 20 | 18 (20) | 6 | 35 (36) | 2 | 129 | 27 (28) | 342,0 B | 3 |
+| 30 | 20 (20) | 11 | 42 (42) | 7 | 179 | 33 (34) | 486,9 B | 7 |
+
+Sonuç: hiçbir şeye dokunmayan oyuncu da Asistan'la dalga 20 duvarını geçiyor (30. dk'da 34). Öneriye dokunan hâlâ daha hızlı (%25 sınırı yok) — etkileşim ödüllendiriliyor. Not: koşular arası oynaklık büyük (B bu koşuda 42, Ölçüm 1'de 32; ilk 3 dk bile farklı), sonuçlar yön gösterir, kesin sayı değil.
+
+**Seçenek 3 (sayı ayarı):** 1 ve 2 birlikte harcamayan/az etkileşen oyuncunun duvarını kaldırdı; Aceleci'nin "fazla kolay" gözlemiyle çelişmemek için şimdilik sayılara dokunmamayı öneriyorum. İkinci oyuncu turunda (Idle, İlerleme, Acemi) yeniden bakılmalı.

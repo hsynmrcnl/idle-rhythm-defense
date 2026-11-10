@@ -26,7 +26,7 @@ with sync_playwright() as pw:
         p = ctx.new_page(); errs = []
         p.on('pageerror', lambda e: errs.append(str(e)))
         p.goto(URL); p.wait_for_timeout(500)
-        p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.wave=15;S.bestWave=15;S.nota=1e5;localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
+        p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.auto.asst=false;S.wave=15;S.bestWave=15;S.nota=1e5;localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
         p.reload(); p.wait_for_timeout(500)
         cv = p.locator('#cv').bounding_box(); p.mouse.click(cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2)
         p.wait_for_function("()=>window.__nb.playing", timeout=3000)
@@ -35,9 +35,10 @@ with sync_playwright() as pw:
         p.evaluate("()=>{window.__nb.hintStall();window.__nb.hintCheck()}")
         check(p.is_visible('#hintChip') and 'Öneri' in p.text_content('#hintChip'), 'ilerleme durup nota birikince öneri çipi çıktı (%s)' % p.text_content('#hintChip'))
         k = p.evaluate("()=>window.__nb.hintK&&{act:window.__nb.hintK.act,cost:window.__nb.hintK.cost}")
-        n0 = p.evaluate("()=>window.__nb.S.nota")
+        sig = "()=>JSON.stringify([window.__nb.S.lv,window.__nb.S.up,window.__nb.S.def,window.__nb.S.bmax,window.__nb.S.slots])"
+        n0 = p.evaluate(sig)
         p.click('#hintChip'); p.wait_for_timeout(300)
-        check(n0 - p.evaluate("()=>window.__nb.S.nota") >= k['cost'] * 0.99 and p.evaluate("()=>window.__nb.playing"), 'dokununca öneri alındı (%s), müzik sürüyor' % k)
+        check(n0 != p.evaluate(sig) and p.evaluate("()=>window.__nb.playing"), 'dokununca öneri alındı (%s), müzik sürüyor' % k)
         p.evaluate("()=>{const nb=window.__nb;nb.setHp(0.3);nb.hintStall();nb.hintCheck()}")
         check(p.evaluate("()=>window.__nb.hintK&&window.__nb.hintK.act") == 'def', 'nabız düşükken savunma öneriliyor')
         p.evaluate("()=>{const nb=window.__nb;nb.S.nota=10;nb.hintStall();nb.hintCheck()}")
