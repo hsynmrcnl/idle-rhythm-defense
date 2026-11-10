@@ -440,7 +440,7 @@ const inRect=(e,r)=>{if(!r)return false;const x=e.clientX,y=e.clientY;if(r.round
 let tKey=false;
 function tutGuard(e){const c=ovCur();if(!c)return;if(tKey&&e.type==='click')return;const L=$('tutL');if(e.target&&L&&L.contains(e.target)&&e.target.closest('button'))return;const st=c.st;
  if(e.type==='keydown'){if(st.allow&&e.key===' ')return;if(e.key==='Tab')return;e.preventDefault();e.stopPropagation();
-  if((e.key==='Enter'||e.key===' ')&&!e.repeat){if(st.kind==='btn'){ovAdvance();return}if(st.kb){st.kb();tClicked=true;setTimeout(tutTick,30);return}const t=st.tgt&&st.tgt();if(t&&t.el){tLast=t.el.dataset.act||'';tClicked=true;tKey=true;try{t.el.click()}finally{tKey=false}setTimeout(tutTick,30)}}return}
+  if(e.key==='Enter'&&!e.repeat){if(st.kind==='btn'){ovAdvance();return}if(st.kb){st.kb();tClicked=true;setTimeout(tutTick,30);return}const t=st.tgt&&st.tgt();if(t&&t.el){tLast=t.el.dataset.act||'';tClicked=true;tKey=true;try{t.el.click()}finally{tKey=false}setTimeout(tutTick,30)}}return}
  if(st.kind==='tap'&&inRect(e,tutRect)&&(!st.allow||st.allow(e))){if(e.type==='click'){const b=e.target.closest&&e.target.closest('[data-act]');tLast=b?b.dataset.act:'';tClicked=true;setTimeout(tutTick,30)}return}
  e.preventDefault();e.stopPropagation();if(e.type==='pointerdown')tutShake()}
 ['pointerdown','click','keydown'].forEach(k=>document.addEventListener(k,tutGuard,true));
