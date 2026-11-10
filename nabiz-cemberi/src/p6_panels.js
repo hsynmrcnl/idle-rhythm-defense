@@ -162,7 +162,7 @@ function renderPanels(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v50 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v51 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -366,7 +366,7 @@ const TUT=[
  {n:4,t:'Başlat',p:'Ortadaki ▶’ye dokun (ya da Enter). İbre döndükçe her vuruş çalar.',kind:'tap',kb:()=>{if(!playing){startStop();updUI()}},tgt:torb,cond:()=>playing},
  {n:5,t:'Nota',p:'Her vuruş nota kazandırır. Notayla enstrümanlarını güçlendireceksin.',kind:'btn',btn:'Devam',tgt:()=>tel('stats')},
  {n:6,t:'İlk düşman',p:'Düşmanlar kenardan merkeze yürür; vuruşların onlara ateş eder. İzle…',kind:'auto',tgt:()=>tel('cvwrap'),cond:()=>S.kills>=1},
- {n:7,t:'Ritme vur',p:'İbre bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun (ya da boşluk tuşu).',kind:'tap',rv:1,tgt:()=>tel('cvwrap'),allow:e=>!orbHit(e),cond:()=>S.seri>=1},
+ {n:7,t:'Ritme vur',p:'İbre bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun (ya da boşluk tuşu).',pt:'İbre parlak bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun. Bir kez tam zamanında dokunman yeter.',kind:'tap',rv:1,tgt:()=>tel('cvwrap'),allow:e=>!orbHit(e),cond:()=>S.seri>=1},
  {n:8,t:'Stüdyo',p:'Stüdyo’ya dokun: notayı burada harcarsın.',kind:'tap',tgt:()=>tsel('#d-studio','#t-studio'),prep:()=>{S.unl.studio=1;unlVis()},cond:()=>tab==='studio'},
  {n:9,t:'Yükselt',p:'Davul’u yükselt: her seviye vuruşları güçlendirir.',kind:'tap',tgt:()=>tel('lvb-davul'),prep:()=>{secGo('sahne');tLv0=lvOf('davul');const x=INS.find(y=>y.id==='davul');tNotaFor(lvQuote(x).c)},cond:()=>lvOf('davul')>tLv0},
  {n:10,t:'Yoğun',p:'Yoğun’a dokun: davul ritmini oyun senin yerine yazar.',kind:'tap',tgt:()=>tsel('#p-studio [data-act=alvl][data-i="0"][data-v="3"]','[data-act=alvl][data-i="0"][data-v="3"]'),prep:()=>{secGo('sahne');tNotaFor(Math.max(300,noteCost()*20))},cond:()=>S.rowm.A0===3},
@@ -426,12 +426,13 @@ function tutTick(){const L=$('tutL');if(!L)return;const c=ovCur();const on=!!c;i
  else{bb.style.left='';bb.style.right='';bb.style.width='';bb.style.margin='';if(r&&top<r.y+r.h&&top+bh>r.y)top=Math.max(12,vh-bh-12)}
  bb.style.top=top+'px';
  const done=st.cond?st.cond():(st.kind==='tap'&&tClicked);if(done)ovAdvance()}
-function tutShowL(st,lab){$('tutLN').textContent=lab;$('tutLT').textContent=T(st.t);$('tutLP').textContent=T(st.p);const b=$('tutLBtn');b.hidden=st.kind!=='btn';b.textContent=T(st.btn||'Devam');try{(b.hidden?$('tutBub'):b).focus({preventScroll:true})}catch(e){}}
-function tutShake(){const h=$('tutHole');h.classList.remove('shake');void h.offsetWidth;h.classList.add('shake');const c=ovCur();if(!c)return;const st=c.st;$('tutLP').textContent=T(st.kind==='btn'?'Balondaki düğmeye dokun.':st.kind==='auto'?'Biraz bekle: düşman yaklaşıyor.':'Parlayan yere dokun.')}
+function tutShowL(st,lab){$('tutLN').textContent=lab;$('tutLT').textContent=T(st.t);$('tutLP').textContent=T(isPhone()&&st.pt?st.pt:st.p);const b=$('tutLBtn');b.hidden=st.kind!=='btn';b.textContent=T(st.btn||'Devam');try{(b.hidden?$('tutBub'):b).focus({preventScroll:true})}catch(e){}}
+function tutShake(){const h=$('tutHole');h.classList.remove('shake');void h.offsetWidth;h.classList.add('shake');const c=ovCur();if(!c)return;const st=c.st;$('tutLP').textContent=st.kind==='btn'?T('Göz at, sonra balondaki düğmeye dokun')+': '+T(st.btn||'Devam'):T(st.kind==='auto'?'Biraz bekle: düşman yaklaşıyor.':'Parlayan yere dokun.')}
 const inRect=(e,r)=>{if(!r)return false;const x=e.clientX,y=e.clientY;if(r.round){const cx=r.x+r.w/2,cy=r.y+r.h/2;return Math.hypot(x-cx,y-cy)<=r.w/2}return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h};
-function tutGuard(e){const c=ovCur();if(!c)return;const L=$('tutL');if(e.target&&L&&L.contains(e.target)&&e.target.closest('button'))return;const st=c.st;
+let tKey=false;
+function tutGuard(e){const c=ovCur();if(!c)return;if(tKey&&e.type==='click')return;const L=$('tutL');if(e.target&&L&&L.contains(e.target)&&e.target.closest('button'))return;const st=c.st;
  if(e.type==='keydown'){if(st.allow&&e.key===' ')return;if(e.key==='Tab')return;e.preventDefault();e.stopPropagation();
-  if(e.key==='Enter'&&!e.repeat){if(st.kind==='btn'){ovAdvance();return}if(st.kb){st.kb();tClicked=true;setTimeout(tutTick,30);return}const t=st.tgt&&st.tgt();if(t&&t.el){tLast=t.el.dataset.act||'';tClicked=true;t.el.click();setTimeout(tutTick,30)}}return}
+  if((e.key==='Enter'||e.key===' ')&&!e.repeat){if(st.kind==='btn'){ovAdvance();return}if(st.kb){st.kb();tClicked=true;setTimeout(tutTick,30);return}const t=st.tgt&&st.tgt();if(t&&t.el){tLast=t.el.dataset.act||'';tClicked=true;tKey=true;try{t.el.click()}finally{tKey=false}setTimeout(tutTick,30)}}return}
  if(st.kind==='tap'&&inRect(e,tutRect)&&(!st.allow||st.allow(e))){if(e.type==='click'){const b=e.target.closest&&e.target.closest('[data-act]');tLast=b?b.dataset.act:'';tClicked=true;setTimeout(tutTick,30)}return}
  e.preventDefault();e.stopPropagation();if(e.type==='pointerdown')tutShake()}
 ['pointerdown','click','keydown'].forEach(k=>document.addEventListener(k,tutGuard,true));
@@ -721,11 +722,12 @@ function rolePrio(si,pk){const x=slotIns(si),N=MI.N,gs=MI.gs,mids=MI.mids.filter
 function autoPicks(si,pk,lv){const x=slotIns(si);if(!x)return[];const p=S.pat[pk],nf=Math.floor(nefesOf(si,pk)),pr=rolePrio(si,pk),frac=EZ_LV[lv-1][2];
  /* uyumu tutan en az sayı korunur (davul tüm vuruş başları, trampet 2 ve 4); kalan sıklık seviyeye göre */
  const keep=x.role==='darbe'?MI.gs.length:(x.role==='keskin'&&x.fam==='vur')?Math.max(1,Math.floor(MI.gs.length/2)):x.role==='kalkan'?MI.gs.length:x.role==='yavas'||x.role==='delici'||x.role==='titresim'?2:1;
- let n=x.role==='alan'?1:Math.min(nf,Math.max(keep,Math.round(nf*frac)));
+ /* v51: Darbe'nin ölçü başı vurgusu yükte 2 sayılır; nefese sığsın diye bir yer ayrılır (yoksa otomatik davul hep ×0,72 cezalıydı) */
+ const cap=x.role==='darbe'&&nf-1>=keep?nf-1:nf;let n=x.role==='alan'?1:Math.min(cap,Math.max(keep,Math.round(nf*frac)));
  const out=[];for(const s of pr){if(out.length>=n)break;let c=0;for(let i=0;i<S.slots.length;i++)if(i!==si&&p[i][s])c++;if(c>=5)continue;out.push(s)}return out}
 const rowOf=st=>{const r=Array(18).fill(0);st.forEach(s=>r[s]=1);return r};
 /* v35: otomatik desende vuruş enstrümanının (Darbe rolü, ör. davul) ölçü başı vurgulu: şarj kendiliğinden dolar (ekonomi_sim: vurgusuz desenle 60 dk'da 0 patlama) */
-const rowOfA=(si,st)=>{const r=rowOf(st),x=slotIns(si);if(x&&x.role==='darbe'&&r[0])r[0]=2;return r};
+const rowOfA=(si,st)=>{const r=rowOf(st),x=slotIns(si);if(x&&x.role==='darbe'&&r[0]&&st.length+1<=nefesOf(si,'A'))r[0]=2;return r};
 /* sis: yazılacak satırlar (null = elle düzenlenmemiş hepsi), lv: seviye (0 = satırın son seviyesi ya da Yoğun). Bağımlılık sırası: davul → trampet → … → bas → melodi.
    Bedel ödenir; nota yetmezse en kalabalık satırdan başlayarak kısaltır. Kolay'da ve B açıksa nakarat da yazılır. */
 function autoRows(sis,lv){const pks=['A'].concat(hasB()&&S.am.nakarat?['B']:[]),skipped=[];let spent=0,wrote=0;
