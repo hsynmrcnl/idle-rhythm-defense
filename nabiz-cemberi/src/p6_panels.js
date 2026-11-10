@@ -164,7 +164,7 @@ function renderPanels(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v55 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v56 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -839,7 +839,7 @@ $('stats').addEventListener('click',anlTry);
 $('stats').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();anlTry()}});
 $('anl').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;if(b.dataset.a==='close'){anlToggle(false);return}
  if(b.dataset.a==='buy'){const k=anlSug[+b.dataset.i];if(!k)return;rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});renderAnl()}});
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(anlOn){anlToggle(false);return}if(S.edit==='S'&&soloView()>=0&&!isField(document.activeElement))soloExit()});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(anlOn){anlToggle(false);return}if(demoMode&&!isField(document.activeElement)){exitDemo();return}if(S.edit==='S'&&soloView()>=0&&!isField(document.activeElement))soloExit()});
 setInterval(()=>{if(anlOn)renderAnl()},1000);
 let demoIdx=0;
 function enterDemo(k){k=DEMOS[k]?k:0;if(demoMode){if(k===demoIdx&&!shareOn)return;S=JSON.parse(demoSnap);demoMode=false}demoIdx=k;playSong(JSON.parse(JSON.stringify(DEMOS[k])),k)}
@@ -850,7 +850,7 @@ function playSong(D,k){shareOn=k<0;if(demoMode){S=JSON.parse(demoSnap);demoMode=
  /* solo notaları: elle yazılmışsa (D.solos) aynen, yoksa her solo yeri için stilden üretilir */
  S.solos={};Object.keys(D.solo||{}).forEach(si=>{const h=D.solos&&D.solos[si];const st=(h&&h.style)||D.soloStyle||'taksim';S.solos[si]=h&&Array.isArray(h.notes)?{notes:h.notes,style:st,seed:4242}:{notes:genSolo(+si,st,4242),style:st,seed:4242}});
  recalc();renderPanels();unlVis();syncFx();if(!playing)startStop();else startWave(1,nowT());
- $('demo').textContent='Kendi oyununa dön';const d2=$('demo2');if(d2){d2.hidden=shareOn||DEMOS.length<2;d2.textContent=T('Diğer örnek şarkı')+' · '+DEMOS[(k+1)%DEMOS.length].name}tutShow();if(shareOn){msg('Paylaşılan şarkı çalıyor · kendi şarkın için: Kendi oyununa dön');shareBar(true)}else msg('Örnek şarkı '+(k+1)+': '+D.name+' · '+D.msg);}
+ $('demo').textContent=T('Kendi oyununa dön');const d2=$('demo2');if(d2){d2.hidden=shareOn||DEMOS.length<2;d2.textContent=T('Diğer örnek şarkı')+' · '+DEMOS[(k+1)%DEMOS.length].name}tutShow();if(shareOn){msg('Paylaşılan şarkı çalıyor · kendi şarkın için: Kendi oyununa dön');shareBar(true)}else msg('Örnek şarkı '+(k+1)+': '+D.name+' · '+D.msg);}
 function exitDemo(){if(!demoMode)return;if(shareOn){shareOn=false;shareBar(false);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}S=JSON.parse(demoSnap);demoMode=false;songRewind();undoReset();MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};soloSel=-1;soloEdSlot=-1;recalc();renderPanels();syncFx();if(playing)startWave(S.wave,nowT());$('demo').textContent='Örnek şarkıyı dinle';const d2=$('demo2');if(d2)d2.hidden=true;unlVis();if(!tabOn(tab)||!$('p-lock').hidden)setTab(isPhone()?'stage':'studio');tutShow();msg('Kendi oyununa döndün')}
 /* v39 şarkı paylaşma: şarkı (yerler, seviyeler, desenler, tempo, ölçü, gam, plan, akorlar, sololar, sahne) sıkıştırılıp adrese yazılır (#s=…); bağlantıyı açan örnek şarkı gibi dinler, "Kendi oyununa dön" ile kendi oyununa geçer */
 let shareOn=false;

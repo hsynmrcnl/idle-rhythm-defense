@@ -174,7 +174,9 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .gear[aria-selected="true"]{color:var(--acc);border-color:var(--acc);box-shadow:0 0 10px -2px var(--acc)}
 .gear[aria-selected="true"] svg{filter:drop-shadow(0 0 3px var(--acc))}
 .gear:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.dock,.subnav,.demochip{display:none}
+.dock,.subnav{display:none}
+/* v56: örnek şarkı çipi masaüstünde de sahnenin sol üstünde (çıkış sayfanın altındaydı) */
+.demochip{display:none}.demochip:not([hidden]){display:inline-flex;position:absolute;top:8px;left:8px;z-index:2;font-family:var(--f-m);font-size:12px;padding:8px 10px;border-radius:8px;border:1px solid var(--hot);background:var(--panel);color:var(--fg);cursor:pointer}
 #verTag{display:block;margin-top:14px}
 #setBox .seg{justify-self:start}
 /* v14 kartlar: her bölüm ayrı kart, açıklama ⓘ'da; Ritim stüdyosu ve Savunma kutucuklu */
