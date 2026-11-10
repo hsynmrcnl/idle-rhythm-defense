@@ -416,7 +416,7 @@ const GEO=(()=>{const TAU_=Math.PI*2,PHI=(1+Math.sqrt(5))/2,pm=[1,-1],sb=(a,b)=>
   igne:solid([[0,0,1.7],[0,0,-1.7],[0.5,0,0],[-0.5,0,0],[0,0.5,0],[0,-0.5,0]]),kama:solid([[0,0,1.5],[0.8,0.8,-0.7],[-0.8,0.8,-0.7],[0.8,-0.8,-0.7],[-0.8,-0.8,-0.7]])}})();
 const GEO_OF={memur:'kup',kurye:'tetra',stajyer:'okta',avukat:'prizma',sansurcu:'ikosa',denetci:'dodeka',mudur:'yildiz',ceo:'elmas'};
 /* v58 akıncı görünümü: kızıl, %35 iri, üstünde ince can çubuğu */
-const RAID_COL='#ff3d5a';let RAID_GEO='tetra';
+const RAID_COL='#ff3d5a';let RAID_GEO='igne';
 const GEO_COL={memur:'#3ff2d2',kurye:'#ffb054',stajyer:'#5ab0ff',avukat:'#b98bff',sansurcu:'#ff3fb4',denetci:'#ffd166',mudur:'#ff5468',ceo:'#ff8ff0'};
 const GEO_SPIN={kurye:2.2,stajyer:1.6,avukat:0.9,denetci:0.7,mudur:0.8,ceo:0.6};
 const GLGT=(()=>{const v=[-0.45,0.55,0.75],l=Math.hypot(...v);return v.map(x=>x/l)})(),gdt=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
