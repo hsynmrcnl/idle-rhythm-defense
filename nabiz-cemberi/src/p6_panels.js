@@ -113,7 +113,10 @@ function slotRowHtml(si,th){
  const L=lvOf(x.id),nx=MS.find(m=>m>L),w=isWeapon(x.role);
  return '<div class="slot"><span class="dot" style="--c:'+col+'"></span><span>'+sel+'<span class="ds"><span class="role">'+roleName(x.role)+'</span> <span class="lvl">Sv '+L+'</span> ♪ '+fmt(noteVal(si,1))+(w||x.role==='titresim'?' · hasar '+fmt(dmgOf(si,1)):'')+' · '+(isSolo(si)?'<span style="color:var(--hot)">SOLO · döngüde normal çalar, solo bölümünde solo desenini ×3 çalar</span> · ':'')+(needleOf(si)>1?'<span style="color:var(--acc)">'+NEEDLES[needleOf(si)-1].n+'</span> · ':'')+nefesTxt(si)+rowMultTxt(si)+(nx?' · '+nx+'. seviyede ×2':'')+(muteUntil[si]>nowT()?' · SUSTURULDU':'')+'</span></span><span class="act">'+((S.up.needle2||S.up.needle3)?'<span class="seg" title="İbre">'+[1,2,3].filter(k=>k===1||(k===2&&S.up.needle2)||(k===3&&S.up.needle3)).map(k=>'<button data-act="needle" data-i="'+si+'" data-k="'+k+'" aria-pressed="'+(needleOf(si)===k)+'" aria-label="'+NEEDLES[k-1].n+'">'+k+'</button>').join('')+'</span>':'')+(S.up.solo?'<button class="btn'+(isSolo(si)?' ready':' ghost')+'" data-act="solo" data-i="'+si+'" aria-pressed="'+isSolo(si)+'">Solo</button>':'')+'<button class="btn ghost" data-act="clearRow" data-i="'+si+'" title="Bu yerin vuruşlarını kaldır" aria-label="Yeri temizle">×</button><button class="btn" id="lvb-'+x.id+'" data-act="lv" data-id="'+x.id+'" data-cost="0"></button></span></div>';
 }
-function renderPanels(){
+/* v57: paneller yeniden çizilince klavye odağı aynı düğmede kalır (Enter'la basılan düğme kayboluyor, odak panel başına dönüyordu) */
+function focusKey(){const e=document.activeElement;if(!e||!e.dataset||!e.dataset.act||!e.closest('#rack'))return null;if(e.id)return '#'+e.id;const d=e.dataset;let q='[data-act="'+d.act+'"]';for(const k of ['i','id','v','k','f','s'])if(d[k]!=null)q+='[data-'+k+'="'+d[k]+'"]';const sec=e.parentElement.closest('[id]');return (sec&&sec.id?'#'+sec.id+' ':'#rack ')+q}
+function renderPanels(){const fk=focusKey();renderPanels0();if(fk&&(!document.activeElement||document.activeElement===document.body)){try{const el=document.querySelector(fk);if(el)el.focus({preventScroll:true})}catch(e){}}}
+function renderPanels0(){
  const th=dispTheme(),p=S.pat[S.edit];
  $('buyMode').innerHTML=[[1,'×1'],[10,'×10'],[0,'Maks']].map(([v,l])=>'<button data-act="buy" data-v="'+v+'" aria-pressed="'+(S.buy===v)+'">'+T(l)+'</button>').join('');$('undoBox').innerHTML=undoBtn();
  $('slotList').innerHTML=S.slots.map((id,si)=>easy('sahne')?slotRowEasy(si,th):slotRowHtml(si,th)).join('');renderPads();if(ac)sfLoadStage();
@@ -164,7 +167,7 @@ function renderPanels(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v56 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v57 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -430,7 +433,7 @@ function tutTick(){const L=$('tutL');if(!L)return;const c=ovCur();const on=!!c;i
  else{h.style.cssText='left:50%;top:40%;width:0;height:0';bd.toggleAttribute('hidden',true)}
  bd.style.setProperty('--bt',(60/(S.bpm||100)).toFixed(3)+'s');
  const vh=innerHeight,vw=innerWidth,bh=bb.offsetHeight||120;let top=r?r.y+r.h+16:vh*0.3;if(top+bh>vh-12)top=Math.max(12,(r?r.y:vh*0.3)-bh-16);
- if(r&&top<r.y+r.h&&top+bh>r.y&&vw>vh*1.3){/* yatay ekran: balon hedefin yanına */const w=Math.min(380,vw*0.42),lx=r.x+r.w/2<vw/2?Math.min(vw-w-12,r.x+r.w+16):Math.max(12,r.x-w-16);bb.style.left=lx+'px';bb.style.right='auto';bb.style.width=w+'px';bb.style.margin='0';top=Math.min(Math.max(12,r.y+r.h/2-bh/2),vh-bh-12)}
+ if(r&&vw>vh*1.3&&(vh<=520||top<r.y+r.h&&top+bh>r.y)){/* yatay ekran: balon hedefin yanına; v57: yatay telefonda her zaman hedefin karşı yarısına (halkanın geri kalanını örtüyordu) */const w=Math.min(380,vw*0.42),lx=r.x+r.w/2<vw/2?Math.min(vw-w-12,Math.max(r.x+r.w+16,vw*0.52)):Math.max(12,Math.min(r.x-w-16,vw*0.48-w));bb.style.left=lx+'px';bb.style.right='auto';bb.style.width=w+'px';bb.style.margin='0';top=Math.min(Math.max(12,r.y+r.h/2-bh/2),vh-bh-12)}
  else{bb.style.left='';bb.style.right='';bb.style.width='';bb.style.margin='';if(r&&top<r.y+r.h&&top+bh>r.y)top=Math.max(12,vh-bh-12)}
  bb.style.top=top+'px';
  const done=st.cond?st.cond():(st.kind==='tap'&&tClicked);if(done)ovAdvance()}
@@ -438,8 +441,10 @@ function tutShowL(st,lab){$('tutLN').textContent=lab;$('tutLT').textContent=T(st
 function tutShake(){const h=$('tutHole');h.classList.remove('shake');void h.offsetWidth;h.classList.add('shake');const c=ovCur();if(!c)return;const st=c.st;$('tutLP').textContent=st.kind==='btn'?T('Göz at, sonra balondaki düğmeye dokun')+': '+T(st.btn||'Devam'):T(st.kind==='auto'?'Biraz bekle: düşman yaklaşıyor.':'Parlayan yere dokun.')}
 const inRect=(e,r)=>{if(!r)return false;const x=e.clientX,y=e.clientY;if(r.round){const cx=r.x+r.w/2,cy=r.y+r.h/2;return Math.hypot(x-cx,y-cy)<=r.w/2}return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h};
 let tKey=false;
-function tutGuard(e){const c=ovCur();if(!c)return;if(tKey&&e.type==='click')return;const L=$('tutL');if(e.target&&L&&L.contains(e.target)&&e.target.closest('button'))return;const st=c.st;
- if(e.type==='keydown'){if(st.allow&&e.key===' ')return;if(e.key==='Tab')return;e.preventDefault();e.stopPropagation();
+function tutGuard(e){const c=ovCur();if(!c)return;if(tKey&&e.type==='click')return;
+ if(e.type==='keydown'&&e.key==='Tab'){/* v57: Tab balonun içinde kalır */e.preventDefault();const bs=[$('tutSkipL'),$('tutLBtn')].filter(b=>b&&!b.hidden);if(bs.length){const i=bs.indexOf(document.activeElement);bs[(i+(e.shiftKey?bs.length-1:1)+bs.length)%bs.length].focus()}else $('tutBub').focus();return}
+ const L=$('tutL');if(e.target&&L&&L.contains(e.target)&&e.target.closest('button'))return;const st=c.st;
+ if(e.type==='keydown'){if(st.allow&&e.key===' ')return;e.preventDefault();e.stopPropagation();
   if(e.key==='Enter'&&!e.repeat){if(st.kind==='btn'){ovAdvance();return}if(st.kb){st.kb();tClicked=true;setTimeout(tutTick,30);return}const t=st.tgt&&st.tgt();if(t&&t.el){tLast=t.el.dataset.act||'';tClicked=true;tKey=true;try{t.el.click()}finally{tKey=false}setTimeout(tutTick,30)}}return}
  if(st.kind==='tap'&&inRect(e,tutRect)&&(!st.allow||st.allow(e))){if(e.type==='click'){const b=e.target.closest&&e.target.closest('[data-act]');tLast=b?b.dataset.act:'';tClicked=true;setTimeout(tutTick,30)}return}
  e.preventDefault();e.stopPropagation();if(e.type==='pointerdown')tutShake()}
