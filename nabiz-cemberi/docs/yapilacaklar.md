@@ -11,6 +11,8 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 
 - [x] **İkon (v52):** yatık sahne (E1 temelli; kristal büyük, renkli vuruşlar, yıldızsız). Laboratuvar: https://claude.ai/artifact/LZxJ2gUYpB76nptLeRAZng
 
+- [x] **Denge kararları (10 Kasım, Hüseyin kararı Claude'a bıraktı):** (1) Seviye ↔ yeni enstrüman dengesi şimdilik değişmez: seviye idle döngüsünün çekirdeği, yeni enstrümanın değeri uyum çarpanı ve açtığı bölümlerde; v53'ten beri öneri çipi ve Asistan yeni enstrümanı kendiliğinden açıyor. (2) Orta oyunda tehdit: sayılara şimdilik dokunulmaz; v51 (davul +%39) ve v54 (Asistan çoklu alım) ilerlemeyi yeni değiştirdi, test aracındaki donma hatası da önceki ölçümleri bozmuştu. Sonraki oyuncu turunda (v57) dalga 10–25 arası nabız ve geri çekilme ölçülüp ona göre düşman can artışı (×1,19/dalga) ayarlanır.
+
 ## 2. Kararlar (v21'de uygulandı)
 - [x] Otomatik geliştir menajerle gelir: "Menajer: otomatik geliştir" (1. albüm), Sahne kartından açılıp kapanır
 - [x] Sahne katmanları gelire gerçekten ×1,1 ekler (Analiz'de de görünür)
