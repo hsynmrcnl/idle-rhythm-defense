@@ -413,6 +413,8 @@ const GEO=(()=>{const TAU_=Math.PI*2,PHI=(1+Math.sqrt(5))/2,pm=[1,-1],sb=(a,b)=>
   cube.forEach((p,ci)=>{[[oi(0,p[0]),oi(1,p[1])],[oi(1,p[1]),oi(2,p[2])],[oi(2,p[2]),oi(0,p[0])]].forEach(([u,w])=>{const tri=[ci,u,w],c=tri.reduce((s,i)=>[s[0]+NV[i][0],s[1]+NV[i][1],s[2]+NV[i][2]],[0,0,0]);let n=cr(sb(NV[u],NV[ci]),sb(NV[w],NV[ci]));const l=Math.hypot(...n);n=n.map(x=>x/l);if(dt(n,c)<0){n=n.map(x=>-x);tri.reverse()}F.push({v:tri,n})})});return{V:NV,F}})();
  return{kup:solid(cube),tetra:solid([[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]]),okta:solid([[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]),ikosa:solid(ico),dodeka:solid(dod),prizma:solid(prism),elmas:solid(gem),yildiz:star}})();
 const GEO_OF={memur:'kup',kurye:'tetra',stajyer:'okta',avukat:'prizma',sansurcu:'ikosa',denetci:'dodeka',mudur:'yildiz',ceo:'elmas'};
+/* v58 akıncı görünümü: kızıl, %35 iri, üstünde ince can çubuğu */
+const RAID_COL='#ff3d5a';
 const GEO_COL={memur:'#3ff2d2',kurye:'#ffb054',stajyer:'#5ab0ff',avukat:'#b98bff',sansurcu:'#ff3fb4',denetci:'#ffd166',mudur:'#ff5468',ceo:'#ff8ff0'};
 const GEO_SPIN={kurye:2.2,stajyer:1.6,avukat:0.9,denetci:0.7,mudur:0.8,ceo:0.6};
 const GLGT=(()=>{const v=[-0.45,0.55,0.75],l=Math.hypot(...v);return v.map(x=>x/l)})(),gdt=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
@@ -429,7 +431,7 @@ function geoState(e,g,sz){const sh=GEO[GEO_OF[e.ty]]||GEO.kup,sp=GEO_SPIN[e.ty]|
  else{const [x,y]=enemyPos(e,g),s2=sz*(1+0.18*bob);proj=q=>[x+q[0]*s2,y+q[1]*s2];C=[0,0,1];ctr=[x,y];sh0=null}
  const Q=sh.V.map(v=>gMul(M,v)),P2=Q.map(proj);
  const faces=sh.F.map(f=>{const n=gMul(M,f.n);return{v:f.v,n,vis:gdt(n,C),cz:f.v.reduce((s,i)=>s+gdt(Q[i],C),0)/f.v.length,lit:Math.max(0,gdt(n,GLGT))}}).filter(o=>o.vis>1e-3).sort((a,b)=>a.cz-b.cz);
- return{P2,faces,ctr,sh0,shR,col:GEO_COL[e.ty]||'#9aa0c8'}}
+ return{P2,faces,ctr,sh0,shR,col:e.raid?RAID_COL:GEO_COL[e.ty]||'#9aa0c8'}}
 function drawGeo(e,th,g,sz){const s=geoState(e,g,sz),fl=clamp(e.flash,0,1),col=s.col,glow=!th.light;
  if(s.sh0){ctx.fillStyle=th.light?'rgba(0,0,0,0.15)':'rgba(0,0,0,0.4)';ctx.beginPath();ctx.ellipse(s.sh0[0],s.sh0[1],s.shR[0],s.shR[1],0,0,TAU);ctx.fill()}
  ctx.save();ctx.lineJoin='round';
@@ -447,7 +449,7 @@ function drawFrags(dt,th){if(!frags.length)return;ctx.save();
   const c=Math.cos(f.rot),sn=Math.sin(f.rot),sc=0.6+0.4*f.life;ctx.globalAlpha=Math.min(1,f.life*1.5);ctx.beginPath();f.rel.forEach((p,i)=>{const x=f.x+(p[0]*c-p[1]*sn)*sc,y=f.y+(p[0]*sn+p[1]*c)*sc;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.closePath();ctx.fillStyle=gTone(f.col,0.75+0.6*f.lit);ctx.fill()}
  ctx.restore()}
 /* doğma efekti: halka + beyaz nokta, 3D'de yerden ışık sütunu; boss'ta daha uzun ve büyük: zeminde ışık havuzu, üç halka, kalın ve yüksek sütun, belirdiği anda sarsıntı */
-function spawnFx(e,th,g,sz,ap){const col=GEO_COL[e.ty]||th.cv.acc,B=e.boss,k=1-ap;ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';
+function spawnFx(e,th,g,sz,ap){const col=e.raid?RAID_COL:GEO_COL[e.ty]||th.cv.acc,B=e.boss,k=1-ap;ctx.save();if(!th.light)ctx.globalCompositeOperation='lighter';
  let b;if(D3){const gp=enemyGround(e,g);b=pj(gp[0],gp[1],0);const hk=B?(ap<0.5?1:2*k):k,h=sz*(B?16:7)*hk,w=sz*(B?1.3:0.45),gr=ctx.createLinearGradient(0,b[1]-h,0,b[1]);gr.addColorStop(0,hexA(col,0));gr.addColorStop(1,hexA(col,(B?0.85:0.7)*hk));ctx.fillStyle=gr;ctx.fillRect(b[0]-w,b[1]-h,w*2,h);if(B){ctx.fillStyle=hexA('#ffffff',0.6*hk);ctx.fillRect(b[0]-w*0.25,b[1]-h,w*0.5,h)}}else b=enemyPos(e,g);
  const ey=D3?sinE:1;
  if(B){const R=sz*3.2,gl=ctx.createRadialGradient(b[0],b[1],0,b[0],b[1],R);gl.addColorStop(0,hexA(col,0.55*Math.sin(Math.PI*ap)));gl.addColorStop(1,hexA(col,0));ctx.save();ctx.translate(b[0],b[1]);ctx.scale(1,ey);ctx.translate(-b[0],-b[1]);ctx.fillStyle=gl;ctx.beginPath();ctx.arc(b[0],b[1],R,0,TAU);ctx.fill();ctx.restore();
@@ -455,7 +457,7 @@ function spawnFx(e,th,g,sz,ap){const col=GEO_COL[e.ty]||th.cv.acc,B=e.boss,k=1-a
  else{const R=sz*(0.6+2.4*ap);ctx.strokeStyle=hexA(col,0.9*k);ctx.lineWidth=1+2.5*k;ctx.beginPath();ctx.ellipse(b[0],b[1],R,R*ey,0,0,TAU);ctx.stroke()}
  ctx.fillStyle=hexA('#ffffff',0.8*k);ctx.beginPath();ctx.arc(b[0],b[1]-(D3?sz:0),sz*(B?0.6:0.35)*k+0.5,0,TAU);ctx.fill();ctx.restore()}
 function drawEnemy(e,th,g){
- const [x,y]=enemyPos(e,g),T=ETYPES[e.ty],sz=0.022*g.R*T.r*(e.boss?1.4:1)*GEO_K;
+ const [x,y]=enemyPos(e,g),T=ETYPES[e.ty],sz=0.022*g.R*T.r*(e.boss?1.4:e.raid?1.35:1)*GEO_K;
  /* doğma: ilk 0,55 sn küçükten sekerek büyür, altında halka açılır (3D'de yerden ışık sütunu); kenarda birden belirmesin */
  if(e.sp0==null)e.sp0=clock;const ap=RM?1:Math.min(1,(clock-e.sp0)/(e.boss?1.3:0.55));
  /* boss önce ışık olarak belirir (ilk %35), sonra sekerek büyür; büyümeye başladığı an sahne sarsılır */
@@ -464,6 +466,7 @@ function drawEnemy(e,th,g){
  if(e.slowT>0||e.dotT>0){ctx.strokeStyle=e.dotT>0?th.cv.warn:th.cv.acc;ctx.lineWidth=1;ctx.setLineDash([2,3]);ctx.beginPath();ctx.arc(0,0,sz*1.5,0,TAU);ctx.stroke();ctx.setLineDash([])}
  if(e.stun>0){ctx.fillStyle=th.cv.warn;for(let k=0;k<3;k++){const a=clock*8+k*TAU/3;ctx.fillRect(Math.cos(a)*sz*1.6-1,Math.sin(a)*sz*1.6-1-sz*0.6,2,2)}}
  ctx.restore();
+ if(e.raid&&ap>=1){const w=sz*2.2,by=y-sz*(D3?2.6:1.7);ctx.fillStyle=hexA(th.cv.ink,0.25);ctx.fillRect(x-w/2,by,w,2);ctx.fillStyle=RAID_COL;ctx.fillRect(x-w/2,by,w*clamp(e.hp/e.hpMax,0,1),2)}
  if(e.boss){const w=sz*3,by=y-sz*(D3?2.9:1.9);ctx.fillStyle=hexA(th.cv.ink,0.25);ctx.fillRect(x-w/2,by,w,3);ctx.fillStyle=GEO_COL[e.ty]||th.en.boss;ctx.fillRect(x-w/2,by,w*clamp(e.hp/e.hpMax,0,1),3);ctx.fillStyle=hexA(th.cv.ink,0.8);ctx.font='600 10px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(T.n,x,by-2)}
 }
 function drawVfx(dt,g,th){
