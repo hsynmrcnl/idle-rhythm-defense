@@ -21,7 +21,7 @@ def check(ok, what):
     print(('  ok  ' if ok else '  FAIL ') + what)
     if not ok: fails.append(what)
 
-SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.nota=1e4;S.muted=true;
+SEED = """()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.d3.own=1;S.nota=1e4;S.muted=true;
   localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}"""
 # 2D'de 0. halkanın s. hücresinin ekran konumu (çember düzeni, neon: dönme yok)
 CELL = """s=>{const nb=window.__nb,L=nb.L,b=document.getElementById('cv').getBoundingClientRect(),R=L/2,ph=L<480,rIn=(ph?0.15:0.2)*R,rOut=0.74*R,
@@ -41,7 +41,7 @@ with sync_playwright() as pw:
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(400)
     d3 = p.evaluate("()=>window.__nb.S.d3")
-    check(d3['own'] == 1 and d3['on'] == 1 and d3['core'] == 'kristal', 'yeni oyunda 3D geliştirmesi alınmış (deneme) ve açık (%s)' % d3)
+    check(d3['own'] == 0 and d3['core'] == 'kristal', 'yeni oyunda 3D alınmamış: Görünüm’de ♪ 500.000 (%s)' % d3)
     p.wait_for_timeout(200)
     check(not p.evaluate("()=>window.__nb.D3") and not p.is_visible('#v3d'), 'ilk öğretici sürerken sahne 2D (halkaya dokunarak ritim yazdırır), düğme gizli')
     p.evaluate(SEED); p.reload(); p.wait_for_timeout(500)
@@ -162,7 +162,7 @@ with sync_playwright() as pw:
     ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); p = ctx.new_page(); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(300)
-    p.evaluate("""()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.nota=1e6;S.muted=true;S.slots=['davul','trampet','gitar',null];S.lv={davul:3,trampet:2,gitar:3};
+    p.evaluate("""()=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.d3.own=1;S.nota=1e6;S.muted=true;S.slots=['davul','trampet','gitar',null];S.lv={davul:3,trampet:2,gitar:3};
       S.up.solo=1;S.up.sdevir=1;S.up.suzun=1;S.up.sef=1;S.plan=Array(8).fill('solo');S.solo={2:1};
       S.solos={2:{notes:[{t:0,len:4,r:0,art:'none'},{t:8,len:6,r:5,art:'vib'},{t:20,len:4,r:3,art:'none'}],style:'hendrix'}};localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}""")
     p.reload(); p.wait_for_timeout(400)
@@ -186,7 +186,7 @@ with sync_playwright() as pw:
     print('EN')
     ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); p = ctx.new_page()
     p.goto(URL); p.wait_for_timeout(300)
-    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.lang='en';S.tut={s:0,done:true};nb.unlockAll();localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
+    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.lang='en';S.tut={s:0,done:true};nb.unlockAll();S.d3.own=1;localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
     p.reload(); p.wait_for_timeout(400); p.click('#d-look'); p.wait_for_timeout(150)
     t = p.inner_text('#p-look').lower()
     check(all(k in t for k in ('3d stage', 'center', 'crystal', 'orb', 'sun', 'record', 'in use', 'tap beat')) and 'kristal' not in t and 'merkez' not in t, '3D bölümü İngilizce')

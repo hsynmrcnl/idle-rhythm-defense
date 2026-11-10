@@ -31,14 +31,14 @@ with sync_playwright() as pw:
         if name == 'telefon_ogretici':
             p.click('#tutLBtn'); p.wait_for_timeout(900)
         else:
-            p.evaluate(SEED); p.evaluate("v=>{window.__nb.S.d3.on=v}", d3); p.reload(); p.wait_for_timeout(500)
+            p.evaluate(SEED); p.evaluate("v=>{window.__nb.S.d3.own=1;window.__nb.S.d3.on=v}", d3); p.reload(); p.wait_for_timeout(500)
             p.evaluate("k=>{document.querySelector('#t-set')&&0}", 0)
             p.evaluate("k=>{const b=[...document.querySelectorAll('[data-act=demoGo]')].find(x=>x.dataset.k==String(k));if(b)b.click()}", demo2)
             p.wait_for_timeout(7000)
         p.screenshot(path=os.path.join(OUT, name + '.png')); ctx.close()
     # kapak 630×500
     ctx = b.new_context(viewport={'width': 630, 'height': 500}); p = ctx.new_page(); p.goto(URL); p.wait_for_timeout(500)
-    p.evaluate(SEED); p.evaluate("()=>{window.__nb.S.d3.on=1}"); p.reload(); p.wait_for_timeout(500)
+    p.evaluate(SEED); p.evaluate("()=>{window.__nb.S.d3.own=1;window.__nb.S.d3.on=1}"); p.reload(); p.wait_for_timeout(500)
     p.evaluate("()=>{const b=document.querySelector('[data-act=demoGo]');if(b)b.click()}"); p.wait_for_timeout(7000)
     p.locator('#cv').screenshot(path=os.path.join(OUT, 'kapak_kaynak.png')); ctx.close()
     b.close()

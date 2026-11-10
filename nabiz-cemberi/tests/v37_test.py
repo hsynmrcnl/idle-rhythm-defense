@@ -26,7 +26,7 @@ with sync_playwright() as pw:
         p = ctx.new_page(); errs = []
         p.on('pageerror', lambda e: errs.append(str(e)))
         p.goto(URL); p.wait_for_timeout(300)
-        p.evaluate("v=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.d3.on=v;S.wave=3;S.bestWave=3;localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}", d3)
+        p.evaluate("v=>{const nb=window.__nb,S=nb.S;S.tut={s:0,done:true};nb.unlockAll();S.d3.own=1;S.d3.on=v;S.wave=3;S.bestWave=3;localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}", d3)
         p.reload(); p.wait_for_timeout(400)
         cv = p.locator('#cv').bounding_box(); cx, cy = cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2
         p.mouse.click(cx, cy); p.wait_for_timeout(800)
