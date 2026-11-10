@@ -465,6 +465,11 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .pulse .pv{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .pulse.danger .hp{background:var(--hot);box-shadow:0 0 8px var(--hot);animation:pdanger .9s ease-in-out infinite}
 @keyframes pdanger{50%{opacity:.3}}
+/* v48 harcama ipucu: ilerleme durup nota birikince sahnenin altında parlayan öneri */
+.hintchip{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:8px;max-width:calc(100% - 24px);font:600 13px var(--f-m);padding:9px 14px;min-height:42px;border-radius:12px;border:1px solid var(--acc);background:color-mix(in srgb,var(--panel) 90%,transparent);color:var(--fg);cursor:pointer;box-shadow:0 0 18px color-mix(in srgb,var(--acc) 45%,transparent);animation:hintp 1.6s ease-in-out infinite;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hintchip b{color:var(--acc);font-weight:700}
+@keyframes hintp{50%{box-shadow:0 0 30px color-mix(in srgb,var(--acc) 70%,transparent)}}
+@media (prefers-reduced-motion: reduce){.hintchip{animation:none}}
 .stchip{position:absolute;top:8px;right:8px;z-index:3;display:inline-flex;align-items:center;gap:6px;font:600 12.5px var(--f-m);padding:9px 12px;min-height:40px;border-radius:10px;border:1px solid var(--hot);background:color-mix(in srgb,var(--panel) 88%,transparent);color:var(--fg);cursor:pointer;box-shadow:0 0 12px -2px var(--hot)}
 .stchip[hidden]{display:none}
 /* v27: 3D / 2D düğmesi, sahnenin sağ üstünde (telefonda Ayarlar dişlisinin altında) */
@@ -646,7 +651,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         <span class="pulse" id="stNabiz" title="Nabız"><i class="hp" id="sHpBar"></i><i class="sh" id="sShBar"></i><span class="pv" id="sHp">100%</span></span>
       </div>
       <div class="anl" id="anl" role="region" aria-label="Analiz" hidden></div>
-      <div class="cvwrap" id="cvwrap"><button class="demochip" id="demoChip" hidden>Örnek şarkı · çık</button><button class="stchip" id="soloChip" hidden aria-label="Solo düzenlemeden çık">✓ Solodan çık</button><button class="v3d" id="v3d" hidden aria-pressed="true" aria-label="3D sahne" title="3D sahne">3D</button><canvas id="cv" aria-label="Ritim sıralayıcı ve savunma sahnesi. Çember düzeninde halkalar, şerit düzeninde satırlar enstrümanları gösterir; düşmanlar kenarlardan sahneye yaklaşır."></canvas></div>
+      <div class="cvwrap" id="cvwrap"><button class="demochip" id="demoChip" hidden>Örnek şarkı · çık</button><button class="hintchip" id="hintChip" hidden aria-live="polite"></button><button class="stchip" id="soloChip" hidden aria-label="Solo düzenlemeden çık">✓ Solodan çık</button><button class="v3d" id="v3d" hidden aria-pressed="true" aria-label="3D sahne" title="3D sahne">3D</button><canvas id="cv" aria-label="Ritim sıralayıcı ve savunma sahnesi. Çember düzeninde halkalar, şerit düzeninde satırlar enstrümanları gösterir; düşmanlar kenarlardan sahneye yaklaşır."></canvas></div>
       <div class="pads" id="pads" hidden aria-label="Seçili sahne yerinin adımları"></div>
       <p class="hint" id="hint"></p>
       <div class="controls">

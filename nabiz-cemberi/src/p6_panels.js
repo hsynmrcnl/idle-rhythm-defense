@@ -162,7 +162,7 @@ function renderPanels(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v47 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v48 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -269,6 +269,20 @@ function goTour(){if(!canTour()||demoMode)return;const gain=tourGain(),c=cityOf(
  S=Object.assign(freshRun(),keep);songRewind();undoReset();MI=meterInfo();eSel=0;enemies=[];wave=null;core={hp:hpMax(),sh:0};ensureOrders();if(playing)startWave(1,nowT());msg(c.n+' turnesi bitti · +'+gain+' Efsane · sıradaki şehir '+cityOf().n);changed();applyTheme();save()}
 /* manager: runs every 2 s while the page is open */
 let autoT=0;
+/* v48 harcama ipucu (docs/denge_d15.md seçenek 1): en iyi dalga 2 dk değişmediyse ya da son 60 sn'de geri çekilme olduysa ve elde önerinin ≥3 katı nota varsa sahnede öneri çipi; dokununca alır. Nabız %60 altındaysa savunma, değilse gelir önerisi (anlRank). Menajerin otomatik geliştirmesi açıksa gösterilmez. */
+const HINT_STALL=120000,HINT_RET=60000;let hintK=null,stallBest=-1,stallT=Date.now(),retSeen=0,retT=-1e12;
+function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
+ if(S.bestWave!==stallBest){stallBest=S.bestWave;stallT=now}
+ if(retreatCount!==retSeen){retSeen=retreatCount;retT=now}
+ const auto=S.mn&&S.mn.lv&&S.auto&&S.auto.lv!==false;
+ let k=null;
+ if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.studio&&!auto&&(now-stallT>HINT_STALL||now-retT<HINT_RET))k=hintPick();
+ hintK=k;if(!k){if(!el.hidden)el.hidden=true;return}
+ el.innerHTML=T('Öneri')+': <b>'+T(k.n)+'</b> · ♪ '+fmt(k.cost);el.title=T('Nota birikti ama ilerleme durdu: dokun, en verimli adımı al');if(el.hidden)el.hidden=false}
+/* öneri: nabız düşükse en ucuz hayatta kalma (nabız/kalkan/tamir), değilse Analiz'in gelir önerisi; elde ≥3 katı nota yoksa yok */
+function hintPick(){try{const low=core.hp/hpMax()<0.6&&S.unl.def;let c=null;if(low)c=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)).sort((x,y)=>x.cost-y.cost)[0]||null;if(!c){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));c=r.inc||r.def}return c&&c.cost>0&&S.nota>=c.cost*3?c:null}catch(e){return null}}
+const hintApply=k=>rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});
+function hintBuy(){const k=hintK;if(!k||S.nota<k.cost)return;hintApply(k);msg(T('Alındı')+': '+T(k.n)+' · ♪ '+fmt(k.cost));hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300)}
 function autoTick(){if(demoMode||!S.mn)return;const now=Date.now();let ch=false;
  /* Menajer: otomatik geliştir (v21) — Analiz'in gelir önerisi; yalnız seviye, ritim ve solo geliştirmesi, notanın yarısını aşmadan */
  if(S.mn.lv&&S.auto.lv!==false&&now-autoT>10000){autoT=now;try{const k=autoBuyPick();if(k){rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});msg('Menajer: '+k.n+' · ♪ '+fmt(k.cost))}}catch(e){console.warn(e)}}

@@ -17,3 +17,15 @@
 ## Ölçüm planı
 - Ekonomi botuna "harcamayan oyuncu" kipi: yalnız ilk 3 dakika elle alır, sonra bekler. 1 ve 2'nin dalga 15–20 süresine etkisini dakika dakika ölç.
 - Sonra ikinci oyuncu turu (yalnız Idle, İlerleme, Acemi personaları) ile doğrula.
+
+## Ölçüm 1 — harcama ipucu (v48, `tools/harcamayan_sim.py 30`)
+İlk 3 dk menajer mantığıyla harcar, sonra A) hiç harcamaz, B) yalnız öneri çipine dokunur (ilerleme 2 dk durunca ya da geri çekilmeden sonra).
+
+| dk | A: dalga (en iyi) | A: nota | A: geri | B: dalga (en iyi) | B: nota | B: geri | B: öneri alımı |
+|---|---|---|---|---|---|---|---|
+| 10 | 19 (19) | 51,1 B | 0 | 19 (19) | 50,9 B | 0 | 0 |
+| 15 | 18 (20) | 94,0 B | 3 | 25 (25) | 230,0 B | 1 | 39 |
+| 20 | 20 (20) | 136,4 B | 5 | 30 (31) | 846,8 B | 3 | 56 |
+| 30 | 20 (20) | 221,3 B | 11 | 31 (32) | 2,5 Mn | 11 | 71 |
+
+Sonuç: harcamayan oyuncu dalga 20'de duvara takılıyor (♪221 B kullanılmadan duruyor); yalnız öneriye dokunan dalga 32'ye çıkıyor. B'de de 25. dakikadan sonra ilerleme yavaşlıyor → seçenek 2 (asistan) o boşluğu doldurmalı.
