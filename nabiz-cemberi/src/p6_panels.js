@@ -6,7 +6,7 @@ const DOCK={stage:'stage',studio:'studio',coll:'studio',def:'def',album:'album',
 const dockLast={studio:'studio',album:'album'};let prevTab='stage';const scrollMem={};
 /* Stüdyo bölümlerinin açılma sırası: her şey bir anda oyuncunun önüne gelmesin. run:1 olanlar bu dönemin geliştirmesine bağlı */
 /* v40 sadeleştirme: açılışlar ilk 10 dakikaya yayılır (sim: dalga ≈ 2,2/dk; eskiden ilk 2 dakikada 9 bölüm açılıyordu) */
-const UNL_W={def:6,rhy:8,look:10,pat:12,anl:14,ord:18,desk:20};
+const UNL_W={def:6,rhy:8,look:10,pat:12,anl:14,asst:15,ord:18,desk:20};
 const SEC_GATE={desk:'desk',syn:'syn',groove:'syn',auto:'syn',rhy:'rhy',pat:'pat',plan:'plan',solo:'solo',tree:'solo'};
 const GATES={syn:{c:()=>S.slots.filter(Boolean).length>=2,n:'Uyum ve Otomatik'},rhy:{c:()=>S.bestWave>=UNL_W.rhy,n:'Ritim stüdyosu'},pat:{c:()=>S.bestWave>=UNL_W.pat,n:'Desen, ölçü ve gam'},plan:{c:()=>!!S.up.sef,n:'Şarkı planı',run:1},solo:{c:()=>!!S.up.solo,n:'Solo editörü ve Solo dalı',run:1},desk:{c:()=>S.bestWave>=UNL_W.desk,n:'Ses masası'}};
 let secNew={};const ordOpen=new Set();
@@ -162,7 +162,7 @@ function renderPanels(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v48 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v49 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -217,6 +217,7 @@ const AM_N={lv:['Geliştirme','Seçtiğin türlerden en verimlisini alır, harca
 const AM_K=[['lv','Seviye'],['rup','Ritim'],['srup','Solo dalı'],['tempo','Tempo'],['def','Savunma']];
 function amSet(k,on){if(k==='akor'){S.progAuto=on;msg(on?'Akorlar otomatik':'Akorlar elle: Şarkı planı kartından seç');changed();return}
  if(k==='dolgu'){fillAuto(on);return}
+ if(k==='asst'){S.auto.asst=on;asstT=0;save();renderAuto();msg(T('Asistan')+': '+T(on?'Açık':'Kapalı'));if(on)setTimeout(hintCheck,50);return}
  if(k.startsWith('mn_')){const id=k.slice(3);if(!S.mn[id])return;S.auto[id]=on;if(id==='lv')autoT=0;save();renderMn();renderAuto();msg(T(AM_N[id][0])+': '+T(on?'Açık':'Kapalı'));return}
  S.am[k]=on;save();renderAuto();msg(T({yeni:'Yeni enstrüman ritmi',nakarat:'Otomatik nakarat',solo:'Otomatik solo'}[k])+': '+T(on?'Açık':'Kapalı'))}
 /* v38 Ses masası kartı: dışa aktarma ücretsiz; yankı (RV_COST) ve ses karıştırıcı (MX_COST) bir kez alınır, albüm/turnede kalır (S.desk keep listelerinde) */
@@ -241,6 +242,8 @@ function renderAuto(){const el=$('autoBox');if(!el)return;const A=S.am;
  if(S.up.akor)h+=row('akor','Akorlar','Kıta ve nakarat farklı yürür, geçişler kadansla',S.progAuto);
  if(S.up.dolgu)h+=row('dolgu','Geçiş dolgusu','Bölüm sonlarında davul kısa bir geçiş çalar',fillHits()>0);
  if(S.up.solo)h+=row('solo','Solo','Soloya ayrılan enstrümana solo yazılır',A.solo);
+ /* v49 Asistan: dalga 15'te ücretsiz, menajerin otomatik geliştirmesi alınana kadar */
+ if(asstOn(1))h+='<h4 class="amh">Asistan</h4>'+row('asst','Otomatik geliştir','Ücretsiz · 20 sn’de bir notanın en çok dörtte birini en verimli geliştirmeye harcar. Menajer gelince onun yerini alır.',S.auto.asst!==false);
  h+='<h4 class="amh">Menajer</h4>';
  if(albUnl()<1)h+='<p class="note">Menajer 1. albümden sonra Albüm sekmesinden tutulur. Her iş ayrı alınır, burada açılıp kapanır.</p>';
  AUTO.forEach(u=>{const nm=AM_N[u.id];if(!S.mn[u.id]){if(albUnl()>=1)h+='<div class="amr off"><span class="at"><span class="nm">'+nm[0]+'</span><span class="ds">'+(albUnl()<u.al?(S.lang==='en'?'Unlocks with album '+u.al:u.al+'. albümle açılır'):'Albüm sekmesinden tutulur · ♪ '+fmt(u.c))+'</span></span><span class="cnt">kilitli</span></div>';return}
@@ -274,7 +277,7 @@ const HINT_STALL=120000,HINT_RET=60000;let hintK=null,stallBest=-1,stallT=Date.n
 function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
  if(S.bestWave!==stallBest){stallBest=S.bestWave;stallT=now}
  if(retreatCount!==retSeen){retSeen=retreatCount;retT=now}
- const auto=S.mn&&S.mn.lv&&S.auto&&S.auto.lv!==false;
+ const auto=S.mn&&S.mn.lv&&S.auto&&S.auto.lv!==false||asstOn();
  let k=null;
  if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.studio&&!auto&&(now-stallT>HINT_STALL||now-retT<HINT_RET))k=hintPick();
  hintK=k;if(!k){if(!el.hidden)el.hidden=true;return}
@@ -283,7 +286,15 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
 function hintPick(){try{const low=core.hp/hpMax()<0.6&&S.unl.def;let c=null;if(low)c=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)).sort((x,y)=>x.cost-y.cost)[0]||null;if(!c){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));c=r.inc||r.def}return c&&c.cost>0&&S.nota>=c.cost*3?c:null}catch(e){return null}}
 const hintApply=k=>rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});
 function hintBuy(){const k=hintK;if(!k||S.nota<k.cost)return;hintApply(k);msg(T('Alındı')+': '+T(k.n)+' · ♪ '+fmt(k.cost));hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300)}
+/* v49 Asistan (docs/denge_d15.md seçenek 2): dalga 15'te ücretsiz açılır; menajerin otomatik geliştirmesi alınana kadar 20 sn'de bir notanın en çok %25'iyle en verimli geliştirmeyi alır. Nabız %60 altındaysa önce hayatta kalma, değilse gelir ve savunma sırayla (Analiz sıralaması). */
+const ASST_T=20000,ASST_B=0.25;let asstT=0,asstFlip=false;
+const asstOn=own=>!!(S.unl&&S.unl.asst&&!(S.mn&&S.mn.lv)&&(own||S.auto&&S.auto.asst!==false));
+function asstPick(){const lim=S.nota*ASST_B,ok=k=>k&&k.cost>0&&k.cost<=lim;let k=null;
+ if(core.hp/hpMax()<0.6&&S.unl.def)k=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)&&ok(x)).sort((x,y)=>x.cost-y.cost)[0]||null;
+ if(!k){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));k=asstFlip&&ok(r.def)?r.def:ok(r.inc)?r.inc:ok(r.def)?r.def:null;if(k)asstFlip=k!==r.def}
+ return k}
 function autoTick(){if(demoMode||!S.mn)return;const now=Date.now();let ch=false;
+ if(asstOn()&&!ovCur()&&now-asstT>ASST_T){asstT=now;try{const k=asstPick();if(k){rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});msg(T('Asistan')+': '+T(k.n)+' · ♪ '+fmt(k.cost))}}catch(e){console.warn(e)}}
  /* Menajer: otomatik geliştir (v21) — Analiz'in gelir önerisi; yalnız seviye, ritim ve solo geliştirmesi, notanın yarısını aşmadan */
  if(S.mn.lv&&S.auto.lv!==false&&now-autoT>10000){autoT=now;try{const k=autoBuyPick();if(k){rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});msg('Menajer: '+k.n+' · ♪ '+fmt(k.cost))}}catch(e){console.warn(e)}}
  if(S.mn.ord&&S.auto.ord!==false){S.orders.forEach((o,k)=>{if(o&&o.tpl&&orderOk(o)){deliver(k);ch=true}})}
@@ -386,6 +397,7 @@ const MINI={
  look:[stTab('look','Yeni: Görünüm','Görünüm’e dokun: tema, düzen ve sahne katmanları.'),stShow('#p-look','Görünüm','Her sahne katmanı geliri ×1,1 yapar; temanın sevdiği tempo ×1,25.')],
  pat:[stTab('studio','Yeni: Ruh hâli','Stüdyo’ya dokun.'),stSc('pat','Ruh hâli'),stShow('#p-studio [data-sec=pat]','Ruh hâli','Gamı (hüzünlü, neşeli…) ve ritim tipini buradan seçersin. Albümlerle yenileri açılır.')],
  anl:[stTab('stage','Yeni: Analiz','Sahneye dön.'),{t:'Analiz',p:'Üstteki bilgi çubuğuna dokun.',kind:'tap',tgt:()=>tel('stats'),cond:()=>anlOn},stShow('#anl','Analiz','Sıradaki en verimli adımı ve çarpanların dökümünü gösterir. Kapatmak için bilgi çubuğuna yine dokun.')],
+ asst:[stTab('studio','Yeni: Asistan','Stüdyo’ya dokun.'),stSc('auto','Otomatik'),stShow('#autoBox [data-k=asst]','Asistan','Ücretsiz asistan notanın en çok dörtte birini en verimli geliştirmelere harcar. İstersen buradan kapatırsın; menajer gelince onun yerini alır.')],
  ord:[stTab('def','Yeni: Siparişler','Savunma’ya dokun.'),stShow('#p-def [data-sec=ord]','Siparişler','Şehirden müzik istekleri: koşulu sağla, teslim et, ekstra nota ve hayran kazan.')],
  desk:[stTab('studio','Yeni: Ses masası','Stüdyo’ya dokun.'),stSc('desk','Ses masası'),stShow('#deskBox .dexp','Ses masası','Şarkını WAV ya da MIDI olarak indir, bağlantıyla paylaş. Yankı ve ses karıştırıcı da burada.')],
  blast:[stTab('stage','Şarj doldu','Sahneye dön.'),{t:'Elle patlat',p:'Kristale dokun (ya da Enter): merkez patlar. Ölçünün ilk vuruşunda dokunursan ×1,5.',kind:'tap',kb:()=>{if(chReady>=0)manualBlast()},tgt:torb,cond:()=>chReady<0}],
@@ -442,6 +454,7 @@ const UNLK=[
  {k:'rhy',c:()=>gateOn('rhy')},
  {k:'anl',c:()=>S.bestWave>=UNL_W.anl},
  {k:'pat',c:()=>gateOn('pat')},
+ {k:'asst',c:()=>S.bestWave>=UNL_W.asst&&!(S.mn&&S.mn.lv)&&!!S.unl.syn},
  {k:'ord',c:()=>S.bestWave>=UNL_W.ord},
  {k:'look',c:()=>S.bestWave>=UNL_W.look},
  {k:'album',c:()=>albUnl()>=1||S.runEarned>=albumTh()*0.5},
@@ -456,7 +469,7 @@ const UNLK=[
 const TAB_UNL={studio:'studio',coll:'coll',def:'def',album:'album',book:'book',look:'look'};
 const tabOn=t=>!TAB_UNL[t]||demoMode||!!S.unl[TAB_UNL[t]];
 function unlCheck(quiet){if(demoMode)return;let ch=false;for(const u of UNLK){if(S.unl[u.k])continue;let ok=false;try{ok=u.c()}catch(e){}if(!ok)continue;S.unl[u.k]=1;ch=true;if(!quiet)S.tipq.push(u.k)}
- if(ch){save();unlVis();if(!quiet)tutShow()}}
+ if(ch){save();unlVis();renderAuto();if(!quiet)tutShow()}}
 function unlVis(){
  Object.keys(TAB_UNL).forEach(t=>{const on=tabOn(t),tb=$('t-'+t);if(tb&&tb.hidden===on)tb.hidden=!on;document.querySelectorAll('.subnav [data-tab="'+t+'"]').forEach(b=>{if(b.hidden===on)b.hidden=!on})});
  [['studio',['studio','coll']],['def',['def']],['album',['album','book']],['look',['look']]].forEach(([g,ts])=>{const d=$('d-'+g),on=ts.some(tabOn);if(d&&d.hidden===on)d.hidden=!on;if(!tabOn(dockLast[g]||g)){const f=ts.find(tabOn);if(f)dockLast[g]=f}});
