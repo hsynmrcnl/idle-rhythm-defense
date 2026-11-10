@@ -46,6 +46,9 @@ Paylaşma, sıralama ve başkalarının şarkıları kapsam dışı. Sıra öner
 - v22: küçük temizlik (Kolay öğretici, Uygula, ped seviye düğmeleri, terimler)
 - v23: telefonda Sahne aşağı kayıyordu, düzeldi
 - v36: Ayarlar → Ölüm sesi açık/kapalı
+- v47: temizlik (ölü kod, EN çevirileri, paralel testler, kararsız test), performans ölçümü; dalga 15 önerisi docs/denge_d15.md
+- v46: yatay telefon düzeni
+- v45: Kolay etiketleri
 - v44: oyuncu turu düzeltmeleri (Şarj kısa öğretici kilidi, klavye, Ritme vur, Atla balonda, örnek şarkı dönüşü, kod yükleme bildirimi). Sırada: Kolay etiketleri (taşmış/nefes), yatay telefon düzeni, dalga 15 dengesi
 - v42: her yeni bölüm için kısa zorunlu öğretici (eski kartlar kalktı); baget kesilmiyor
 - v41: zorunlu öğretici (13 adım, spot ışığı, baget, Atla 5 sn)

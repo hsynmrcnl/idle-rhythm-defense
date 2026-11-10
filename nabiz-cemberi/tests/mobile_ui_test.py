@@ -125,8 +125,16 @@ with sync_playwright() as pw:
             go_studio(); p.evaluate("()=>{document.getElementById('rack').scrollTop=0}")
             p.screenshot(path=os.path.join(OUT, 'v14_studio.png'))
             # durdur / başlat: şarkı kaldığı yerden devam eder
-            p.click('#d-stage'); p.wait_for_timeout(100)
-            p.mouse.click(cx, cy); p.wait_for_timeout(6000)
+            p.click('#d-stage')
+            # sekme değişince tuval yeniden boyutlanır: yerine oturana kadar bekle, merkezi yeniden ölç (yükte eski koordinata tıklanıyordu)
+            prev = None
+            for k in range(30):
+                bb = p.locator('#cv').bounding_box(); cur = (round(bb['x']), round(bb['y']), round(bb['width']), round(bb['height']))
+                if cur == prev: break
+                prev = cur; p.wait_for_timeout(100)
+            cx, cy = bb['x'] + bb['width'] / 2, bb['y'] + bb['height'] / 2
+            p.mouse.click(cx, cy)
+            p.wait_for_function("()=>window.__nb.playing", timeout=3000); p.wait_for_timeout(6000)
             b0 = p.evaluate("()=>window.__nb.curBar"); p.mouse.click(cx, cy); p.wait_for_timeout(400)
             p.mouse.click(cx, cy); p.wait_for_timeout(500)
             b1 = p.evaluate("()=>window.__nb.curBar")

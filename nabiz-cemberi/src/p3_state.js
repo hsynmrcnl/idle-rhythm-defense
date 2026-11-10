@@ -68,7 +68,6 @@ const insColor=(x,th)=>shade(th.fam[x.fam],SHADES[(x.fi-1)%SHADES.length]);
 const roleName=r=>ROLES[r].n;
 const isWeapon=r=>!(r==='kalkan'||r==='titresim'||r==='gelir'||r==='destek');
 const isSolo=si=>!!(S.up.solo&&S.solo[si]&&S.slots[si]);
-const soloK=()=>S.up.solofast?4:8;
 const soloSlots=()=>S.slots.map((id,si)=>isSolo(si)?si:-1).filter(x=>x>=0);
 function planArr(){if(S.up.sef&&Array.isArray(S.plan)&&S.plan.length===8&&S.plan.every(t=>SECTS[t]))return S.plan;if(S.up.solo&&soloSlots().length)return S.up.solofast?['verse','verse','solo','verse','verse','solo','verse','verse']:['verse','verse','verse','solo','verse','verse','verse','solo'];return hasB()?['verse','chorus','verse','chorus','verse','chorus','verse','chorus']:['verse','verse','verse','verse','verse','verse','verse','verse']}
 const planLen=()=>planArr().length*SEC_BARS;
@@ -146,7 +145,6 @@ const nr=nt=>Math.min(nt.r,soloRows()-1);
 function soloMerge(so,m){if(!S.up.suzun||!so||!so.notes.includes(m))return so?so.notes.indexOf(m):-1;const r=nr(m),T=soloSteps();let t0=m.t,t1=m.t+m.len,hit=true;
  while(hit){hit=false;for(let k=0;k<so.notes.length;k++){const q=so.notes[k];if(q===m||nr(q)!==r)continue;const q1=q.t+noteLenEff(q);if(q.t<=t1&&q1>=t0){t0=Math.min(t0,q.t);t1=Math.max(t1,q1);so.notes.splice(k,1);hit=true;break}}}
  m.t=t0;m.len=clamp(t1-t0,1,T-t0);return so.notes.indexOf(m)}
-function aliveLen(x,nt){const a=artEff(x,nt.art),L=noteLenEff(nt);for(let k=1;k<L;k++)if(tickPow(x,k,a)<=0)return k;return L}
 function noteSus(x,nt){const a=artEff(x,nt.art);let v=0;for(let k=1;k<noteLenEff(nt);k++){const p=tickPow(x,k,a);if(p>0)v+=p}return v}
 /* seyir analysis: phrase shape badges, machine-gun habituation */
 function analyzeSolo(si){const x=slotIns(si);const ns=soloNotesOf(si).slice().sort((a,b)=>a.t-b.t||a.r-b.r);const R=soloRows(),n=(SOLO_SCALE[S.scale]||SOLO_SCALE.minor).length,T=soloSteps();let run=0,mg=0;const hab=[];
