@@ -43,3 +43,22 @@ Sonuç: harcamayan oyuncu dalga 20'de duvara takılıyor (♪221 B kullanılmada
 Sonuç: hiçbir şeye dokunmayan oyuncu da Asistan'la dalga 20 duvarını geçiyor (30. dk'da 34). Öneriye dokunan hâlâ daha hızlı (%25 sınırı yok) — etkileşim ödüllendiriliyor. Not: koşular arası oynaklık büyük (B bu koşuda 42, Ölçüm 1'de 32; ilk 3 dk bile farklı), sonuçlar yön gösterir, kesin sayı değil.
 
 **Seçenek 3 (sayı ayarı):** 1 ve 2 birlikte harcamayan/az etkileşen oyuncunun duvarını kaldırdı; Aceleci'nin "fazla kolay" gözlemiyle çelişmemek için şimdilik sayılara dokunmamayı öneriyorum. İkinci oyuncu turunda (Idle, İlerleme, Acemi) yeniden bakılmalı.
+
+## Ölçüm 3 — orta oyunda tehdit (v57, `tools/tehdit_olc.py`)
+Sıradan oyuncu modeli: dalga 15'e kadar 10 sn'de bir en verimli geliştirme (notanın en çok yarısı), sonra yalnız Asistan. 2 sn'lik adımlarla dalga dalga en düşük nabız ve geri çekilme.
+
+- Dalga 1–29: her koşuda nabız %100, geri çekilme 0; dalga başına ~24–30 sn (düşman doğma süresi belirliyor, oyuncu hep fazlasıyla güçlü). İlk ~12,5 dakika tehdit yok.
+- Sonrası koşudan koşuya çok değişiyor: bir koşuda dalga 30'dan itibaren her dalgada bir geri çekilme (30 dk'da dalga 47, 19 geri çekilme); iki başka koşuda 16. dakikada dalga 38'e kadar hâlâ %100 ve 0 geri çekilme.
+- Denenen tek ayar: Denetçi (10'luk dalga patronu) canı 14 → 40 ve 70. Dalga 10/20/30'da nabız yine %100; tek başına patron canı gerilim yaratmıyor.
+
+Sonuç: tehdit ikili (ya hiç yok ya duvar); düşman can artışını (×1,19) oynatmak yalnız duvarın yerini kaydırır, arada “nabız düşüp toparlanan” bir bant oluşturmaz. Bu bir sayı ayarı değil tasarım kararı (ör. sızıntı hasarını küçültüp sızıntıyı sıklaştırmak, patronların yanında koruma dalgası, dalga içi “baskın” anları). Karar Hüseyin'de; sayılar değiştirilmedi.
+
+## Ölçüm 4 — Baskın (v58, `tools/tehdit_olc.py 14`)
+Her 5 dalgada (patron dalgası hariç) tek koldan kurye akını; toplam canı oyuncunun `RAID_T` saniyelik hasarı kadar. Sızan akıncı nabzın %6'sını alır, geri çekilme olmaz.
+
+| RAID_T | dalga 5 | dalga 15 | dalga 25* | geri çekilme (14 dk) | en iyi dalga |
+|---|---|---|---|---|---|
+| 5, 10, 16 | %100 | %100 | %100 | 0 | 33 |
+| **24 (seçilen)** | %94 | %52 | %70 | 0 | 33 |
+
+\* Dalga 25 patron (Müdür) dalgası, baskın yok; %70 dalga 15'teki baskından kalan nabızdı (nabız kendiliğinden dolmuyor). Bunun üzerine baskının aldığı nabız dalga bitince geri veriliyor. İlerleme hızı değişmedi (14 dk'da yine dalga 33).
