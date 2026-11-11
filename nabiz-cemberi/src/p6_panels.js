@@ -167,7 +167,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v58 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v59 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -400,7 +400,7 @@ const stShow=(sel,tt,p,btn)=>({t:tt,p,kind:'btn',btn:btn||'Anladım',tgt:()=>tse
 const stTap=(sel,tt,p,more)=>Object.assign({t:tt,p,kind:'tap',tgt:()=>tsel(...[].concat(sel)),prep:()=>{tReveal(sel);const o=tsel(...[].concat(sel));if(o){o.el.scrollIntoView({block:'center'});const c=+o.el.dataset.cost;if(c)tNotaFor(c)}}},more||{});
 const MINI={
  studio:[stTab('studio','Yeni: Stüdyo','Stüdyo’ya dokun: notayı burada harcarsın.'),stTap('#lvb-davul','Yükselt','Davul’u yükselt: her seviye vuruşları güçlendirir.')],
- coll:[stTab('coll','Yeni: Koleksiyon','Koleksiyon’a dokun: yeni enstrümanlar burada.'),stShow('#collList','Koleksiyon','Enstrüman açınca sahneye kendi ritmiyle gelir. Aileler ilerledikçe açılır.')],
+ coll:[stTab('coll','Yeni: Koleksiyon','Koleksiyon’a dokun: yeni enstrümanlar burada.'),stShow(['#collList > :first-child','#collList'],'Koleksiyon','Enstrüman açınca sahneye kendi ritmiyle gelir. Aileler ilerledikçe açılır.')],
  syn:[stTab('studio','Yeni: Uyum','Stüdyo’ya dokun.'),stTap('[data-act=autoAll]','Hepsini düzenle','Hepsini düzenle enstrümanları birbirine uydurur; tutan uyumlar çarpan verir.')],
  tap:[stTab('stage','Ritme vur','Sahneye dön.'),{t:'Ritme vur',p:'İbre bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun: seri bonusu.',kind:'tap',rv:1,tgt:()=>tel('cvwrap'),allow:e=>!orbHit(e),cond:()=>S.seri>=1,prep:()=>{S.seri=0}}],
  def:[stTab('def','Yeni: Savunma','Savunma’ya dokun: nabız, hasar ve menzil burada.'),stTap(['#defList .dtile.rec','#defList .dtile:not([disabled])'],'Savunma','Önerilen geliştirmeye dokun.'),stShow('#p-def .pulse, #p-def .dsl','Nabız','Düşman merkeze varırsa Nabız düşer; sıfırlanırsa bir dalga geri gidersin.')],
@@ -456,7 +456,10 @@ function tutEnd(skip){ovTop();const sb=tutSand;S.tut.done=true;S.tutm=0;if(!skip
   save();msg(skip?'Öğretici kapatıldı · Ayarlar’dan yeniden başlatabilirsin':'Öğretici bitti. Yeni bölümler açıldıkça kısa öğreticiler gelecek.')}tutShow();tutTick()}
 const ovTop=()=>{if(!isPhone())try{window.scrollTo({top:0})}catch(e){}};
 function ovSkip(){const c=ovCur();if(!c)return;if(c.main){tutEnd(true);return}S.tipq=[];S.tutm=0;tutT0=0;save();ovTop();tutTick();msg('Kısa öğreticiler geçildi')}
-function tutTarget(st){if(!st.tgt)return null;const t=st.tgt();if(!t)return null;if(t.el){let b=t.el.getBoundingClientRect();if(b.top<0||b.bottom>innerHeight){t.el.scrollIntoView({block:'center'});b=t.el.getBoundingClientRect()}return{x:b.left-5,y:b.top-5,w:b.width+10,h:b.height+10,round:0}}
+/* v59: hedef ekran dışındaysa adım başına BİR kez kaydırılır (her karede kaydırınca ekrandan uzun hedefte sayfa kilitleniyor, oyuncu kaydıramıyordu); ekrandan uzun hedef üstten hizalanır, delik ekrana kırpılır */
+let tutScrK='';
+function tutTarget(st){if(!st.tgt)return null;const t=st.tgt();if(!t)return null;if(t.el){let b=t.el.getBoundingClientRect();if((b.top<0||b.bottom>innerHeight)&&tutScrK!==tutPrep){tutScrK=tutPrep;t.el.scrollIntoView({block:b.height>innerHeight*0.8?'start':'center'});b=t.el.getBoundingClientRect()}
+  if(b.height>innerHeight*0.8||b.top<0||b.bottom>innerHeight){const y0=Math.max(8,b.top-5),y1=Math.min(innerHeight-8,b.bottom+5);if(y1-y0>40)return{x:b.left-5,y:y0,w:b.width+10,h:y1-y0,round:0}}return{x:b.left-5,y:b.top-5,w:b.width+10,h:b.height+10,round:0}}
  if(t.cv){const c=vis();if(!tvis(c))return null;const [x,y,r]=t.cv(),b=c.getBoundingClientRect(),kx=b.width/(CW||1),ky=b.height/(CH||1),cx=b.left+(x+OX)*kx,cy=b.top+(y+OY)*ky,rr=r*kx;return{x:cx-rr,y:cy-rr,w:rr*2,h:rr*2,round:1}}return null}
 /* Ayarlar → öğreticiyi yeniden başlat: kaydı bozmamak için geçici, temiz bir oyunda */
 function tutSandbox(){if(demoMode)exitDemo();tutSand=JSON.stringify(S);const keep={lang:S.lang,muted:S.muted,theme:S.theme,themes:S.themes,layout:S.layout,sfset:S.sfset,ui:S.ui,ksfx:S.ksfx,tens:S.tens};S=Object.assign(freshRun(),freshMeta(),keep);S.tut={s:0,done:false};S.unl={};S.tipq=[];normalizeS();S.tut={s:0,done:false};MI=meterInfo();enemies=[];wave=null;core={hp:hpMax(),sh:0};songRewind();undoReset();if(playing)startStop();recalc();renderPanels();unlVis();tutPrep=-1;tutT0=0;tutTick()}
