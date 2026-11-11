@@ -62,3 +62,19 @@ Her 5 dalgada (patron dalgası hariç) tek koldan kurye akını; toplam canı oy
 | **24 (seçilen)** | %94 | %52 | %70 | 0 | 33 |
 
 \* Dalga 25 patron (Müdür) dalgası, baskın yok; %70 dalga 15'teki baskından kalan nabızdı (nabız kendiliğinden dolmuyor). Bunun üzerine baskının aldığı nabız dalga bitince geri veriliyor. İlerleme hızı değişmedi (14 dk'da yine dalga 33).
+
+## Ölçüm 5 — ilk albüme varış (v61, `tools/album_olc.py 60`)
+Aynı sıradan oyuncu modeli. Albüm eşiği ♪15 Mn (dönem kazancı); Albüm sekmesi eşiğin yarısında açılır.
+
+| dk | en iyi dalga | dönem kazancı | eşiğe oran |
+|---|---|---|---|
+| 10 | 22 | ♪660 B | %4 |
+| 15 | 35 | ♪3,8 Mn | %25 |
+| 20 | 44 | ♪13,8 Mn | %92 |
+| 25 | 45 | ♪29,9 Mn | %199 |
+| 40 | 45 | ♪131 Mn | %877 |
+| 60 | 53 | ♪261 Mn | %1737 |
+
+- Albüm sekmesi 17,7. dk'da açılıyor, ilk albüm 20,4. dk'da çıkarılabiliyor; bu model dalga 45 duvarına da aynı anda (~22. dk) varıyor: albüm duvarın çözümü olarak doğru yerde.
+- Model hızlı oyuncu (düzenli harcıyor). Oyuncu turunda İlerleme takipçisi 25. dk'da dalga 23'teydi ve Albüm sekmesini görmedi; daha yavaş oyuncuda ilk albüm muhtemelen 30–40. dk.
+- Eşik değiştirilmedi. Risk: duvarda bekleyen oyuncu albümü bilmiyor (sekme ancak eşiğin yarısında açılıyor, öneri çipi albüm önermiyor).

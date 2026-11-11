@@ -37,6 +37,17 @@ with sync_playwright() as pw:
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.pat.A[0]=S.pat.A[0].map(()=>0);S.pat.A[0][0]=1;nb.recalc();nb.setHp(1);nb.setWave(15)}")
     r = p.evaluate("""()=>{const nb=window.__nb;let minHp=1;const r0=nb.retreats;let leaked=false;for(let i=0;i<60;i++){nb.ff(1);minHp=Math.min(minHp,nb.hpFrac());if(nb.S.wave!==15)break}return {minHp,ret:nb.retreats-r0}}""")
     check(r['minHp'] < 1, 'tek vuruşlu zayıf kurulumda nabız düştü (en düşük %%%d)' % round(r['minHp'] * 100))
+    # v61: ilk baskında kısa öğretici
+    p.evaluate("()=>{const nb=window.__nb,S=nb.S;delete S.unl.raid;S.tipq=[];S.tutm=0;nb.recalc()}")
+    cv = p.locator('#cv').bounding_box()
+    if not p.evaluate("()=>window.__nb.playing"):
+        p.mouse.click(cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2); p.wait_for_function("()=>window.__nb.playing", timeout=3000)
+    p.evaluate("()=>window.__nb.setWave(5)"); p.wait_for_timeout(700)
+    check(p.evaluate("()=>window.__nb.S.unl.raid===1") and p.evaluate("()=>document.getElementById('tutLT').textContent") == 'Baskın!' and p.is_visible('#tutLBtn'), 'ilk baskında “Baskın!” kısa öğreticisi')
+    p.click('#tutLBtn'); p.wait_for_timeout(300)
+    check(p.is_hidden('#tutL'), 'Anladım ile kapandı')
+    p.evaluate("()=>window.__nb.setWave(15)"); p.wait_for_timeout(500)
+    check(p.is_hidden('#tutL'), 'ikinci baskında tekrar çıkmadı')
     check(not errs, 'sayfa hatası yok %s' % errs[:2])
     b.close()
 srv.shutdown()

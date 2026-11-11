@@ -68,7 +68,7 @@ with sync_playwright() as pw:
         p.wait_for_function("()=>window.__nb.playing", timeout=3000)
         p.evaluate("()=>{window.__nb.S.nota=1e6;window.__nb.hintStall();window.__nb.hintCheck()}")
         check(p.is_hidden('#hintChip'), 'asistan açıkken öneri çipi yok')
-        p.evaluate("()=>{window.__nb.S.auto.asst=false;window.__nb.hintStall();window.__nb.hintCheck()}")
+        p.evaluate("()=>{const S=window.__nb.S;S.unl.raid=1;S.tipq=[];S.tutm=0;S.auto.asst=false;window.__nb.hintStall();window.__nb.hintCheck()}")
         check(p.is_visible('#hintChip'), 'asistan kapalıyken öneri çipi var')
         # menajer gelince asistan biter
         p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.auto.asst=true;S.mn.lv=1;nb.renderPanels()}")
