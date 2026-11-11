@@ -167,7 +167,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v61 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v62 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -283,6 +283,8 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
  if(S.bestWave!==stallBest){stallBest=S.bestWave;stallT=now}
  if(retreatCount!==retSeen){retSeen=retreatCount;retT=now}
  const auto=S.mn&&S.mn.lv&&S.auto&&S.auto.lv!==false||asstOn();
+ /* v62: albüm eşiği dolmuş ve ilerleme 2 dk durmuşsa öneri çipi albümü gösterir (Asistan açıkken de); dokununca Albüm sekmesi (albüm oyunu sıfırladığı için kendisi çıkarmaz) */
+ if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.album&&S.runEarned>=albumTh()&&now-stallT>HINT_STALL&&!(S.mn&&S.mn.alb&&S.auto.alb===true)){hintK={alb:1};el.innerHTML=T('Albüm hazır')+': <b>+'+fansFor()+' '+T('hayran')+'</b>';el.title=T('İlerleme durdu: albüm çıkar, oyun baştan başlar ama hayranlar kalıcı gelir verir');if(el.hidden)el.hidden=false;return}
  let k=null;
  if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.studio&&!auto&&(now-stallT>HINT_STALL||now-retT<HINT_RET))k=hintPick();
  hintK=k;if(!k){if(!el.hidden)el.hidden=true;return}
@@ -292,7 +294,7 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
 function newInsCand(){if(!S.slots.includes(null))return null;const x=INS.filter(x=>!lvOf(x.id)&&famOpen(x.fam)).sort((a,b)=>a.u-b.u)[0];return x?{act:'lv',id:x.id,n:(S.lang==='en'?'New: ':'Yeni: ')+x.n,cost:x.u}:null}
 function hintPick(){try{const low=core.hp/hpMax()<0.6&&S.unl.def;let c=null;if(!low){const ni=newInsCand();if(ni&&S.nota>=ni.cost*3)return ni}if(low)c=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)).sort((x,y)=>x.cost-y.cost)[0]||null;if(!c){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));c=r.inc||r.def}return c&&c.cost>0&&S.nota>=c.cost*3?c:null}catch(e){return null}}
 const hintApply=k=>rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});
-function hintBuy(){const k=hintK;if(!k||S.nota<k.cost)return;hintApply(k);msg(T('Alındı')+': '+T(k.n)+' · ♪ '+fmt(k.cost));hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300)}
+function hintBuy(){const k=hintK;if(k&&k.alb){setTab('album');$('hintChip').hidden=true;hintK=null;return}if(!k||S.nota<k.cost)return;hintApply(k);msg(T('Alındı')+': '+T(k.n)+' · ♪ '+fmt(k.cost));hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300)}
 /* v49 Asistan (docs/denge_d15.md seçenek 2): dalga 15'te ücretsiz açılır; menajerin otomatik geliştirmesi alınana kadar 20 sn'de bir notanın en çok %25'iyle en verimli geliştirmeyi alır. Nabız %60 altındaysa önce hayatta kalma, değilse gelir ve savunma sırayla (Analiz sıralaması). */
 const ASST_T=20000,ASST_B=0.25;let asstT=Date.now(),asstFlip=false,asstSurv=false;
 const asstOn=own=>!!(S.unl&&S.unl.asst&&!(S.mn&&S.mn.lv)&&(own||S.auto&&S.auto.asst!==false));
