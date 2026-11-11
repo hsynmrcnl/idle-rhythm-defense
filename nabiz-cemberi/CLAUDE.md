@@ -9,6 +9,7 @@ Tek sayfalık, kütüphanesiz bir tarayıcı oyunu: **idle rhythm defense**. Oyu
 - Saz sentez kalır (sesi beğenildi); saz için örnek kayıt arama.
 - Akor/dolgu önerisini yeniden görmek isteyebilir: `docs/` içinde yoksa sohbet geçmişinden özetle.
 - Kısa, madde madde, "önce sonuç" cevaplar. Uzun açıklamayı o istemeden yazma.
+- Fable 5.2 yalnız danışman: işi (kod, test, yayın) ana oturum yapar; Fable 5.2 yalnız görüş/inceleme için alt ajan olarak çağrılır (`model: "fable"`), dosya değiştirmez, commit/push yapmaz.
 
 ## Dosya düzeni
 ```
