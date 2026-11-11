@@ -167,7 +167,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v60 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v61 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -411,6 +411,7 @@ const MINI={
  asst:[stTab('studio','Yeni: Asistan','Stüdyo’ya dokun.'),stSc('auto','Otomatik'),stShow('#autoBox [data-k=asst]','Asistan','Ücretsiz asistan notanın en çok dörtte birini en verimli geliştirmelere harcar. İstersen buradan kapatırsın; menajer gelince onun yerini alır.')],
  ord:[stTab('def','Yeni: Siparişler','Savunma’ya dokun.'),stShow('#p-def [data-sec=ord]','Siparişler','Şehirden müzik istekleri: koşulu sağla, teslim et, ekstra nota ve hayran kazan.')],
  desk:[stTab('studio','Yeni: Ses masası','Stüdyo’ya dokun.'),stSc('desk','Ses masası'),stShow('#deskBox .dexp','Ses masası','Şarkını WAV ya da MIDI olarak indir, bağlantıyla paylaş. Yankı ve ses karıştırıcı da burada.')],
+ raid:[stTab('stage','Baskın!','Sahneye dön.'),stShow('#cvwrap','Baskın!','Kızıl iğneler Sessizlik A.Ş. akıncıları: tek koldan gelir, sıradan düşmandan dayanıklıdır. Sızan her biri nabzı biraz düşürür ama geri çekilmezsin. Hepsini durdurursan bonus nota.')],
  blast:[stTab('stage','Şarj doldu','Sahneye dön.'),{t:'Elle patlat',p:'Kristale dokun (ya da Enter): merkez patlar. Ölçünün ilk vuruşunda dokunursan ×1,5.',kind:'tap',kb:()=>{if(chReady>=0)manualBlast()},tgt:torb,cond:()=>chReady<0}],
  plan:[stTab('studio','Yeni: Şarkı planı','Stüdyo’ya dokun.'),stSc('plan','Şarkı planı'),stShow('#p-studio [data-sec=plan]','Şarkı planı','Şarkının bölümlerini dizersin; 4 ve üstü farklı bölüm geliri ×1,25 yapar.')],
  solo:[stTab('studio','Yeni: Solo','Stüdyo’ya dokun.'),stSc('sahne','Solo'),stShow('[data-act=solo]','Solo','Melodik bir enstrümanın Solo düğmesi: solo bölümünde üç kat güçle çalar. Tarzını Solo bölümünde seçersin.')],
@@ -481,6 +482,7 @@ const UNLK=[
  {k:'book',c:()=>Object.keys(S.found).length>0&&!!S.unl.album},
  {k:'desk',c:()=>gateOn('desk')},
  {k:'blast',c:()=>chReady>=0&&playing},
+ {k:'raid',c:()=>playing&&!!wave&&!!wave.raid},
  {k:'plan',c:()=>gateOn('plan')},
  {k:'solo',c:()=>gateOn('solo')}
 ].concat(FAMS.slice(1).map(([f,n])=>({k:'fam_'+f,c:()=>famOpen(f)||famCanOpen(f)})));
