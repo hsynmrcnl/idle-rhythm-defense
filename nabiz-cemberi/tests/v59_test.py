@@ -34,6 +34,8 @@ with sync_playwright() as pw:
         s = p.evaluate(ST)
         check(s['sy'] == 0 and s['rack'] == 0, 'Koleksiyon adımında sayfa ve liste kaymadı (sayfa %d, liste %d)' % (s['sy'], s['rack']))
         check(0 <= s['hy'] and s['hy'] + s['hh'] <= s['vh'] and s['hh'] < s['vh'] * 0.5, 'vurgu ekranın içinde ve küçük (%d px)' % s['hh'])
+        tg = p.evaluate("()=>{const h=document.getElementById('tutHole').getBoundingClientRect();const e=document.elementFromPoint(h.x+h.width-40,h.y+h.height/2);const r=[...document.querySelectorAll('#collList .irow')].find(x=>{const b=x.getBoundingClientRect();return h.y+h.height/2>b.top&&h.y+h.height/2<b.bottom});return r?{locked:r.classList.contains('locked'),t:r.textContent.slice(0,40)}:null}")
+        check(tg and tg['locked'] and 'Aç' in tg['t'], 'vurgu satın alınacak (açılmamış) enstrümanda, sahnedekinde değil (%s)' % tg)
         p.click('#tutLBtn'); p.wait_for_timeout(400)
         check(p.evaluate(ST)['hid'], 'Anladım ile kapandı')
         n0 = p.evaluate("()=>window.__nb.S.nota")
