@@ -41,7 +41,9 @@ function renderColl(th){if(!famOpen(famSel)&&!FAMS.some(x=>x[0]===famSel))famSel
 /* sıkı satır: ad + seviye + etki aynı satırda, durum en sağda */
 function insRowC(x,th){const L=lvOf(x.id),col=insColor(x,th),on=S.slots.includes(x.id),ez=easy('coll');
  const eff=ez?'<span class="role">'+ezRole(x.role)+'</span> '+x.d:'<span class="role">'+roleName(x.role)+'</span> '+(L?ROLES[x.role].d:x.d)+' · nefes '+x.nf+((isWeapon(x.role)||x.role==='titresim')?' · ♪ '+x.b+' · hasar '+x.dmg:' · ♪ '+x.b*(x.role==='gelir'?3:1));
- const st=!L?'<button class="btn" data-act="lv" data-id="'+x.id+'" data-cost="'+x.u+'">'+(x.u?'Aç · ♪ '+fmt(x.u):'Aç')+'</button>':on?'<span class="own">Sahnede</span>':S.slots.includes(null)?'<button class="btn" data-act="place" data-id="'+x.id+'">Sahneye koy</button>':'<span class="cnt">Yedekte</span>';
+ /* v64: sahne doluyken Aç düğmesi yer de ekler (tek ödeme, enstrüman sahneye girer); 10 yer doluysa yedeğe gittiği yazar (oyuncu turu: Bas yedekte kaldı, para boşa gitti) */
+ const full=!S.slots.includes(null),sl=full&&S.slots.length<MAXSLOTS,uc=x.u+(sl?slotCost():0);
+ const st=!L?'<button class="btn" data-act="lv" data-id="'+x.id+'"'+(sl?' data-slot="1" title="'+T('Sahne dolu: yeni bir sahne yeri de açılır')+'"':'')+' data-cost="'+uc+'">'+(sl?'Aç + sahne yeri · ♪ '+fmt(uc):full?'Aç · yedeğe · ♪ '+fmt(x.u):x.u?'Aç · ♪ '+fmt(x.u):'Aç')+'</button>':on?'<span class="own">Sahnede</span>':S.slots.includes(null)?'<button class="btn" data-act="place" data-id="'+x.id+'">Sahneye koy</button>':'<span class="cnt">Yedekte</span>';
  return '<div class="irow'+(L?'':' locked')+'"><span class="dot" style="--c:'+col+'"></span><span class="it"><span class="nm">'+x.n+'</span>'+(L?'<span class="lvl">Sv '+L+'</span>':'')+' <span class="ie">'+eff+'</span></span>'+st+'</div>'}
 /* v53: dil değişince sayfa yenilenir; açık sekme korunur (Ayarlar'dayken Sahne/Stüdyo'ya atlıyordu) */
 function langReload(){save();try{sessionStorage.setItem('nb-tab',tab)}catch(e){}location.reload()}
@@ -171,7 +173,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v63 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v64 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -295,9 +297,10 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
  el.innerHTML=T('Öneri')+': <b>'+T(k.n)+'</b> · ♪ '+fmt(k.cost);el.title=T('Nota birikti ama ilerleme durdu: dokun, en verimli adımı al');if(el.hidden)el.hidden=false}
 /* öneri: nabız düşükse en ucuz hayatta kalma (nabız/kalkan/tamir), değilse Analiz'in gelir önerisi; elde ≥3 katı nota yoksa yok */
 /* v53: boş sahne yeri varken en ucuz açılabilir enstrüman (öneri çipi ve Asistan; Idle oyuncu 2. enstrümanı 25 dk açmadı, Uyum ve Asistan ona bağlı) */
-function newInsCand(){if(!S.slots.includes(null))return null;const x=INS.filter(x=>!lvOf(x.id)&&famOpen(x.fam)).sort((a,b)=>a.u-b.u)[0];return x?{act:'lv',id:x.id,n:(S.lang==='en'?'New: ':'Yeni: ')+x.n,cost:x.u}:null}
+/* v64: sahne doluysa yer de eklenerek (yer kalmadıysa yok) */
+function newInsCand(){const full=!S.slots.includes(null);if(full&&S.slots.length>=MAXSLOTS)return null;const x=INS.filter(x=>!lvOf(x.id)&&famOpen(x.fam)).sort((a,b)=>a.u-b.u)[0];if(!x)return null;const en=S.lang==='en';return full?{act:'lv',id:x.id,slot:1,n:(en?'New: ':'Yeni: ')+x.n+(en?' + stage slot':' + sahne yeri'),cost:x.u+slotCost()}:{act:'lv',id:x.id,n:(en?'New: ':'Yeni: ')+x.n,cost:x.u}}
 function hintPick(){try{const low=core.hp/hpMax()<0.6&&S.unl.def;let c=null;if(!low){const ni=newInsCand();if(ni&&S.nota>=ni.cost*3)return ni}if(low)c=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)).sort((x,y)=>x.cost-y.cost)[0]||null;if(!c){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));c=r.inc||r.def}return c&&c.cost>0&&S.nota>=c.cost*3?c:null}catch(e){return null}}
-const hintApply=k=>rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});
+const hintApply=k=>rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':'',slot:k.slot?'1':''}});
 function hintBuy(){const k=hintK;if(k&&k.alb){setTab('album');$('hintChip').hidden=true;hintK=null;return}if(!k||S.nota<k.cost)return;hintApply(k);msg(T('Alındı')+': '+T(k.n)+' · ♪ '+fmt(k.cost));hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300)}
 /* v49 Asistan (docs/denge_d15.md seçenek 2): dalga 15'te ücretsiz açılır; menajerin otomatik geliştirmesi alınana kadar 20 sn'de bir notanın en çok %25'iyle en verimli geliştirmeyi alır. Nabız %60 altındaysa önce hayatta kalma, değilse gelir ve savunma sırayla (Analiz sıralaması). */
 const ASST_T=20000,ASST_B=0.25;let asstT=Date.now(),asstFlip=false,asstSurv=false;
@@ -310,10 +313,10 @@ function asstPick(lim0){const lim=lim0==null?S.nota*ASST_B:lim0,ok=k=>k&&k.cost>
  return k}
 function autoTick(){if(demoMode||!S.mn)return;const now=Date.now();let ch=false;
  /* v54: bir turda tek alım yerine tur başındaki notanın %25'i bitene kadar (en çok 40 alım): büyük birikimde tek ucuz alım yetmiyordu (Idle: ♪442 B birikti) */
- if(asstOn()&&!ovCur()&&now-asstT>ASST_T){asstT=now;try{let left=S.nota*ASST_B,n=0,sum=0,last=null;for(let i=0;i<40;i++){const k=asstPick(left);if(!k)break;const n0=S.nota;rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});const sp=n0-S.nota;if(sp<=0)break;left-=sp;sum+=sp;n++;last=k}
+ if(asstOn()&&!ovCur()&&now-asstT>ASST_T){asstT=now;try{let left=S.nota*ASST_B,n=0,sum=0,last=null;for(let i=0;i<40;i++){const k=asstPick(left);if(!k)break;const n0=S.nota;rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':'',slot:k.slot?'1':''}});const sp=n0-S.nota;if(sp<=0)break;left-=sp;sum+=sp;n++;last=k}
   if(n)msg(T('Asistan')+': '+(n===1?T(last.n):n+' '+T('geliştirme'))+' · ♪ '+fmt(sum))}catch(e){console.warn(e)}}
  /* Menajer: otomatik geliştir (v21) — Analiz'in gelir önerisi; yalnız seviye, ritim ve solo geliştirmesi, notanın yarısını aşmadan */
- if(S.mn.lv&&S.auto.lv!==false&&now-autoT>10000){autoT=now;try{const k=autoBuyPick();if(k){rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});msg('Menajer: '+k.n+' · ♪ '+fmt(k.cost))}}catch(e){console.warn(e)}}
+ if(S.mn.lv&&S.auto.lv!==false&&now-autoT>10000){autoT=now;try{const k=autoBuyPick();if(k){rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':'',slot:k.slot?'1':''}});msg('Menajer: '+k.n+' · ♪ '+fmt(k.cost))}}catch(e){console.warn(e)}}
  if(S.mn.ord&&S.auto.ord!==false){S.orders.forEach((o,k)=>{if(o&&o.tpl&&orderOk(o)){deliver(k);ch=true}})}
  if(S.mn.ins&&S.auto.ins!==false){const empty=S.slots.indexOf(null);if(empty>=0){const cand=INS.filter(x=>!lvOf(x.id)&&famOpen(x.fam)&&x.u<=S.nota*0.25).sort((a,b)=>a.u-b.u)[0];if(cand){S.nota-=cand.u;S.lv[cand.id]=1;S.slots[empty]=cand.id;if(S.am.yeni){ezPlaced(empty);undoReset();msg('Menajer '+cand.n+' açtı, '+(empty+1)+'. yere koydu');ch=true}else{const row=Array(18).fill(0);const steps=cand.fam==='vur'?MI.gs.slice(0,Math.min(cand.nf,MI.gs.length)):[MI.gs[0],MI.gs[Math.min(2,MI.gs.length-1)]];steps.forEach(st=>{const k=noteCost();if(S.nota>=k){S.nota-=k;row[st]=1}});S.pat.A[empty]=row;undoReset();msg('Menajer '+cand.n+' açtı, '+(empty+1)+'. yere koydu');ch=true}}}}
  if(S.mn.alb&&S.auto.alb===true&&S.runEarned>=albumTh()*2){releaseAlbum();return}
@@ -570,7 +573,7 @@ function rackAct(b){const act=b.dataset.act;
  if(act==='demoGo'){enterDemo(+b.dataset.k);if(isPhone())setTab('stage');return}
  if(act==='demoExit'){exitDemo();return}
  if(act==='buy'){S.buy=+b.dataset.v}
- else if(act==='lv'){const x=IDX[b.dataset.id];if(!x)return;const q=b.dataset.one&&lvOf(x.id)?{n:1,c:Math.round(x.lb*Math.pow(GROW,lvOf(x.id)))}:lvQuote(x);if(q.unlock){if(!famOpen(x.fam)){msg(FAM[x.fam].n+' ailesi kapalı: Koleksiyon sekmesindeki kapıya bak');return}if(pay(q.c)){S.lv[x.id]=1;const empty=S.slots.indexOf(null);if(empty>=0){S.slots[empty]=x.id;msg(x.n+' açıldı ve '+(empty+1)+'. yere kondu. Vuruş eklemeyi unutma.');ezPlaced(empty)}else msg(x.n+' açıldı, yedekte bekliyor. Bir yeri boşalt ya da yer ekle.')}}else if(pay(q.c)){const was=lvOf(x.id);S.lv[x.id]+=q.n;const ms=MS.find(m=>was<m&&S.lv[x.id]>=m);if(ms)msg(x.n+' '+ms+'. seviye · nota ve hasar ×2'+(ms===25?' · ses zenginleşti':''))}}
+ else if(act==='lv'){const x=IDX[b.dataset.id];if(!x)return;const q=b.dataset.one&&lvOf(x.id)?{n:1,c:Math.round(x.lb*Math.pow(GROW,lvOf(x.id)))}:lvQuote(x);if(q.unlock){if(!famOpen(x.fam)){msg(FAM[x.fam].n+' ailesi kapalı: Koleksiyon sekmesindeki kapıya bak');return}const sl=b.dataset.slot&&!S.slots.includes(null)&&S.slots.length<MAXSLOTS;if(pay(q.c+(sl?slotCost():0))){if(sl)S.slots.push(null);S.lv[x.id]=1;const empty=S.slots.indexOf(null);if(empty>=0){S.slots[empty]=x.id;msg(x.n+' açıldı ve '+(empty+1)+'. yere kondu. Vuruş eklemeyi unutma.');ezPlaced(empty)}else msg(x.n+' açıldı, yedekte bekliyor. Bir yeri boşalt ya da yer ekle.')}}else if(pay(q.c)){const was=lvOf(x.id);S.lv[x.id]+=q.n;const ms=MS.find(m=>was<m&&S.lv[x.id]>=m);if(ms)msg(x.n+' '+ms+'. seviye · nota ve hasar ×2'+(ms===25?' · ses zenginleşti':''))}}
  else if(act==='openFam'){const f=b.dataset.f;if(!famCanOpen(f)){msg('Kapı için koşullar tamamlanmadı');return}const c=famCond(f).cost||0;if(c&&!pay(c))return;S.famOpen[f]=1;famSel=f;msg(FAM[f].n+' ailesi açıldı');save()}
  else if(act==='place'){const x=IDX[b.dataset.id],empty=S.slots.indexOf(null);if(x&&empty>=0){S.slots[empty]=x.id;msg(x.n+' '+(empty+1)+'. yere kondu');ezPlaced(empty)}}
  else if(act==='addslot'){if(S.slots.length<MAXSLOTS&&pay(slotCost())){S.slots.push(null);msg('Yeni sahne yeri açıldı: '+S.slots.length)}}
@@ -862,7 +865,7 @@ const anlTry=()=>{if($('stats').classList.contains('locked')){msg('Analiz '+UNL_
 $('stats').addEventListener('click',anlTry);
 $('stats').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();anlTry()}});
 $('anl').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;if(b.dataset.a==='close'){anlToggle(false);return}
- if(b.dataset.a==='buy'){const k=anlSug[+b.dataset.i];if(!k)return;rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':''}});renderAnl()}});
+ if(b.dataset.a==='buy'){const k=anlSug[+b.dataset.i];if(!k)return;rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':'',slot:k.slot?'1':''}});renderAnl()}});
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(anlOn){anlToggle(false);return}if(demoMode&&!isField(document.activeElement)){exitDemo();return}if(S.edit==='S'&&soloView()>=0&&!isField(document.activeElement))soloExit()});
 setInterval(()=>{if(anlOn)renderAnl()},1000);
 let demoIdx=0;
