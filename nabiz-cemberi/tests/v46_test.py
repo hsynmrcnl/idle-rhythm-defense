@@ -46,6 +46,8 @@ with sync_playwright() as pw:
         check(p.is_visible('#p-set'), 'dişli Ayarlar’ı açıyor')
         rk = p.evaluate("()=>{const r=document.getElementById('rack');return [r.scrollHeight>r.clientHeight,getComputedStyle(r).overflowY]}")
         check(rk[1] == 'auto', 'panel kendi içinde kayar (%s)' % rk)
+        g = p.evaluate("()=>{const g=document.querySelector('.top .gear').getBoundingClientRect(),r=document.getElementById('rack').getBoundingClientRect();return [g.bottom,r.top,document.getElementById('msg').parentNode.id]}")
+        check(g[1] >= g[0] and g[2] == 'cvwrap', 'v66: kayan panel dişlinin altından başlıyor, mesaj tuvalin üstünde (%s)' % g)
         check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
         ctx.close()
     b.close()
