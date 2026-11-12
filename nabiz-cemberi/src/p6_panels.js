@@ -1,5 +1,5 @@
 /* ================= panels ================= */
-let tab='studio',soloSel=-1,soloEdSlot=-1,soloDrag=null,bookNew=false,eSel=0,eK=4,eRot=0,eGhost=0,resetArm=false,resetT=0;
+let tab='studio',soloSel=-1,soloEdSlot=-1,soloDrag=null,bookNew=false,eSel=0,eK=4,eRot=0,eGhost=0,resetArm=false,resetT=0,albArm=false,albT=0;
 const TABS=['studio','coll','def','book','look','album','set'];
 /* telefon dock'u: 5 bölüm; Stüdyo|Koleksiyon ve Albüm|Kitap bir düğmeyi paylaşır, dişli (t-set) Ayarlar'ı açar */
 const DOCK={stage:'stage',studio:'studio',coll:'studio',def:'def',album:'album',book:'album',look:'look'};
@@ -615,7 +615,11 @@ function rackAct(b){const act=b.dataset.act;
   const pick=part=>{for(const id of FILL_PARTS[part]){const si=S.slots.indexOf(id);if(si>=0)return si}return S.slots.findIndex((id,si)=>isFillRow(si))};
   tpl.h.forEach(([off,part,v])=>{const si=pick(part);if(si<0)return;const s=Math.min(MI.N-1,z0+Math.round(off*zl/8));rows[si][s]=Math.max(rows[si][s],v)});applyRows('F',rows,tpl.n+' dolgusu yerleştirildi');return}
  else if(act==='euclid'){S.rowm[S.edit+eSel]='m';applyRows(S.edit,eucRows(),(slotIns(eSel)||{n:'Yer'}).n+' yerine '+eK+' vuruş dağıtıldı');return}
- else if(act==='album'){if(demoMode){msg('Örnek şarkıdayken albüm çıkmaz. Önce kendi oyununa dön.');return}releaseAlbum();return}
+ else if(act==='album'){if(demoMode){msg('Örnek şarkıdayken albüm çıkmaz. Önce kendi oyununa dön.');return}
+  /* v63: albüm oyunu baştan başlatır; iki dokunuş (tek dokunuşla onaysız çıkıyordu) */
+  if(S.runEarned<albumTh()){releaseAlbum();return}
+  if(albArm){albArm=false;clearTimeout(albT);releaseAlbum();return}
+  albArm=true;const o=b.textContent;b.textContent=T('Emin misin? Oyun baştan başlar · tekrar bas');albT=setTimeout(()=>{albArm=false;b.textContent=o},4000);return}
  else if(act==='fxreset'){delete S.fxo[dispTheme().id];renderPanels();return}
  else if(act==='waveBack'){setWave(S.wave-5);msg('Dalga '+S.wave+' · geri çekilmek ücretsiz');return}
  else if(act==='waveFwd'){setWave(S.wave+5);msg('Dalga '+S.wave);return}
@@ -630,7 +634,7 @@ function rackAct(b){const act=b.dataset.act;
  else if(act==='tour'){if(demoMode){msg('Önce kendi oyununa dön');return}if(!canTour()){msg('Turne için '+TOUR_AL+' albüm gerekir');return}if(!tourArm){tourArm=true;b.textContent='Emin misin? Albümler ve hayranlar sıfırlanır · tekrar bas';tourT=setTimeout(()=>{tourArm=false;b.textContent='Turneye çık'},4000);return}tourArm=false;clearTimeout(tourT);goTour();return}
  else if(act==='tutRestart'){tutSandbox();msg('Öğretici başladı · kaydın bitince geri gelir');return}
  else if(act==='saveCode'){const ta=$('saveCode');exportCode().then(code=>{ta.value=code;$('saveInfo').textContent=Math.round(code.length/1024*10)/10+' KB';const done=()=>msg('Kayıt kodu kopyalandı · başka cihazda Ayarlar → Kayıt → yapıştır → Koddan yükle');const fb=()=>{ta.focus();ta.select();msg('Kod üretildi · seçili metni kopyala')};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done,fb);else fb()});return}
- else if(act==='loadCode'){const code=($('saveCode').value||'').trim();if(!code){msg('Önce kayıt kodunu yapıştır');return}const si=$('saveInfo'),say=t=>{msg(t);if(si)si.textContent=T(t)};if(!loadArm){loadArm=true;b.textContent=T('Tekrar bas: yükle');say('Emin misin? Buradaki kayıt silinir · yüklemek için tekrar bas');loadT=setTimeout(()=>{loadArm=false;b.textContent=T('Koddan yükle')},4000);return}loadArm=false;clearTimeout(loadT);b.textContent=T('Koddan yükle');parseCode(code).then(d=>{applyLoaded(d);say('Kayıt yüklendi')},err=>say('Yüklenemedi: '+T(err&&err.message||'kod okunamadı')));return}
+ else if(act==='loadCode'){const code=($('saveCode').value||'').trim();if(!code){msg('Önce kayıt kodunu yapıştır');return}const si=$('saveInfo'),say=t=>{msg(t);if(si)si.textContent=T(t)};if(!loadArm){/* v63: önce kodu doğrula; geçersizse onay sormadan söyle. Onay süresi 8 sn */parseCode(code).then(()=>{loadArm=true;b.textContent=T('Tekrar bas: yükle');say('Emin misin? Buradaki kayıt silinir · yüklemek için tekrar bas');loadT=setTimeout(()=>{loadArm=false;b.textContent=T('Koddan yükle')},8000)},err=>say('Yüklenemedi: '+T(err&&err.message||'kod okunamadı')));return}loadArm=false;clearTimeout(loadT);b.textContent=T('Koddan yükle');parseCode(code).then(d=>{applyLoaded(d);say('Kayıt yüklendi')},err=>say('Yüklenemedi: '+T(err&&err.message||'kod okunamadı')));return}
  /* v25: oyunu sıfırla — kayıt silinir, sayfa yeniden açılır: öğretici, ayarlar, açılan bölümler dahil her şey ilk açılıştaki gibi */
  else if(act==='reset'){
   if(resetArm){resetArm=false;clearTimeout(resetT);wiping=true;if(playing)try{startStop()}catch(err){}try{localStorage.removeItem(KEY)}catch(err){}b.textContent=T('Sıfırlanıyor…');b.disabled=true;setTimeout(()=>location.reload(),60);return}
