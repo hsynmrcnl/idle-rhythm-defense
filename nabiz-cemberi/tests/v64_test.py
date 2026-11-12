@@ -1,4 +1,4 @@
-"""v64: sahne doluyken Aç düğmesi sahne yeri de ekler; öneri/Asistan adayı yer+enstrüman; 10 yer doluysa yedeğe yazar.
+"""v64: Ayarlar'da Terimler sözlüğü, üst çubukta düşman etiketi, Sv yerine Seviye; sahne doluyken Aç düğmesi sahne yeri de ekler; öneri/Asistan adayı yer+enstrüman; 10 yer doluysa yedeğe yazar.
 
     python build.py && python tests/v64_test.py
 """
@@ -38,6 +38,10 @@ with sync_playwright() as pw:
     t = p.locator('#collList .irow.locked button').first.inner_text()
     check('yedeğe' in t and p.locator('#collList button[data-slot="1"]').count() == 0, '10 yer doluyken düğme yedeğe yazıyor: “%s”' % t)
     check(p.evaluate("()=>{const k=window.__nb.asstPick(1e12);return !(k&&k.act==='lv'&&k.id&&!window.__nb.S.lv[k.id])}"), '10 yer doluyken Asistan yeni enstrüman almıyor')
+    g = p.evaluate("()=>[...document.querySelectorAll('.gloss dt')].map(e=>e.textContent)")
+    check(len(g) >= 10 and 'Nefes' in g and 'Uyum' in g, 'Terimler sözlüğü %d terim' % len(g))
+    p.evaluate("()=>{const nb=window.__nb;nb.setTab('studio');nb.renderPanels()}")
+    check('Sv ' not in p.locator('#slotList').inner_text() if p.locator('#slotList').count() else True, 'Sahne listesinde Sv yerine Seviye')
     check(not errs, 'sayfa hatası yok %s' % errs[:2])
     b.close()
 srv.shutdown()
