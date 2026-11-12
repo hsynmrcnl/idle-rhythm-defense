@@ -167,7 +167,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v62 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v63 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -284,7 +284,7 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
  if(retreatCount!==retSeen){retSeen=retreatCount;retT=now}
  const auto=S.mn&&S.mn.lv&&S.auto&&S.auto.lv!==false||asstOn();
  /* v62: albüm eşiği dolmuş ve ilerleme 2 dk durmuşsa öneri çipi albümü gösterir (Asistan açıkken de); dokununca Albüm sekmesi (albüm oyunu sıfırladığı için kendisi çıkarmaz) */
- if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.album&&S.runEarned>=albumTh()&&now-stallT>HINT_STALL&&!(S.mn&&S.mn.alb&&S.auto.alb===true)){hintK={alb:1};el.innerHTML=T('Albüm hazır')+': <b>+'+fansFor()+' '+T('hayran')+'</b>';el.title=T('İlerleme durdu: albüm çıkar, oyun baştan başlar ama hayranlar kalıcı gelir verir');if(el.hidden)el.hidden=false;return}
+ if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.album&&S.runEarned>=albumTh()&&(now-stallT>HINT_STALL||S.runEarned>=albumTh()*3)&&!(S.mn&&S.mn.alb&&S.auto.alb===true)){hintK={alb:1};el.innerHTML=T('Albüm hazır')+': <b>+'+fansFor()+' '+T('hayran')+'</b>';el.title=T('İlerleme durdu: albüm çıkar, oyun baştan başlar ama hayranlar kalıcı gelir verir');if(el.hidden)el.hidden=false;return}
  let k=null;
  if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.studio&&!auto&&(now-stallT>HINT_STALL||now-retT<HINT_RET))k=hintPick();
  hintK=k;if(!k){if(!el.hidden)el.hidden=true;return}
@@ -444,7 +444,11 @@ function tutShowL(st,lab){$('tutLN').textContent=lab;$('tutLT').textContent=T(st
 function tutShake(){const h=$('tutHole');h.classList.remove('shake');void h.offsetWidth;h.classList.add('shake');const c=ovCur();if(!c)return;const st=c.st;$('tutLP').textContent=st.kind==='btn'?T('Göz at, sonra balondaki düğmeye dokun')+': '+T(st.btn||'Devam'):T(st.kind==='auto'?'Biraz bekle: düşman yaklaşıyor.':'Parlayan yere dokun.')}
 const inRect=(e,r)=>{if(!r)return false;const x=e.clientX,y=e.clientY;if(r.round){const cx=r.x+r.w/2,cy=r.y+r.h/2;return Math.hypot(x-cx,y-cy)<=r.w/2}return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h};
 let tKey=false;
-function tutGuard(e){const c=ovCur();if(!c)return;if(tKey&&e.type==='click')return;
+/* v63: kısa öğreticide hedefin ve balonun dışına dokunmak (ya da Escape) o kısa öğreticiyi kapatır ve dokunuş yerine ulaşır; tıklamalar artık sessizce yutulmaz. Ana öğretici eskisi gibi kilitli. */
+let tPassT=0;
+function miniClose(){S.tipq.shift();S.tutm=0;tutT0=0;save();tPassT=performance.now()+800;tutTick()}
+function tutGuard(e){if(e.type==='click'&&performance.now()<tPassT){tPassT=0;return}const c=ovCur();if(!c)return;if(tKey&&e.type==='click')return;
+ if(!c.main){const Lb=$('tutL');if(e.type==='keydown'&&e.key==='Escape'){e.preventDefault();miniClose();return}if(e.type==='pointerdown'&&!(Lb&&Lb.contains(e.target)&&e.target.closest('#tutBub'))&&!(c.st.kind==='tap'&&inRect(e,tutRect))){miniClose();return}}
  if(e.type==='keydown'&&e.key==='Tab'){/* v57: Tab balonun içinde kalır */e.preventDefault();const bs=[$('tutSkipL'),$('tutLBtn')].filter(b=>b&&!b.hidden);if(bs.length){const i=bs.indexOf(document.activeElement);bs[(i+(e.shiftKey?bs.length-1:1)+bs.length)%bs.length].focus()}else $('tutBub').focus();return}
  const L=$('tutL');if(e.target&&L&&L.contains(e.target)&&e.target.closest('button'))return;const st=c.st;
  if(e.type==='keydown'){if(st.allow&&e.key===' ')return;e.preventDefault();e.stopPropagation();

@@ -18,7 +18,8 @@ function leak(e,k,now){const T=ETYPES[e.ty];
  if(e.raid){/* akıncı: küçük, ölümcül olmayan hasar */let dmg=hpMax()*RAID_DMG;if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}{const h0=core.hp;core.hp=Math.max(Math.min(core.hp,hpMax()*RAID_FLOOR),core.hp-dmg);if(wave)wave.raidDmg=(wave.raidDmg||0)+(h0-core.hp)}retreatFlash=Math.max(retreatFlash,0.6);if(wave)wave.raidLeak++;enemies.splice(k,1);return}
  let dmg=T.dmg*(1+0.03*e.w);if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}core.hp-=dmg;retreatFlash=Math.max(retreatFlash,0.6);if(T.mute){const cands=S.slots.map((id,si)=>id?si:-1).filter(x=>x>=0);if(cands.length){const si=cands[Math.floor(Math.random()*cands.length)];muteUntil[si]=now+barDur();msg(slotIns(si).n+' bir ölçü susturuldu')}}enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;if(core.hp<=0)retreat(now)}
 /* öğretici: ilk düşman ve Ritme vur'dan sonra arayüz adımlarında dalga durur */
-const tutHold=()=>{if(ffOn)return false;const c=ovCur();return !!(c&&(!c.main||c.st.n>=8))};
+/* v63: yalnız ana öğretici dalgayı durdurur; kısa öğreticiler durdurmaz (bekleyen kısa öğretici idle oyunu donduruyordu, 4 persona) */
+const tutHold=()=>{if(ffOn)return false;const c=ovCur();return !!(c&&c.main&&c.st.n>=8)};
 function retreat(now){retreatCount++;dngIn=false;const from=S.wave,to=Math.max(1,S.wave-1);enemies=[];core.hp=hpMax();core.sh=0;retreatFlash=1.5;tapeStop(from,to);msg('Sessizlik A.Ş. sahneyi bastı. Dalga '+from+' → '+to+'. Nabız tazelendi.');startWave(to,now)}
 function wallHit(e){const k=Math.floor(e.a*WN)%WN;const E=wallE[k];if(E<=0.02)return 0;const b=wallBase(),top=b+Math.min(1,E)*wallSpan();if(e.d>=b&&e.d<=top)return E*wallD[k];return 0}
 function logic(now){
