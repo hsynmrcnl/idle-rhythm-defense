@@ -115,7 +115,11 @@ function slotRowHtml(si,th){
 }
 /* v57: paneller yeniden çizilince klavye odağı aynı düğmede kalır (Enter'la basılan düğme kayboluyor, odak panel başına dönüyordu) */
 function focusKey(){const e=document.activeElement;if(!e||!e.dataset||!e.dataset.act||!e.closest('#rack'))return null;if(e.id)return '#'+e.id;const d=e.dataset;let q='[data-act="'+d.act+'"]';for(const k of ['i','id','v','k','f','s'])if(d[k]!=null)q+='[data-'+k+'="'+d[k]+'"]';const sec=e.parentElement.closest('[id]');return (sec&&sec.id?'#'+sec.id+' ':'#rack ')+q}
-function renderPanels(){const fk=focusKey();renderPanels0();if(fk&&(!document.activeElement||document.activeElement===document.body)){try{const el=document.querySelector(fk);if(el)el.focus({preventScroll:true})}catch(e){}}}
+function renderPanels(){const fk=focusKey(),ae=document.activeElement,sec=ae&&ae.closest&&ae.closest('#rack [id]'),fs='button,[href],input,select,[tabindex]:not([tabindex="-1"])',ix=sec?[...sec.querySelectorAll(fs)].indexOf(ae):-1,sid=sec&&sec.id;renderPanels0();
+ if(fk&&(!document.activeElement||document.activeElement===document.body)){try{let el=document.querySelector(fk);
+  /* v63: düğme yok olduysa (Aç → Sahnede) aynı bölümde aynı sıradaki odaklanabilir öğeye */
+  if(!el&&sid&&ix>=0){const c=$(sid);if(c){const L=[...c.querySelectorAll(fs)];el=L[Math.min(ix,L.length-1)]||null}}
+  if(el)el.focus({preventScroll:true})}catch(e){}}}
 function renderPanels0(){
  const th=dispTheme(),p=S.pat[S.edit];
  $('buyMode').innerHTML=[[1,'×1'],[10,'×10'],[0,'Maks']].map(([v,l])=>'<button data-act="buy" data-v="'+v+'" aria-pressed="'+(S.buy===v)+'">'+T(l)+'</button>').join('');$('undoBox').innerHTML=undoBtn();
