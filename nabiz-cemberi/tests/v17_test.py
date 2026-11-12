@@ -54,7 +54,7 @@ with sync_playwright() as pw:
     p.click('[data-act=harm][data-v=uclu]'); p.wait_for_timeout(50)
     check(p.evaluate("()=>window.__nb.S.harm") == 'uclu', 'Görünüm → Armoni → Üçlü')
     p.evaluate("()=>{const S=window.__nb.S;S.runEarned=1e30}")
-    p.click('[data-act=tab][data-tab=album]'); p.click('#aBtn'); p.wait_for_timeout(100)
+    p.click('[data-act=tab][data-tab=album]'); p.click('#aBtn'); p.wait_for_timeout(100); p.click('#aBtn'); p.wait_for_timeout(100)
     check(p.evaluate("()=>window.__nb.S.harm") == 'uclu' and p.evaluate("()=>window.__nb.S.albums.length") == 1, 'armoni seçimi albümden sonra kalıyor')
     p.click('[data-act=tab][data-tab=look]'); p.click('[data-act=harm][data-v=zengin]')
     # örnek şarkılar zengin armoniyle hatasız çalıyor

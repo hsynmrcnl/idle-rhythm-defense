@@ -1,5 +1,5 @@
 /* ================= panels ================= */
-let tab='studio',soloSel=-1,soloEdSlot=-1,soloDrag=null,bookNew=false,eSel=0,eK=4,eRot=0,eGhost=0,resetArm=false,resetT=0;
+let tab='studio',soloSel=-1,soloEdSlot=-1,soloDrag=null,bookNew=false,eSel=0,eK=4,eRot=0,eGhost=0,resetArm=false,resetT=0,albArm=false,albT=0;
 const TABS=['studio','coll','def','book','look','album','set'];
 /* telefon dock'u: 5 bölüm; Stüdyo|Koleksiyon ve Albüm|Kitap bir düğmeyi paylaşır, dişli (t-set) Ayarlar'ı açar */
 const DOCK={stage:'stage',studio:'studio',coll:'studio',def:'def',album:'album',book:'album',look:'look'};
@@ -115,7 +115,11 @@ function slotRowHtml(si,th){
 }
 /* v57: paneller yeniden çizilince klavye odağı aynı düğmede kalır (Enter'la basılan düğme kayboluyor, odak panel başına dönüyordu) */
 function focusKey(){const e=document.activeElement;if(!e||!e.dataset||!e.dataset.act||!e.closest('#rack'))return null;if(e.id)return '#'+e.id;const d=e.dataset;let q='[data-act="'+d.act+'"]';for(const k of ['i','id','v','k','f','s'])if(d[k]!=null)q+='[data-'+k+'="'+d[k]+'"]';const sec=e.parentElement.closest('[id]');return (sec&&sec.id?'#'+sec.id+' ':'#rack ')+q}
-function renderPanels(){const fk=focusKey();renderPanels0();if(fk&&(!document.activeElement||document.activeElement===document.body)){try{const el=document.querySelector(fk);if(el)el.focus({preventScroll:true})}catch(e){}}}
+function renderPanels(){const fk=focusKey(),ae=document.activeElement,sec=ae&&ae.closest&&ae.closest('#rack [id]'),fs='button,[href],input,select,[tabindex]:not([tabindex="-1"])',ix=sec?[...sec.querySelectorAll(fs)].indexOf(ae):-1,sid=sec&&sec.id;renderPanels0();
+ if(fk&&(!document.activeElement||document.activeElement===document.body)){try{let el=document.querySelector(fk);
+  /* v63: düğme yok olduysa (Aç → Sahnede) aynı bölümde aynı sıradaki odaklanabilir öğeye */
+  if(!el&&sid&&ix>=0){const c=$(sid);if(c){const L=[...c.querySelectorAll(fs)];el=L[Math.min(ix,L.length-1)]||null}}
+  if(el)el.focus({preventScroll:true})}catch(e){}}}
 function renderPanels0(){
  const th=dispTheme(),p=S.pat[S.edit];
  $('buyMode').innerHTML=[[1,'×1'],[10,'×10'],[0,'Maks']].map(([v,l])=>'<button data-act="buy" data-v="'+v+'" aria-pressed="'+(S.buy===v)+'">'+T(l)+'</button>').join('');$('undoBox').innerHTML=undoBtn();
@@ -167,7 +171,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v62 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v63 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -284,7 +288,7 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
  if(retreatCount!==retSeen){retSeen=retreatCount;retT=now}
  const auto=S.mn&&S.mn.lv&&S.auto&&S.auto.lv!==false||asstOn();
  /* v62: albüm eşiği dolmuş ve ilerleme 2 dk durmuşsa öneri çipi albümü gösterir (Asistan açıkken de); dokununca Albüm sekmesi (albüm oyunu sıfırladığı için kendisi çıkarmaz) */
- if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.album&&S.runEarned>=albumTh()&&now-stallT>HINT_STALL&&!(S.mn&&S.mn.alb&&S.auto.alb===true)){hintK={alb:1};el.innerHTML=T('Albüm hazır')+': <b>+'+fansFor()+' '+T('hayran')+'</b>';el.title=T('İlerleme durdu: albüm çıkar, oyun baştan başlar ama hayranlar kalıcı gelir verir');if(el.hidden)el.hidden=false;return}
+ if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.album&&S.runEarned>=albumTh()&&(now-stallT>HINT_STALL||S.runEarned>=albumTh()*3)&&!(S.mn&&S.mn.alb&&S.auto.alb===true)){hintK={alb:1};el.innerHTML=T('Albüm hazır')+': <b>+'+fansFor()+' '+T('hayran')+'</b>';el.title=T('İlerleme durdu: albüm çıkar, oyun baştan başlar ama hayranlar kalıcı gelir verir');if(el.hidden)el.hidden=false;return}
  let k=null;
  if(playing&&!demoMode&&!ovCur()&&S.tut&&S.tut.done&&S.unl&&S.unl.studio&&!auto&&(now-stallT>HINT_STALL||now-retT<HINT_RET))k=hintPick();
  hintK=k;if(!k){if(!el.hidden)el.hidden=true;return}
@@ -444,7 +448,11 @@ function tutShowL(st,lab){$('tutLN').textContent=lab;$('tutLT').textContent=T(st
 function tutShake(){const h=$('tutHole');h.classList.remove('shake');void h.offsetWidth;h.classList.add('shake');const c=ovCur();if(!c)return;const st=c.st;$('tutLP').textContent=st.kind==='btn'?T('Göz at, sonra balondaki düğmeye dokun')+': '+T(st.btn||'Devam'):T(st.kind==='auto'?'Biraz bekle: düşman yaklaşıyor.':'Parlayan yere dokun.')}
 const inRect=(e,r)=>{if(!r)return false;const x=e.clientX,y=e.clientY;if(r.round){const cx=r.x+r.w/2,cy=r.y+r.h/2;return Math.hypot(x-cx,y-cy)<=r.w/2}return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h};
 let tKey=false;
-function tutGuard(e){const c=ovCur();if(!c)return;if(tKey&&e.type==='click')return;
+/* v63: kısa öğreticide hedefin ve balonun dışına dokunmak (ya da Escape) o kısa öğreticiyi kapatır ve dokunuş yerine ulaşır; tıklamalar artık sessizce yutulmaz. Ana öğretici eskisi gibi kilitli. */
+let tPassT=0;
+function miniClose(){S.tipq.shift();S.tutm=0;tutT0=0;save();tPassT=performance.now()+800;tutTick()}
+function tutGuard(e){if(e.type==='click'&&performance.now()<tPassT){tPassT=0;return}const c=ovCur();if(!c)return;if(tKey&&e.type==='click')return;
+ if(!c.main){const Lb=$('tutL');if(e.type==='keydown'&&e.key==='Escape'){e.preventDefault();miniClose();return}if(e.type==='pointerdown'&&!(Lb&&Lb.contains(e.target)&&e.target.closest('#tutBub'))&&!(c.st.kind==='tap'&&inRect(e,tutRect))){miniClose();return}}
  if(e.type==='keydown'&&e.key==='Tab'){/* v57: Tab balonun içinde kalır */e.preventDefault();const bs=[$('tutSkipL'),$('tutLBtn')].filter(b=>b&&!b.hidden);if(bs.length){const i=bs.indexOf(document.activeElement);bs[(i+(e.shiftKey?bs.length-1:1)+bs.length)%bs.length].focus()}else $('tutBub').focus();return}
  const L=$('tutL');if(e.target&&L&&L.contains(e.target)&&e.target.closest('button'))return;const st=c.st;
  if(e.type==='keydown'){if(st.allow&&e.key===' ')return;e.preventDefault();e.stopPropagation();
@@ -607,7 +615,11 @@ function rackAct(b){const act=b.dataset.act;
   const pick=part=>{for(const id of FILL_PARTS[part]){const si=S.slots.indexOf(id);if(si>=0)return si}return S.slots.findIndex((id,si)=>isFillRow(si))};
   tpl.h.forEach(([off,part,v])=>{const si=pick(part);if(si<0)return;const s=Math.min(MI.N-1,z0+Math.round(off*zl/8));rows[si][s]=Math.max(rows[si][s],v)});applyRows('F',rows,tpl.n+' dolgusu yerleştirildi');return}
  else if(act==='euclid'){S.rowm[S.edit+eSel]='m';applyRows(S.edit,eucRows(),(slotIns(eSel)||{n:'Yer'}).n+' yerine '+eK+' vuruş dağıtıldı');return}
- else if(act==='album'){if(demoMode){msg('Örnek şarkıdayken albüm çıkmaz. Önce kendi oyununa dön.');return}releaseAlbum();return}
+ else if(act==='album'){if(demoMode){msg('Örnek şarkıdayken albüm çıkmaz. Önce kendi oyununa dön.');return}
+  /* v63: albüm oyunu baştan başlatır; iki dokunuş (tek dokunuşla onaysız çıkıyordu) */
+  if(S.runEarned<albumTh()){releaseAlbum();return}
+  if(albArm){albArm=false;clearTimeout(albT);releaseAlbum();return}
+  albArm=true;const o=b.textContent;b.textContent=T('Emin misin? Oyun baştan başlar · tekrar bas');albT=setTimeout(()=>{albArm=false;b.textContent=o},4000);return}
  else if(act==='fxreset'){delete S.fxo[dispTheme().id];renderPanels();return}
  else if(act==='waveBack'){setWave(S.wave-5);msg('Dalga '+S.wave+' · geri çekilmek ücretsiz');return}
  else if(act==='waveFwd'){setWave(S.wave+5);msg('Dalga '+S.wave);return}
@@ -622,7 +634,7 @@ function rackAct(b){const act=b.dataset.act;
  else if(act==='tour'){if(demoMode){msg('Önce kendi oyununa dön');return}if(!canTour()){msg('Turne için '+TOUR_AL+' albüm gerekir');return}if(!tourArm){tourArm=true;b.textContent='Emin misin? Albümler ve hayranlar sıfırlanır · tekrar bas';tourT=setTimeout(()=>{tourArm=false;b.textContent='Turneye çık'},4000);return}tourArm=false;clearTimeout(tourT);goTour();return}
  else if(act==='tutRestart'){tutSandbox();msg('Öğretici başladı · kaydın bitince geri gelir');return}
  else if(act==='saveCode'){const ta=$('saveCode');exportCode().then(code=>{ta.value=code;$('saveInfo').textContent=Math.round(code.length/1024*10)/10+' KB';const done=()=>msg('Kayıt kodu kopyalandı · başka cihazda Ayarlar → Kayıt → yapıştır → Koddan yükle');const fb=()=>{ta.focus();ta.select();msg('Kod üretildi · seçili metni kopyala')};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done,fb);else fb()});return}
- else if(act==='loadCode'){const code=($('saveCode').value||'').trim();if(!code){msg('Önce kayıt kodunu yapıştır');return}const si=$('saveInfo'),say=t=>{msg(t);if(si)si.textContent=T(t)};if(!loadArm){loadArm=true;b.textContent=T('Tekrar bas: yükle');say('Emin misin? Buradaki kayıt silinir · yüklemek için tekrar bas');loadT=setTimeout(()=>{loadArm=false;b.textContent=T('Koddan yükle')},4000);return}loadArm=false;clearTimeout(loadT);b.textContent=T('Koddan yükle');parseCode(code).then(d=>{applyLoaded(d);say('Kayıt yüklendi')},err=>say('Yüklenemedi: '+T(err&&err.message||'kod okunamadı')));return}
+ else if(act==='loadCode'){const code=($('saveCode').value||'').trim();if(!code){msg('Önce kayıt kodunu yapıştır');return}const si=$('saveInfo'),say=t=>{msg(t);if(si)si.textContent=T(t)};if(!loadArm){/* v63: önce kodu doğrula; geçersizse onay sormadan söyle. Onay süresi 8 sn */parseCode(code).then(()=>{loadArm=true;b.textContent=T('Tekrar bas: yükle');say('Emin misin? Buradaki kayıt silinir · yüklemek için tekrar bas');loadT=setTimeout(()=>{loadArm=false;b.textContent=T('Koddan yükle')},8000)},err=>say('Yüklenemedi: '+T(err&&err.message||'kod okunamadı')));return}loadArm=false;clearTimeout(loadT);b.textContent=T('Koddan yükle');parseCode(code).then(d=>{applyLoaded(d);say('Kayıt yüklendi')},err=>say('Yüklenemedi: '+T(err&&err.message||'kod okunamadı')));return}
  /* v25: oyunu sıfırla — kayıt silinir, sayfa yeniden açılır: öğretici, ayarlar, açılan bölümler dahil her şey ilk açılıştaki gibi */
  else if(act==='reset'){
   if(resetArm){resetArm=false;clearTimeout(resetT);wiping=true;if(playing)try{startStop()}catch(err){}try{localStorage.removeItem(KEY)}catch(err){}b.textContent=T('Sıfırlanıyor…');b.disabled=true;setTimeout(()=>location.reload(),60);return}
