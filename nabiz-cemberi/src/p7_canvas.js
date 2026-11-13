@@ -15,7 +15,8 @@ const FS_BLUR=PREC+'varying vec2 vUv;uniform sampler2D t;uniform vec2 dir;unifor
 const FS_TRAIL=PREC+'varying vec2 vUv;uniform sampler2D s;uniform sampler2D pv;uniform float k;void main(){vec3 a=texture2D(s,vUv).rgb;vec3 b=texture2D(pv,vUv).rgb*k;gl_FragColor=vec4(max(a,b),1.0);}';
 const FS_COMP=PREC+[
 'varying vec2 vUv;uniform sampler2D s;uniform sampler2D bl;',
-'uniform float time,kick,bloomK,ca,scan,crt,glitch,grain,htone,mis,vign,dust,warm,sat,kaleid,asp;',
+'uniform float time,kick,bloomK,ca,scan,crt,glitch,grain,htone,mis,vign,dust,warm,sat,kaleid,asp,lcd,lcdN;',
+'uniform vec3 lp0,lp1,lp2,lp3;',
 'uniform vec3 paper,ink,dustCol;',
 'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
 'void main(){',
@@ -44,6 +45,8 @@ const FS_COMP=PREC+[
 '  outc=mix(outc,outc*spot,smoothstep(0.22,0.42,satM));',
 '  col=mix(col,outc,clamp(htone,0.0,1.0));',
 ' }',
+/* v70 LCD: lcdN satırlık piksel ızgarası, parlaklık dört tona (lp0..lp3), piksel arası koyu çizgi */
+' if(lcd>0.0){vec2 g=vec2(lcdN*max(asp,0.01),lcdN);vec2 pc=(floor(uv*g)+0.5)/g;vec3 c2=texture2D(s,pc).rgb+texture2D(bl,pc).rgb*bloomK*0.5;float lv=pow(clamp(dot(c2,vec3(0.3,0.59,0.11)),0.0,1.0),0.8)*1.25;float q=clamp(floor(lv*3.0+0.5),0.0,3.0);vec3 pcl=q<0.5?lp0:q<1.5?lp1:q<2.5?lp2:lp3;vec2 f=fract(uv*g);pcl*=mix(0.8,1.0,step(0.12,f.x)*step(0.12,f.y));col=mix(col,pcl,lcd);}',
 ' float l=dot(col,vec3(0.299,0.587,0.114));col=mix(vec3(l),col,sat);',
 ' col*=vec3(1.0+warm*0.14,1.0+warm*0.03,1.0-warm*0.18);',
 ' col*=1.0-scan*0.4*(0.5+0.5*sin(gl_FragCoord.y*2.6));',
@@ -87,7 +90,7 @@ if(gl){try{GLX=(()=>{
   gl.uniform1i(U.s,0);gl.uniform1i(U.bl,1);
   gl.uniform1f(U.time,time);gl.uniform1f(U.kick,kick);gl.uniform1f(U.bloomK,fx.bloom>0.01?fx.bloom:0);
   [['ca','ca'],['scan','scan'],['crt','crt'],['glitch','glitch'],['grain','grain'],['half','htone'],['mis','mis'],['vign','vign'],['dust','dust'],['warm','warm'],['sat','sat'],['kaleid','kaleid']].forEach(([k,u])=>{if(U[u])gl.uniform1f(U[u],fx[k]||0)});
-  gl.uniform3fv(U.paper,v3(th.cv.bg));gl.uniform3fv(U.ink,v3(th.cv.ink));gl.uniform3fv(U.dustCol,v3(th.cv.ink));if(U.asp)gl.uniform1f(U.asp,w/h);
+  gl.uniform3fv(U.paper,v3(th.cv.bg));gl.uniform3fv(U.ink,v3(th.cv.ink));gl.uniform3fv(U.dustCol,v3(th.cv.ink));if(U.asp)gl.uniform1f(U.asp,w/h);if(U.lcd){const lc=th.lcd||{n:144,pal:['#0f380f','#306230','#8bac0f','#9bbc0f']};gl.uniform1f(U.lcd,fx.lcd||0);gl.uniform1f(U.lcdN,lc.n);gl.uniform3fv(U.lp0,v3(lc.pal[0]));gl.uniform3fv(U.lp1,v3(lc.pal[1]));gl.uniform3fv(U.lp2,v3(lc.pal[2]));gl.uniform3fv(U.lp3,v3(lc.pal[3]))}
   pass(null,view.width,view.height);
  }}
 })()}catch(err){console.warn('WebGL kapalı:',err);GLX=null}}

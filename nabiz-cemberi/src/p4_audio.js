@@ -32,7 +32,7 @@ function syncFx(){
  master.gain.setTargetAtTime(S.muted?0:0.7,t,0.02);
  masterLP.frequency.setTargetAtTime(k.lp,t,0.1);
  crackleG.gain.setTargetAtTime(k.crackle?0.05:0,t,0.1);
- dShaper.curve=curve(k.crush?'crush':k.drive);mShaper.curve=curve(k.drive*0.5);
+ dShaper.curve=curve(k.crush?'crush':k.drive);mShaper.curve=curve(k.chip?'crush':k.drive*0.5);
  if(S.up.filter){musicLP.frequency.setTargetAtTime(5200,t,0.1);lfoG.gain.setTargetAtTime(4200,t,0.1)}
  else{lfoG.gain.setTargetAtTime(0,t,0.1);musicLP.frequency.setTargetAtTime(20000,t,0.1)}
 }
