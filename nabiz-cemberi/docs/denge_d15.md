@@ -109,3 +109,14 @@ En iyi dalganın gerisindeyken (albüm, turne, geri çekilme sonrası), baskın 
 
 - Albümden sonra dalga 43'e 14. dk'da (ilk koşuda 18), kolay kısım hızlı geçiliyor, duvarda yine güç gerekiyor.
 - Açık: modelde albüm sonrası dalga 44'te gelir 15.–18. dk sabit kaldı (♪60,1 B/sn); Asistan'ın bir şey almadığı görünüyor, ayrıca bakılmalı.
+
+### v71: Asistan bütçeye sığanı alır
+Albümden sonra modelde gelir 15.–18. dk sabit kalıyordu. Neden: `asstPick` yalnız Analiz'in en verimli (en kısa geri ödemeli) gelir/savunma alımına bakıyordu; o alım bütçeyi (notanın %25'i) aşınca hiçbir şey almadan bekliyordu, ucuz ama iyi geliştirmeler alınmıyordu. Artık `anlRank(f,lim)` bütçeye sığan adaylar arasından en verimliyi seçer.
+
+| dk | albüm sonrası dalga (v68) | albüm sonrası dalga (v71) | gelir/sn (v71) |
+|---|---|---|---|
+| 10 | 36 | 35 | 20,8 B |
+| 14 | 43 | 45 | 88,0 B |
+| 17 | 44 | 50 | 176,6 B |
+
+İlk albüm 18,2 → 17,7. dk.
