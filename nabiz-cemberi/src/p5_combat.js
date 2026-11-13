@@ -9,12 +9,13 @@ function waveComp(w){const r=rng(w*7919+13);const bd=barDur();let n=Math.min(60,
  if(!boss&&w>=RAID_EVERY&&w%RAID_EVERY===0){const m=8+Math.floor(w/5),l0=r();for(let k=0;k<m;k++)items.push({ty:'kurye',at:span*0.55+k*bd*0.1,lane:l0+(k/m-0.5)*0.22,raid:m})}
  items.sort((a,b)=>a.at-b.at);return items}
 function waveSummary(w){const c={};waveComp(w).forEach(it=>{c[it.ty]=(c[it.ty]||0)+(ETYPES[it.ty].swarm||1)});return Object.entries(c).map(([k,v])=>v+' '+ETYPES[k].n.toLocaleLowerCase('tr-TR')).join(', ')}
-function startWave(w,now){S.wave=w;if(w>S.bestWave){S.bestWave=w;const nf=nextFam();if(nf&&famCanOpen(nf[0])&&!famCond(nf[0]).cost)setTimeout(()=>msg(nf[1]+' ailesi açılabilir: Koleksiyon sekmesine bak'),1200)}wave={n:w,queue:waveComp(w),startT:now,done:false,nextAt:0,boss:null};wave.raid=wave.queue.some(q=>q.raid);wave.raidLeak=0;const line=(wave.raid?'Baskın! Sessizlik A.Ş. akıncıları tek koldan geliyor':null)||BOSS_LINES[(wave.queue.find(q=>ETYPES[q.ty].boss)||{}).ty]||WAVE_LINES[w];waveText=(wave.raid?T('BASKIN')+' · ':'')+T('Dalga')+' '+w;waveFlash=1;if(line)msg(line);if(typeof renderDef==='function')renderDef()}
+function startWave(w,now){S.wave=w;if(w>S.bestWave){S.bestWave=w;const nf=nextFam();if(nf&&famCanOpen(nf[0])&&!famCond(nf[0]).cost)setTimeout(()=>msg(nf[1]+' ailesi açılabilir: Koleksiyon sekmesine bak'),1200)}wave={n:w,queue:waveComp(w),startT:now,done:false,nextAt:0,boss:null};wave.raid=wave.queue.some(q=>q.raid);wave.raidLeak=0;const line=(wave.raid?'Baskın! Sessizlik A.Ş. akıncıları tek koldan geliyor':null)||BOSS_LINES[(wave.queue.find(q=>ETYPES[q.ty].boss)||{}).ty]||WAVE_LINES[w];waveText=(wave.raid?T('BASKIN')+' · ':'')+T('Dalga')+' '+w+(w<S.bestWave&&!demoMode?' · '+T('hızlı geçiş')+' »':'');waveFlash=1;if(line)msg(line);if(typeof renderDef==='function')renderDef()}
 function spawn(ty,now,w,lane,raid){const T=ETYPES[ty];const cnt=T.swarm||1;for(let k=0;k<cnt;k++){let hp=4*Math.pow(1.19,w-1)*T.hp;if(raid)hp=Math.max(hp,dps()*globalMDmg()*RAID_T/raid);const e={raid:!!raid,ty,hp,hpMax:hp,d:1+k*0.03,a:(lane!=null?lane:Math.random())+(cnt>1?(Math.random()-0.5)*0.08:0),sp:T.sp*(1+0.004*w),slow:0,slowT:0,stun:0,dot:0,dotT:0,flash:0,w,boss:!!T.boss,lastSp:now,wob:Math.random()*TAU,id:Math.random(),waved:false};e.a=((e.a%1)+1)%1;enemies.push(e);if(e.boss)wave.boss=e}}
 function laneDist(a,b){const d=Math.abs(a-b);return S.layout==='circle'?Math.min(d,1-d):d}
 function bounty(e){const T=ETYPES[e.ty];return(2*Math.pow(1.18,e.w-1)*T.b+rate()*0.4*T.b)*bountyM()}
 function kill(e,k,now){killSfx(e.boss);const g=bounty(e);earn(g);S.kills++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);if(S.dnum!==false&&pops.length<48)pops.push({e,t:'+♪ '+fmt(g),life:1,k:1});if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
 function leak(e,k,now){const T=ETYPES[e.ty];
+ if(wave)wave.leaked=true;
  if(e.raid){/* akıncı: küçük, ölümcül olmayan hasar */let dmg=hpMax()*RAID_DMG;if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}{const h0=core.hp;core.hp=Math.max(Math.min(core.hp,hpMax()*RAID_FLOOR),core.hp-dmg);if(wave)wave.raidDmg=(wave.raidDmg||0)+(h0-core.hp)}retreatFlash=Math.max(retreatFlash,0.6);if(wave)wave.raidLeak++;enemies.splice(k,1);return}
  let dmg=T.dmg*(1+0.03*e.w);if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}core.hp-=dmg;retreatFlash=Math.max(retreatFlash,0.6);if(T.mute){const cands=S.slots.map((id,si)=>id?si:-1).filter(x=>x>=0);if(cands.length){const si=cands[Math.floor(Math.random()*cands.length)];muteUntil[si]=now+barDur();msg(slotIns(si).n+' bir ölçü susturuldu')}}enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;if(core.hp<=0)retreat(now)}
 /* öğretici: ilk düşman ve Ritme vur'dan sonra arayüz adımlarında dalga durur */
@@ -22,13 +23,17 @@ function leak(e,k,now){const T=ETYPES[e.ty];
 const tutHold=()=>{if(ffOn)return false;const c=ovCur();return !!(c&&c.main&&c.st.n>=8)};
 function retreat(now){retreatCount++;dngIn=false;const from=S.wave,to=Math.max(1,S.wave-1);enemies=[];core.hp=hpMax();core.sh=0;retreatFlash=1.5;tapeStop(from,to);msg('Sessizlik A.Ş. sahneyi bastı. Dalga '+from+' → '+to+'. Nabız tazelendi.');startWave(to,now)}
 function wallHit(e){const k=Math.floor(e.a*WN)%WN;const E=wallE[k];if(E<=0.02)return 0;const b=wallBase(),top=b+Math.min(1,E)*wallSpan();if(e.d>=b&&e.d<=top)return E*wallD[k];return 0}
+/* v68 hızlı geçiş (docs/denge_d15.md Ölçüm 6): en iyi dalganın gerisindeyken (albüm, turne, geri çekilme sonrası), baskın dalgası değilse ve o dalgada düşman sızmadıysa dalga FAST kat hızlı akar (nabız kendiliğinden dolmadığı için nabız koşulu kalıcı kapatıyordu): düşmanlar sık doğar ve hızlı yürür, dalga arası kısalır. Albümden sonra aynı 20 dakikayı yeniden yürümek gerekmesin. */
+const FAST=2.5;let fastNow=false;
+const fastOn=()=>!!(wave&&!demoMode&&wave.n<S.bestWave&&!wave.raid&&!wave.leaked);
 function logic(now){
  const dt=clamp(now-lastLogic,0,0.1);lastLogic=now;if(dt<=0||!wave)return;if(tutHold()){wave.startT+=dt;return}
+ fastNow=fastOn();const fk=fastNow?FAST:1;if(fastNow)wave.startT-=dt*(FAST-1);
  while(wave.queue.length&&wave.startT+wave.queue[0].at<=now){const it=wave.queue.shift();spawn(it.ty,now,wave.n,it.lane,it.raid)}
  const bd=barDur(),dec=Math.exp(-dt*2.2),gs=Math.min(0.6,globalSlow()+(planAt(curBar).sec.slow||0)),useWall=!!S.stage.wall,useBeams=!!S.stage.beams,beamDps=useBeams?dps()*0.03:0;
  for(let k=0;k<WN;k++){wallE[k]*=dec;wallD[k]*=dec}
  for(let k=enemies.length-1;k>=0;k--){const e=enemies[k];const T=ETYPES[e.ty];e.flash=Math.max(0,e.flash-dt*8);
-  if(e.stun>0)e.stun-=dt;else{const sl=Math.min(0.85,(e.slowT>0?e.slow:0)+(T.noSlow?0:gs));e.d-=e.sp*(1-sl)*dt;if(e.slowT>0)e.slowT-=dt}
+  if(e.stun>0)e.stun-=dt;else{const sl=Math.min(0.85,(e.slowT>0?e.slow:0)+(T.noSlow?0:gs));e.d-=e.sp*(1-sl)*dt*fk;if(e.slowT>0)e.slowT-=dt}
   if(S.stage.wave&&!e.waved&&e.d<0.8){e.waved=true;applySlow(e,0.25,1.0)}
   let dd=0;
   if(e.dotT>0){dd+=e.dot*dt;e.dotT-=dt}
@@ -40,7 +45,7 @@ function logic(now){
  }
  const secNow=planAt(curBar).sec;core.hp=Math.min(hpMax(),core.hp+regen()*dt*(secNow.regen||1));
  if(S.stage.mirror)core.sh=Math.min(shieldMax(),core.sh+2*dt);
- if(!wave.queue.length&&enemies.length===0&&!wave.done){wave.done=true;wave.nextAt=now+bd;if(wave.raid){if(!wave.raidLeak){const g=Math.max(10,rate()*RAID_BONUS);earn(g);msg(T('Baskın püskürtüldü')+' · +♪ '+fmt(g))}else{/* baskının aldığı nabız dalga bitince geri gelir: baskın anlık gerilim, kalıcı ceza değil (nabız kendiliğinden dolmuyor) */core.hp=Math.min(hpMax(),core.hp+(wave.raidDmg||0));msg(T('Baskın geçti')+' · '+wave.raidLeak+' '+T('akıncı sızdı')+' · '+T('nabız toparlandı'))}}}
+ if(!wave.queue.length&&enemies.length===0&&!wave.done){wave.done=true;wave.nextAt=now+bd/fk;if(wave.raid){if(!wave.raidLeak){const g=Math.max(10,rate()*RAID_BONUS);earn(g);msg(T('Baskın püskürtüldü')+' · +♪ '+fmt(g))}else{/* baskının aldığı nabız dalga bitince geri gelir: baskın anlık gerilim, kalıcı ceza değil (nabız kendiliğinden dolmuyor) */core.hp=Math.min(hpMax(),core.hp+(wave.raidDmg||0));msg(T('Baskın geçti')+' · '+wave.raidLeak+' '+T('akıncı sızdı')+' · '+T('nabız toparlandı'))}}}
  if(wave.done&&now>=wave.nextAt)startWave(wave.n+1,now);
 }
 /* v27 şarj: vurgulu adımlar ve Alan rolü merkezi doldurur (ölçü başına en çok CH_BAR); dolunca merkez patlar: tüm sahneye BLAST_S sn'lik hasar, patrona yarısı */
