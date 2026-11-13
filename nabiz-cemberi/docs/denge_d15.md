@@ -78,3 +78,19 @@ Aynı sıradan oyuncu modeli. Albüm eşiği ♪15 Mn (dönem kazancı); Albüm 
 - Albüm sekmesi 17,7. dk'da açılıyor, ilk albüm 20,4. dk'da çıkarılabiliyor; bu model dalga 45 duvarına da aynı anda (~22. dk) varıyor: albüm duvarın çözümü olarak doğru yerde.
 - Model hızlı oyuncu (düzenli harcıyor). Oyuncu turunda İlerleme takipçisi 25. dk'da dalga 23'teydi ve Albüm sekmesini görmedi; daha yavaş oyuncuda ilk albüm muhtemelen 30–40. dk.
 - Eşik değiştirilmedi. Risk: duvarda bekleyen oyuncu albümü bilmiyor (sekme ancak eşiğin yarısında açılıyor, öneri çipi albüm önermiyor).
+
+## Ölçüm 6 · Albüm sonrası toparlanma (`tools/toparlanma_olc.py`, v67)
+
+Oyuncu turu 20261112-0404'te İlerleme takipçisi albümden sonra 300 oyun-sn'de dalga 6'daydı (ilk koşuda aynı sürede 11). Model (album_olc ile aynı): ilk albüm 18,2. dk, +10 hayran.
+
+| dk | 1. koşu dalga | gelir/sn | albüm sonrası dalga | gelir/sn |
+|---|---|---|---|---|
+| 1 | 3 | 6 | 3 | 6 |
+| 3 | 6 | 52 | 6 | 101 |
+| 5 | 11 | 287 | 11 | 743 |
+| 8 | 17 | 1,5 B | 18 | 5,0 B |
+| 10 | 22 | 2,6 B | 24 | 7,8 B |
+| 12 | 28 | 5,3 B | 29 | 17,9 B |
+
+- Gelir albümden sonra 2–3 kat, ama **dalga hızı aynı**: dalgalar zamanla ilerliyor (≈2,3 dalga/dk), güç fazlası dalgayı hızlandırmıyor. Oyuncu albümden sonra aynı 20 dakikayı yeniden yürüyor; "toparlanma yavaş" hissi bundan.
+- Oyuncu turundaki dalga 6 / 11 farkı modelde yok (modelde iki koşu aynı hızda); oradaki fark büyük olasılıkla oyuncunun elle oynaması ve `ilerle` kullanımı.
