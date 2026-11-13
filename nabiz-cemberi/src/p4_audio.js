@@ -32,7 +32,7 @@ function syncFx(){
  master.gain.setTargetAtTime(S.muted?0:0.7,t,0.02);
  masterLP.frequency.setTargetAtTime(k.lp,t,0.1);
  crackleG.gain.setTargetAtTime(k.crackle?0.05:0,t,0.1);
- dShaper.curve=curve(k.crush?'crush':k.drive);mShaper.curve=curve(k.drive*0.5);
+ dShaper.curve=curve(k.crush?'crush':k.drive);mShaper.curve=curve(k.chip?'crush':k.drive*0.5);
  if(S.up.filter){musicLP.frequency.setTargetAtTime(5200,t,0.1);lfoG.gain.setTargetAtTime(4200,t,0.1)}
  else{lfoG.gain.setTargetAtTime(0,t,0.1);musicLP.frequency.setTargetAtTime(20000,t,0.1)}
 }
@@ -137,8 +137,10 @@ function dangerBeat(s,t){if(recOn||!tensOn()||S.muted||t<tapeT)return;const f=hp
  if(gs&&(crit||g===0||g===half)){O('sine',62,t,0.22,0.8,alertG,38);O('sine',58,t+0.16,0.2,0.55,alertG,36);dngSnd++}
  if(crit&&s===0){O('square',1320,t,0.09,0.06,alertG);O('square',990,t+0.12,0.09,0.05,alertG)}}
 function dangerAudio(){if(!ac||!dangerLP)return;const now=ac.currentTime;if(now<tapeT)return;const f=hpFrac(),k=!recOn&&tensOn()&&playing&&f<DNG?f/DNG:1,fq=k>=1?20000:500*Math.pow(36,k);dangerLP.frequency.setTargetAtTime(fq,now,0.08)}
-function tapeStop(from,to){if(recOn||!tensOn()||!ac||!playing||ffOn)return;const t=ac.currentTime;tapeT=t+1.7;tapeGray=1.8;tapeLbl=T('Dalga')+' '+from+' → '+to;const f=dangerLP.frequency;f.cancelScheduledValues(t);f.setValueAtTime(Math.min(20000,f.value),t);f.exponentialRampToValueAtTime(160,t+0.9);f.setValueAtTime(160,t+1.3);f.exponentialRampToValueAtTime(20000,t+1.7);
- if(!S.muted){O('sawtooth',220,t,0.95,0.16,music,30);O('triangle',110,t,0.95,0.3,drum,20)}}
+/* v69 “Kristal kırıldı” (laboratuvar https://claude.ai/artifact/8TGP3Sj6d51dAzTiarjqha, seçenek B): kristal çatlar (iki tık), 0,45 sn'de kırılır (gümbürtü + cam), müzik boğulur; 1,75 sn'de parçalar geri gelir (tıkırtı + yükselen ton). Görüntü p7 goDraw. */
+function tapeStop(from,to){if(recOn||!tensOn()||!ac||!playing||ffOn)return;const t=ac.currentTime;tapeT=t+2.3;tapeGray=2.3;tapeLbl=T('Dalga')+' '+from+' → '+to;goStart();const f=dangerLP.frequency;f.cancelScheduledValues(t);f.setValueAtTime(Math.min(20000,f.value),t);f.setValueAtTime(Math.min(20000,f.value),t+0.45);f.exponentialRampToValueAtTime(260,t+0.7);f.setValueAtTime(260,t+1.75);f.exponentialRampToValueAtTime(20000,t+2.25);
+ if(!S.muted){Nz(t,'highpass',3500,0,0.5,0.05,alertG);Nz(t+0.22,'highpass',3000,0,0.6,0.06,alertG);const s=t+0.45;O('sine',95,s,1.3,0.9,alertG,26);Nz(s,'lowpass',400,0,0.7,0.5,alertG);for(let k=0;k<12;k++)Nz(s+Math.random()*0.7,'bandpass',3500+Math.random()*5000,0,0.18,0.05+Math.random()*0.08,alertG);
+  for(let k=0;k<8;k++)Nz(t+1.75+k*0.035,'bandpass',5000+k*400,0,0.1,0.04,alertG);O('triangle',180,t+1.8,0.5,0.12,alertG,720)}}
 function recoverSfx(){if(!ac||!playing||S.muted)return;const t=ac.currentTime+0.01;O('sawtooth',220,t,0.6,0.05,music,880);Nz(t,'highpass',3000,0,0.08,0.5,drum)}
 function killSfx(boss){if(recOn||S.ksfx===false||!ac||!playing||Math.abs(lastLogic-ac.currentTime)>0.5)return;const now=ac.currentTime,g=grid.find(x=>x.t>now+0.008),t=g?g.t:now+0.02;if(Math.abs(t-killSlot)<0.004)return;killSlot=t;killSnd++;
  let fs=[];try{fs=chordFreqsAt(curBar,g?g.s:0)}catch(err){}if(!fs||!fs.length)fs=[220,261.6,329.6];killIdx=(killIdx+1+Math.floor(Math.random()*2))%fs.length;let f=fs[killIdx];while(f<520)f*=2;while(f>1400)f/=2;

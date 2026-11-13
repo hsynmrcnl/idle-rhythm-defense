@@ -42,6 +42,7 @@ with sync_playwright() as pw:
         p.wait_for_timeout(800)
         check(p.evaluate("()=>window.__nb.dangerF") > 15000, 'kurtulunca müzik açıldı')
         w0 = p.evaluate("()=>window.__nb.S.wave"); p.evaluate("()=>window.__nb.retreatNow()"); p.wait_for_timeout(200)
+        check(p.evaluate("()=>window.__nb.goT") >= 0, 'v69: geri çekilmede kristal kırılma efekti başladı')
         check(p.evaluate("()=>window.__nb.tapeGray") > 0 and p.evaluate("()=>window.__nb.S.wave") == w0 - 1 and p.evaluate("()=>window.__nb.saveFx") == 0, 'geri çekilme: gri ekran, dalga geri, kurtuluş sayılmıyor')
         # elle patlat
         p.wait_for_timeout(1800)

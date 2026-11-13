@@ -102,6 +102,18 @@ const THEMES={
   kit:{drive:8,crush:1,lp:20000,gate:0,crackle:0},
   fx:{bloom:1.05,ca:.6,scan:.4,crt:.16,glitch:.45,grain:.08,half:0,mis:0,vign:.55,trail:.3,dust:0,warm:-.25,sat:1.2,kaleid:0,shake:.3},
   blurb:'HUD radarı, lazer ibre, glitch ve tarama çizgileri.'},
+ /* v70 Cep LCD (laboratuvar https://claude.ai/artifact/5Y2b4LxwGXsqzXDWyUBLPT): eski el konsolu ekranı; WebGL süzgeci (fx.lcd) sahneyi lcd.n piksele indirip dört tona (lcd.pal) boyar, ızgara + iz; WebGL yoksa tuval renkleri zaten dört yeşil. Ses: kit.chip müziği de bit düşürücüden geçirir */
+ lcd:{id:'lcd',c:1e+07,n:'Cep LCD',al:2,bpm:[110,140],light:false,ring:'neon',needle:'neon',core:'neon',part:'spark',
+  css:{bg:'#0d1f0d',panel:'#132a13',panel2:'#1a361a',line:'#2f5a2f',fg:'#c4e07a',muted:'#8bac0f',dim:'#4f7a2a',acc:'#9bbc0f',onacc:'#0f380f',hot:'#c4e07a'},
+  font:{d:'"Press Start 2P","Courier New",monospace',b:'"JetBrains Mono",ui-monospace,monospace',m:'"JetBrains Mono",ui-monospace,monospace'},
+  /* tuval yüksek karşıtlıklı neon çizer, süzgeç dört yeşile indirir (yeşil çizince boş hücreler zeminle aynı tona düşüyordu) */
+  cv:{bg:'#07060f',ink:'#ece9ff',dim:'#5d5788',acc:'#3ff2d2',hot:'#ff3fb4',core:'#0b0a17',warn:'#ffb054'},
+  fam:{vur:'#9bbc0f',tel:'#c4e07a',tus:'#8bac0f',nef:'#b6d43a',ele:'#d8f08a',dun:'#a8c83a'},
+  en:{body:'#9aa0c8',edge:'#ffffff',boss:'#ff5370',style:'glow'},
+  kit:{drive:0,crush:1,chip:1,lp:9000,gate:0,crackle:0},
+  lcd:{n:144,pal:['#0f380f','#306230','#8bac0f','#9bbc0f']},
+  fx:{bloom:0,ca:0,scan:0,crt:0,glitch:0,grain:.03,half:0,mis:0,vign:.1,trail:.55,dust:0,warm:0,sat:1,kaleid:0,shake:.15,lcd:1},
+  blurb:'Dört tonlu yeşil piksel ekran, iz bırakan LCD ve 8-bit ses.'},
  punk:{id:'punk',c:2e+07,n:'Punk',al:2,bpm:[150,180],light:true,ring:'spray',needle:'marker',core:'paper',part:'splat',
   css:{bg:'#ece6d6',panel:'#f6f2e6',panel2:'#e3dbc7',line:'#1a1a1a',fg:'#111111',muted:'#47433b',dim:'#8b8574',acc:'#ff2e88',onacc:'#ffffff',hot:'#2b59ff'},
   font:{d:'"Rubik Dirt","Impact",sans-serif',b:'"Courier Prime","Courier New",monospace',m:'"Courier Prime","Courier New",monospace'},
@@ -139,7 +151,7 @@ const THEMES={
   fx:{bloom:.6,ca:.1,scan:0,crt:0,glitch:0,grain:.14,half:0,mis:0,vign:.6,trail:.3,dust:0,warm:.45,sat:1.3,kaleid:.35,shake:.1},
   blurb:'Kilim desenli halkalar, nazar çekirdeği, kaleydoskop.'}
 };
-const THEME_ORDER=['neon','cyber','punk','lofi','synth','anadolu'];
+const THEME_ORDER=['neon','cyber','lcd','punk','lofi','synth','anadolu'];
 /* v27 3D sahne: normalde Görünüm'de ♪ D3_COST ile açılan geliştirme; D3_TEST açıkken (deneme süresi) herkeste alınmış gelir */
 const D3_TEST=false,D3_COST=5e5;
 const CORES=[{id:'kristal',n:'Kristal',d:'Temanın renklerinde dönen altıgen kristal; şarj oldukça içi ışır.',c:0},{id:'kure',n:'Küre',d:'Parlak bir ışık küresi, davulla nabız gibi atar.',c:5e6},{id:'gunes',n:'Güneş',d:'Çizgili synthwave güneşi, merkezde süzülür.',c:5e7},{id:'plak',n:'Plak',d:'Zeminde dönen plak, etiketi temanın renginde.',c:5e8}];
@@ -164,6 +176,7 @@ const FXK=[
  ['warm','Sıcaklık','Soğuk maviden sıcak turuncuya',-.6,.8],
  ['sat','Doygunluk','Renklerin canlılığı',0,1.6],
  ['kaleid','Kaleydoskop','Görüntü dilimlere aynalanır',0,1],
+ ['lcd','LCD','Dört tonlu piksel ekran',0,1],
  ['shake','Sarsıntı','Davulda ekran titrer',0,1]
 ];
 const METERS={

@@ -53,6 +53,8 @@ with sync_playwright() as pw:
     check(len(dock()) == 5, 'örnek şarkıda bütün sekmeler görünüyor')
     p.click('#demoChip'); p.wait_for_timeout(200)
     check(dock() == ['stage'], 'örnek şarkıdan çıkınca yine yalnız Sahne (%s)' % dock())
+    check(p.evaluate("()=>document.getElementById('app').dataset.tab") == 'set', 'v67: örnek şarkıdan girildiği sekmeye (Ayarlar) dönüldü')
+    p.evaluate("()=>window.__nb.setTab('stage')"); p.wait_for_timeout(150)
     p.tap('#stats'); p.wait_for_timeout(150)
     check(not p.evaluate("()=>window.__nb.anlOn") and 'Analiz 14' in p.inner_text('#msg'), 'Analiz henüz kapalı, ne zaman açılacağı yazıyor')
     p.evaluate("()=>{const S=window.__nb.S;S.kills=1}"); p.wait_for_timeout(400)
