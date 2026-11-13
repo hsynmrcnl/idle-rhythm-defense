@@ -175,7 +175,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v70 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v71 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -311,7 +311,7 @@ function asstPick(lim0){const lim=lim0==null?S.nota*ASST_B:lim0,ok=k=>k&&k.cost>
  /* düşük nabızda bir hayatta kalma, bir gelir/savunma sırayla (hep nabız alıp takılmasın); yeni enstrüman her durumda */
  if(core.hp/hpMax()<0.6&&S.unl.def&&!asstSurv){k=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)&&ok(x)).sort((x,y)=>x.cost-y.cost)[0]||null;if(k){asstSurv=true;return k}}
  asstSurv=false;{const ni=newInsCand();if(ok(ni))return ni}
- if(!k){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));k=asstFlip&&ok(r.def)?r.def:ok(r.inc)?r.inc:ok(r.def)?r.def:null;if(k)asstFlip=k!==r.def}
+ if(!k){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'),lim);k=asstFlip&&ok(r.def)?r.def:ok(r.inc)?r.inc:ok(r.def)?r.def:null;if(k)asstFlip=k!==r.def}
  return k}
 function autoTick(){if(demoMode||!S.mn)return;const now=Date.now();let ch=false;
  /* v54: bir turda tek alım yerine tur başındaki notanın %25'i bitene kadar (en çok 40 alım): büyük birikimde tek ucuz alım yetmiyordu (Idle: ♪442 B birikti) */
@@ -832,8 +832,9 @@ function anlCands(){const c=[];
  DUP.forEach(u=>{const L=S.def[u.id]||0;if(u.max&&L>=u.max)return;c.push({act:'def',id:u.id,n:u.n+' '+(L+1),cost:defCost(u),ap:()=>{S.def[u.id]=L+1;return()=>{if(L)S.def[u.id]=L;else delete S.def[u.id]}}})});
  return c}
 /* gelir: kendini en kısa sürede ödeyen; savunma: ♪ başına en çok hasar/sn */
-function anlRank(f){const r0=rate(),d0=dps(),all=[];
- for(const k of anlCands()){if(f&&!f(k))continue;const undo=k.ap();try{recalc();k.dr=rate()-r0;k.dd=dps()-d0}finally{undo()}all.push(k)}
+/* v71: lim verilirse yalnız o bütçeye sığan adaylar (Asistan: en verimli alım bütçeyi aşınca hiçbir şey almadan bekliyordu) */
+function anlRank(f,lim){const r0=rate(),d0=dps(),all=[];
+ for(const k of anlCands()){if(f&&!f(k))continue;if(lim!=null&&!(k.cost>0&&k.cost<=lim))continue;const undo=k.ap();try{recalc();k.dr=rate()-r0;k.dd=dps()-d0}finally{undo()}all.push(k)}
  recalc();
  const best=(key,base)=>all.filter(k=>k[key]>Math.max(1e-9,base*1e-4)).sort((a,b)=>a.cost/a[key]-b.cost/b[key])[0]||null;
  return{r0,d0,inc:best('dr',r0),def:best('dd',d0)}}
