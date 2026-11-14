@@ -175,7 +175,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v72 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v73 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -431,7 +431,9 @@ const MINI={
  mn:[stTab('album','İlk albüm','Albüm’e dokun.'),stShow('[data-act=mnBuy]','Menajer','Menajer tutarsan işler otomatikleşir: geliştirme, siparişler, enstrüman koyma.')],
  book:[stTab('book','Yeni: Kitap','Kitap’a dokun.'),stShow('#p-book','Kitap','Bulduğun ritim kalıpları ve ipuçları burada; her keşif geliri kalıcı +%5 artırır.')]};
 const famMini=f=>[stTab('coll','Yeni aile','Koleksiyon’a dokun.'),stTap('#famBar [data-act=fam][data-f="'+f+'"]','Yeni aile','Parlayan aile simgesine dokun.'),stTap('[data-act=openFam][data-f="'+f+'"]','Aileyi aç','Aileyi açmak ücretsiz; enstrümanları sonra notayla tek tek alırsın.'),stShow('#collList .irow.locked','İlk enstrüman','Bu ailenin en ucuz enstrümanı. Notan yetmiyorsa Vurmalılar’da daha ucuzları var.')];
-const miniOf=k=>MINI[k]||(/^fam_/.test(k)?famMini(k.slice(4)):null);
+/* v73: Asistan Uyum açılmadan geldiyse (takılan oyuncu) Otomatik kartı yok: kısa öğretici sahnede anlatır */
+const ASST_LONE=[stTab('stage','Yeni: Asistan','Sahneye dokun.'),stShow('#stats','Asistan','Takıldığın için ücretsiz Asistan geldi: notanın dörtte biriyle en verimli geliştirmeleri kendisi alır. İkinci enstrümandan sonra Stüdyo → Otomatik’ten kapatabilirsin.')];
+const miniOf=k=>(k==='asst'&&!gateOn('syn')?ASST_LONE:null)||MINI[k]||(/^fam_/.test(k)?famMini(k.slice(4)):null);
 const MINI_GAP=25000;let miniGapT=0;const miniDone=()=>{if(S.tipq.length&&!ffOn)miniGapT=Date.now()+MINI_GAP};
 function ovCur(){if(tutActive()){const st=TUT[S.tut.s];return{st,key:'t'+S.tut.s,main:1,lab:T('Öğretici')+' '+st.n+' / '+TUT_N}}
  if(demoMode||tutSand||!S.tut||!S.tut.done||!S.tipq)return null;
@@ -493,10 +495,12 @@ const UNLK=[
  {k:'rhy',c:()=>gateOn('rhy')},
  {k:'anl',c:()=>S.bestWave>=UNL_W.anl},
  {k:'pat',c:()=>gateOn('pat')},
- {k:'asst',c:()=>S.bestWave>=UNL_W.asst&&!(S.mn&&S.mn.lv)&&!!S.unl.syn},
+ /* v73: dalga 6'dan sonra 3 kez geri çekilen (takılan) oyuncuya da gelir, ikinci enstrüman şartı olmadan (ölçüm: hiç almayan oyuncu dalga 12'de 40 dk takılıyordu, tools/acilis_olc.py) */
+ {k:'asst',c:()=>!(S.mn&&S.mn.lv)&&(S.bestWave>=UNL_W.asst&&!!S.unl.syn||retreatCount>=3&&S.bestWave>=6)},
  {k:'ord',c:()=>S.bestWave>=UNL_W.ord},
  {k:'look',c:()=>S.bestWave>=UNL_W.look},
- {k:'album',c:()=>albUnl()>=1||S.runEarned>=albumTh()*0.5},
+ /* v73: dalga 25'te de (yavaş kazananda sekme dalga 41'e kalıyordu; hedef erken görünsün) */
+ {k:'album',c:()=>albUnl()>=1||S.runEarned>=albumTh()*0.5||S.bestWave>=25},
  {k:'mn',c:()=>albUnl()>=1},
  {k:'book',c:()=>Object.keys(S.found).length>0&&!!S.unl.album},
  {k:'desk',c:()=>gateOn('desk')},
