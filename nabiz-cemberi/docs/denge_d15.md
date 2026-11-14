@@ -120,3 +120,26 @@ Albümden sonra modelde gelir 15.–18. dk sabit kalıyordu. Neden: `asstPick` y
 | 17 | 44 | 50 | 176,6 B |
 
 İlk albüm 18,2 → 17,7. dk.
+
+## Ölçüm 7 · Açılış takvimi ve tehdit, üç oyuncu modeli (`tools/acilis_olc.py`, v73)
+
+Oyuncu turu 20261113-1752: Hikâye ilk 18 dalgada hiç tehdit görmedi; Kaybolan dalga 6–7'de nabız %1; İlerleme d24–41'de yeni açılış görmedi, Albüm sekmesi d41'de açıldı.
+
+Modeller: **pasif** (öğretici Atla, hiçbir şey almaz), **tutumlu** (20 sn'de bir notanın %25'iyle en verimli alım), **hızlı** (10 sn'de bir %50, sonra Asistan).
+
+**Test aracı hatası (düzeltildi):** `ffRun` saati geri alırken susturma sürelerini (`muteUntil`) geri almıyordu; ileri sarmadan sonra enstrümanlar sürekli susmuş kalıyor, gelir duruyordu. Ölçümlerdeki "dalga 55'te çöküş, dalga 41'e geri" ve muhtemelen v71'deki "dalga 44'te gelir sabit" bulgusunun bir kısmı buydu; `ilerle` kullanan personaları da etkiliyordu.
+
+v72 (düzeltmeden önce, pasif): dalga 12'de takılı, 40 dk'da 28 geri çekilme, nabız %1, Asistan hiç gelmiyor (dalga 15 + Uyum şartı).
+
+v73 (Asistan takılınca da gelir, Albüm sekmesi dalga 25'te, susturma düzeltmesi):
+
+| dk | pasif dalga | tutumlu dalga | hızlı dalga |
+|---|---|---|---|
+| 10 | 12 (Asistan 9,7. dk) | 26 | 23 |
+| 15 | 24 | 40 | 37 |
+| 20 | 38 | 53 | 50 |
+| 30 | 55 | 61 | 59 |
+| 40 | 61 | 62 | 64 |
+
+- Tehdit: tutumlu/hızlı oyuncuda nabız yalnız baskınlarda (%46–90) ve dalga 55–60 duvarında düşüyor; arası %100. "İlk 18 dalga tehditsiz" bulgusu modelde de var; bilerek bırakıldı (öğrenme alanı), baskınlar gerilimi taşıyor.
+- Albüm sekmesi üç modelde de dalga 25'te (9–15. dk); duvar dalga 60 civarında, albümle aşılır.
