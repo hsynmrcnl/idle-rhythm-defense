@@ -175,7 +175,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v74 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v75 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -518,7 +518,7 @@ function unlVis(){
  Object.keys(TAB_UNL).forEach(t=>{const on=tabOn(t),tb=$('t-'+t);if(tb&&tb.hidden===on)tb.hidden=!on;document.querySelectorAll('.subnav [data-tab="'+t+'"]').forEach(b=>{if(b.hidden===on)b.hidden=!on})});
  [['studio',['studio','coll']],['def',['def']],['album',['album','book']],['look',['look']]].forEach(([g,ts])=>{const d=$('d-'+g),on=ts.some(tabOn);if(d&&d.hidden===on)d.hidden=!on;if(!tabOn(dockLast[g]||g)){const f=ts.find(tabOn);if(f)dockLast[g]=f}});
  const oc=document.querySelector('#p-def [data-sec=ord]'),oo=!!S.unl.ord||demoMode;if(oc&&oc.hidden===oo)oc.hidden=!oo;
- const st=$('stats'),al=!S.unl.anl&&!demoMode;if(st&&st.classList.contains('locked')!==al){st.classList.toggle('locked',al);if(al&&anlOn)anlToggle(false)}
+ const st=$('stats'),al=!S.unl.anl&&!demoMode;if(st&&st.classList.contains('locked')!==al){st.classList.toggle('locked',al);{const lb=al?T('Analiz')+' · '+T('dalga')+' '+UNL_W.anl+T('’te açılır'):T('Analiz: sıradaki adım ve çarpanlar');st.setAttribute('aria-label',lb);st.title=lb}if(al&&anlOn)anlToggle(false)}
  const tp=$('tap'),to=!!S.unl.tap||demoMode;if(tp&&tp.hidden===to)tp.hidden=!to;
  if(!tabOn(tab)||($('p-lock')&&!$('p-lock').hidden))setTab(tab)}
 /* kart sırası: önce baştaki öğretici, sonra açılış kartları */
@@ -792,7 +792,12 @@ function autoRows(sis,lv){const pks=['A'].concat(hasB()&&S.am.nakarat?['B']:[]),
  changed();if(wrote)msg((sis&&sis.length===1?slotIns(sis[0]).n+' · '+T(lvlSame(sis[0])?'Otomatik ritim':EZ_LV[(lv||3)-1][1]):'Grup düzenlendi')+(spent>0?' · ♪ '+fmt(spent):spent<0?' · ♪ '+fmt(-spent)+' geri':'')+(skipped.length?' · '+skipped.length+' elle satır korundu':''))}
 /* v55: üç seviye aynı deseni yazıyorsa (Davul, Trampet gibi az nefesli) tek “Otomatik ritim” düğmesi; yoksa Sade · Hareketli · Yoğun */
 const lvlSame=si=>{try{const n=[1,2,3].map(v=>autoPicks(si,'A',v).length);return n[0]===n[2]}catch(e){return false}};
-function lvlBtns(si){const m=S.rowm['A'+si];if(lvlSame(si))return '<span class="ezopts sm"><button data-act="alvl" data-i="'+si+'" data-v="3" aria-pressed="'+(+m>0)+'">'+T('Otomatik ritim')+'</button>'+(m==='m'?'<small class="cnt">elle</small>':'')+'</span>';return '<span class="ezopts sm">'+EZ_LV.map(([v,n])=>'<button data-act="alvl" data-i="'+si+'" data-v="'+v+'" aria-pressed="'+(m===v)+'">'+n+'</button>').join('')+(m==='m'?'<small class="cnt">elle</small>':'')+'</span>'}
+/* v75: Sade/Hareketli/Yoğun'dan hangisi en çok gelir getiriyor (oyuncu turu: Hi-hat'te Yoğun uyumu bozup Sade'den az kazandırıyordu, uyarı yoktu). Satır geçici yazılır, ölçülür, geri alınır; sonuç önbellekte */
+const lvlBestC={};
+function lvlBest(si){const key=si+'|'+JSON.stringify(S.pat.A)+'|'+S.slots.join()+'|'+JSON.stringify(S.lv)+'|'+S.bpm+'|'+S.meter;if(lvlBestC[si]&&lvlBestC[si].k===key)return lvlBestC[si].v;
+ const sv=S.pat.A[si].slice();let best=0,bv=-1;try{for(const v of [1,2,3]){S.pat.A[si]=rowOfA(si,autoPicks(si,'A',v));recalc();const r=rate();if(r>bv*1.005){bv=r;best=v}}}catch(e){best=0}finally{S.pat.A[si]=sv;recalc()}
+ lvlBestC[si]={k:key,v:best};return best}
+function lvlBtns(si){const m=S.rowm['A'+si];if(lvlSame(si))return '<span class="ezopts sm"><button data-act="alvl" data-i="'+si+'" data-v="3" aria-pressed="'+(+m>0)+'">'+T('Otomatik ritim')+'</button>'+(m==='m'?'<small class="cnt">elle</small>':'')+'</span>';const bst=lvlBest(si);return '<span class="ezopts sm">'+EZ_LV.map(([v,n])=>'<button data-act="alvl" data-i="'+si+'" data-v="'+v+'" aria-pressed="'+(m===v)+'"'+(v===bst?' title="'+T('Bu satırda en çok geliri bu seçenek getirir')+'"':'')+'>'+n+(v===bst?' <small>'+T('en iyi')+'</small>':'')+'</button>').join('')+(m==='m'?'<small class="cnt">elle</small>':'')+'</span>'}
 /* Otomatik → Yeni enstrüman ritmi: sahneye giren enstrüman, satırı boşsa Hareketli ritimle gelir */
 function ezPlaced(si){if(!S.am.yeni||!S.slots[si]||STEPS(S.pat.A,si).length)return;autoRows([si],2)}
 /* dolgu: Kapalı / Otomatik (sekizlik yükseliş; 4+ vuruş geçişte zil ve ×1,25) */
@@ -872,7 +877,8 @@ function renderAnl(){const el=$('anl');if(!el||!anlOn)return;const R=anlRank();a
  el.innerHTML='<div class="ah"><b>Analiz</b><button class="x" data-a="close" aria-label="Kapat">×</button></div><h4>Sıradaki en verimli adım</h4>'+anlSugHtml(R.inc,'Gelir','dr',R.r0,0)+anlSugHtml(R.def,'Savunma','dd',R.d0,1)+anlMultRows();
  if(S.lang==='en')i18n(el)}
 function anlToggle(on){anlOn=on==null?!anlOn:!!on;const el=$('anl'),st=$('stats');if(!el)return;el.hidden=!anlOn;st.setAttribute('aria-expanded',String(anlOn));if(anlOn){el.style.setProperty('--anlTop',(st.offsetTop+st.offsetHeight+6)+'px');renderAnl()}}
-const anlTry=()=>{if($('stats').classList.contains('locked')){msg('Analiz '+UNL_W.anl+'. dalgada açılır');return}anlToggle()};
+/* v75: kilitliyken ne zaman açılacağı ve ne işe yaradığı */
+const anlTry=()=>{if($('stats').classList.contains('locked')){msg(T('Analiz')+' · '+T('dalga')+' '+UNL_W.anl+' · '+T('sıradaki en verimli alımı ve gelir çarpanlarını gösterir')+' · '+T('şimdi')+' '+S.wave);return}anlToggle()};
 $('stats').addEventListener('click',anlTry);
 $('stats').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();anlTry()}});
 $('anl').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;if(b.dataset.a==='close'){anlToggle(false);return}

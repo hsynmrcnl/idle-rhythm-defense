@@ -56,7 +56,7 @@ with sync_playwright() as pw:
     check(p.evaluate("()=>document.getElementById('app').dataset.tab") == 'set', 'v67: örnek şarkıdan girildiği sekmeye (Ayarlar) dönüldü')
     p.evaluate("()=>window.__nb.setTab('stage')"); p.wait_for_timeout(150)
     p.tap('#stats'); p.wait_for_timeout(150)
-    check(not p.evaluate("()=>window.__nb.anlOn") and 'Analiz 14' in p.inner_text('#msg'), 'Analiz henüz kapalı, ne zaman açılacağı yazıyor')
+    check(not p.evaluate("()=>window.__nb.anlOn") and 'dalga 14' in p.inner_text('#msg'), 'Analiz henüz kapalı, ne zaman açılacağı yazıyor')
     p.evaluate("()=>{const S=window.__nb.S;S.kills=1}"); p.wait_for_timeout(400)
     check(mk() == 'studio' and card() == 'Yeni: Stüdyo' and dock() == ['stage', 'studio'], 'ilk susturucuyla Stüdyo açıldı, kısa öğretici başladı (%s)' % card())
     p.screenshot(path=os.path.join(OUT, 'v26_studio_card.png'))
