@@ -73,7 +73,7 @@ with sync_playwright() as pw:
             if p.is_visible('#tutLBtn'): p.click('#tutLBtn')
             else:
                 p.wait_for_timeout(350); x, y, w = hole(p); p.mouse.click(x, y)
-            p.wait_for_timeout(450)
+            p.wait_for_timeout(450); p.evaluate("()=>{window.__nb.miniGapT=0}"); p.wait_for_timeout(200)  # v72: kısa öğreticiler arası bekleme
         check(any('Savunma' in x for x in seen) and any('Tempo' in x for x in seen) and lab() == '', 'Savunma ve Tempo kısa öğreticileri sırayla oynandı (%s)' % seen)
         check(p.evaluate("()=>window.__nb.S.tipq.length") == 0, 'eski kart yok, sıra boş')
         # yeniden başlat: geçici oyunda, Atla ile kayıt geri gelir
