@@ -40,6 +40,8 @@ h1 .o{color:transparent;-webkit-text-stroke:1px var(--acc)}
 .msg{margin:0;text-align:center;font-family:var(--f-m);font-size:12px;color:var(--acc);min-height:1.5em}
 .rack{min-width:0}
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:6px;overflow-x:auto}
+/* v76: masaüstünde sekmeler sığmazsa ikinci satıra iner (1366 px'te “Albüm” kırpılıyordu) */
+@media (min-width:701px){.tabs{flex-wrap:wrap;overflow-x:visible}}
 .tab{font-family:var(--f-d);font-size:12px;padding:10px 10px;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap}
 .tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--acc)}
 .tab .bd{display:inline-block;margin-left:6px;font-family:var(--f-m);font-size:11px;color:var(--onacc);background:var(--acc);border-radius:10px;padding:0 6px}
