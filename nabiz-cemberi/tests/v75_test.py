@@ -30,7 +30,7 @@ with sync_playwright() as pw:
     check('14' in m and 'çarpan' in m and '14' in lab, 'kilitli Analiz ne zaman açılacağını ve ne işe yaradığını söylüyor (“%s” / “%s”)' % (m[:70], lab))
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;nb.unlockAll();S.tipq=[];S.tutm=0;S.nota=1e6;S.slots=['davul','trampet','shaker','hihat'];['trampet','shaker','hihat'].forEach(id=>S.lv[id]=8);S.lv.davul=12;nb.recalc();nb.setTab('studio');nb.renderPanels()}")
     p.wait_for_timeout(300)
-    r = p.evaluate("""()=>{const nb=window.__nb,S=nb.S,out=[];document.querySelectorAll('#slotList .slot').forEach((el,si)=>{const bs=[...el.querySelectorAll('[data-act=alvl]')];if(bs.length===3)out.push([si,bs.map(b=>b.textContent.includes('en iyi'))])});
+    r = p.evaluate("""()=>{const nb=window.__nb,S=nb.S,out=[];document.querySelectorAll('#slotList .slot').forEach((el,si)=>{const bs=[...el.querySelectorAll('[data-act=alvl]')];if(bs.length===3)out.push([si,bs.map(b=>b.textContent.includes('en çok gelir'))])});
       const p0=JSON.stringify(S.pat.A);const res=out.map(([si,mk])=>{const rates=[1,2,3].map(v=>{const sv=JSON.stringify(S.pat.A);const b=document.querySelector('#slotList [data-act=alvl][data-i="'+si+'"][data-v="'+v+'"]');S.nota=1e6;b.click();const r=nb.rate();S.pat.A=JSON.parse(sv);nb.recalc();return r});const bi=mk.indexOf(true);return {si,bi,rates,ok:bi>=0&&rates[bi]>=Math.max(...rates)*0.99}});
       return {res,same:p0===JSON.stringify(S.pat.A)}}""")
     check(len(r['res']) > 0 and all(x['ok'] for x in r['res']), '“en iyi” işaretli seçenek gerçekten en çok geliri getiriyor (%s)' % r['res'])

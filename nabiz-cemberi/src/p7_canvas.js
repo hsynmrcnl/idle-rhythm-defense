@@ -510,7 +510,10 @@ function drawPops(dt,g,th){if(S.dnum===false){if(pops.length)pops.length=0;retur
  for(const e of enemies)if(e.dnA>0&&clock-(e.dnT||0)>0.35){if(e.dnA>=1&&pops.length<48)pops.push({e,t:fmt(e.dnA),life:1,k:0});e.dnA=0;e.dnT=clock}
  if(!pops.length)return;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
  for(let k=pops.length-1;k>=0;k--){const p=pops[k];p.life-=dt*(p.k?0.9:1.5);if(p.life<=0){pops.splice(k,1);continue}
-  if(p.x==null){const [x,y]=enemyPos(p.e,g);p.x=x+(Math.random()-0.5)*fs;p.y=y-fs*(p.k?1.4:0.9)}
+  /* v76b: yeni sayı yakındaki taze bir sayının üstüne binecekse hasar sayısı atlanır, ödül sayısı yukarı itilir (yoğun dalgada okunmaz yığın oluyordu) */
+  if(p.x==null){const [x,y]=enemyPos(p.e,g);p.x=x+(Math.random()-0.5)*fs;p.y=y-fs*(p.k?1.4:0.9);
+   for(let t=0;t<4;t++){const hit=pops.some(q=>q!==p&&q.x!=null&&q.life>0.45&&Math.abs(q.x-p.x)<fs*2.2&&Math.abs((q.y-(1-q.life)*fs*(q.k?2.2:1.6))-p.y)<fs*0.95);if(!hit)break;if(!p.k){p.life=0;break}p.y-=fs}
+   if(p.life<=0){pops.splice(k,1);continue}}
   const up=RM?0:(1-p.life)*fs*(p.k?2.2:1.6),sz=p.k?Math.round(fs*1.15):fs;ctx.globalAlpha=Math.min(1,p.life*1.6);
   ctx.font=(p.k?'700 ':'600 ')+sz+'px '+th.font.m;ctx.lineWidth=3;ctx.strokeStyle=hexA(th.cv.bg,0.85);ctx.strokeText(p.t,p.x,p.y-up);ctx.fillStyle=p.k?th.cv.acc:hexA(th.cv.ink,0.92);ctx.fillText(p.t,p.x,p.y-up)}
  ctx.globalAlpha=1;ctx.lineJoin='miter'}
@@ -547,7 +550,7 @@ function goDraw(dt,th,fs,c){if(goT<0)return;goT+=dt;waveFlash=0;const t=goT,o=or
   const e=ease(Math.min(1,k/0.9));goFr.forEach(f=>{const d=f.sp*L*e+(f.r0||0)*R,x=o.x+Math.cos(f.ca)*d,y=o.y+Math.sin(f.ca)*d+k*k*0.12*L;ctx.save();ctx.translate(x,y);ctx.rotate(f.rot*k);ctx.globalAlpha=Math.max(0.2,1-k/1.1);ctx.fillStyle=f.c;ctx.beginPath();f.p.forEach((q,i)=>i?ctx.lineTo(q[0]*R,q[1]*R):ctx.moveTo(q[0]*R,q[1]*R));ctx.closePath();ctx.fill();ctx.restore()});ctx.globalAlpha=1}
  else if(t<GO_RE+0.3){const k=(t-GO_RE)/0.3,e=1-ease(k);goFr.forEach(f=>{if(f.r0)return;const d=f.sp*L*e*0.7,x=o.x+Math.cos(f.ca)*d,y=o.y+Math.sin(f.ca)*d;ctx.save();ctx.translate(x,y);ctx.rotate(f.rot*e);ctx.globalAlpha=0.9;ctx.fillStyle=f.c;ctx.beginPath();f.p.forEach((q,i)=>i?ctx.lineTo(q[0]*R,q[1]*R):ctx.moveTo(q[0]*R,q[1]*R));ctx.closePath();ctx.fill();ctx.restore()});ctx.globalAlpha=1}
  const fd=(a,b,f)=>Math.max(0,Math.min(1,(t-a)/f,(b-t)/f));
- let a=fd(GO_CR,GO_CR+1.1,0.15);if(a>0){ctx.globalAlpha=a;ctx.fillStyle='#ff3d5a';ctx.font='800 '+fs(0.075);ctx.fillText(T('SUSTURULDU'),c,0.16*L);ctx.globalAlpha=1}
+ let a=fd(GO_CR,GO_CR+1.1,0.15);if(a>0){ctx.globalAlpha=a;ctx.fillStyle='#ff3d5a';ctx.font='800 '+fs(0.075);ctx.fillText(T('SAHNE SUSTU'),c,0.16*L);ctx.globalAlpha=1}
  a=fd(GO_CR+0.3,GO_END,0.25);if(a>0){ctx.globalAlpha=a;ctx.fillStyle='#e8e6ff';ctx.font='700 '+fs(0.045);ctx.fillText(tapeLbl+' · '+T('nabız tazelendi'),c,0.84*L);ctx.globalAlpha=1}}
 function dangerDraw(dt,g,th){dangerAudio();const f=hpFrac(),on=tensOn()&&playing,dng=on&&f<DNG&&f>0?1-f/DNG:0,c=L/2;
  if(dng>0)dngIn=true;if(dngIn&&f>=DNG_OK){dngIn=false;if(on){saveFx=1;recoverSfx()}}
