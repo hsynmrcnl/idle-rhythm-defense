@@ -715,6 +715,7 @@ function drawScene(dt){
  if(crashFlash>0){crashFlash=Math.max(0,crashFlash-dt*2.5);ctx.fillStyle='rgba(255,255,255,'+(crashFlash*0.18).toFixed(3)+')';ctx.fillRect(-OX,-OY,CW,CH)}
  if(!D3)enemies.forEach(e=>drawEnemy(e,th,g));
  drawVfx(dt,g,th);
+ if(kbFocus())drawKbCell(g,th);
  drawNova(dt,g,th);
  drawParts(dt,th);
  drawPops(dt,g,th);
@@ -812,6 +813,17 @@ function frame(ms){
 }
 
 /* ================= boot ================= */
+/* v78 klavyeyle hücre: sahneye Tab ile odaklan, oklar hücre seçer (sağ/sol adım, yukarı/aşağı sahne yeri), Enter vuruş koyar/kaldırır; Boşluk Ritme vur olarak kalır (oyuncu turu: hücrelere klavyeyle ulaşılamıyordu) */
+let kbSi=0,kbS=0;
+const kbFocus=()=>document.activeElement===vis()&&soloView()<0;
+function kbSay(){const x=slotIns(kbSi),v=S.pat[S.edit][kbSi]&&S.pat[S.edit][kbSi][kbS];msg(T('Yer')+' '+(kbSi+1)+' · '+(x?x.n:T('boş'))+' · '+T('adım')+' '+(kbS+1)+' · '+(v?T('vuruş var'):T('vuruş yok')))}
+function drawKbCell(g,th){if(kbSi>=S.slots.length)kbSi=0;if(kbS>=MI.N)kbS=0;const [x,y]=cellPos(kbSi,kbS,g),r=Math.max(9,(g.t||g.rowH||0.04*L)*0.55);ctx.save();ctx.strokeStyle=th.cv.ink;ctx.lineWidth=3;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();ctx.restore()}
+{const cv=vis();cv.tabIndex=0;cv.setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight ArrowUp ArrowDown Enter Space');cv.setAttribute('aria-label',cv.getAttribute('aria-label')+' '+T('Oklarla hücre seç, Enter ile vuruş koy, Boşluk ile ritme vur.'));
+ cv.addEventListener('focus',()=>{if(soloView()<0)kbSay()});
+ cv.addEventListener('keydown',e=>{if(!kbFocus())return;const N=MI.N,ns=S.slots.length;let mv=true;
+  if(e.key==='ArrowRight')kbS=(kbS+1)%N;else if(e.key==='ArrowLeft')kbS=(kbS+N-1)%N;else if(e.key==='ArrowDown'||e.key==='ArrowUp'){const occ=S.slots.map((id,i)=>id?i:-1).filter(i=>i>=0);if(occ.length){const j=occ.indexOf(kbSi),d=e.key==='ArrowDown'?1:-1;kbSi=occ[j<0?0:(j+d+occ.length)%occ.length]}}
+  else if(e.key==='Enter'){e.preventDefault();cellClick(kbSi,kbS);setTimeout(kbSay,30);return}else mv=false;
+  if(mv){e.preventDefault();kbSay()}})}
 recalc();core.hp=hpMax();ensureOrders();secCheck(true);unlCheck(unlQuiet);unlQuiet=false;unlVis();applyTheme();{let t0=null;try{t0=sessionStorage.getItem('nb-tab');sessionStorage.removeItem('nb-tab')}catch(e){}setTab(t0||(isPhone()?'stage':'studio'))}hintFor(null);tutShow();if(S.lang==='en'){document.documentElement.lang='en';$('app').lang='en';i18n(document.body);$('langBtn').textContent='TR'}
 openShared();window.addEventListener('hashchange',()=>{if(/^#s=/.test(location.hash))openShared()});
 const away=Math.min((Date.now()-(S.last||Date.now()))/1000,8*3600);
