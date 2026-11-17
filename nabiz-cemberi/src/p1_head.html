@@ -637,6 +637,29 @@ input[type=range]{width:100%;accent-color:var(--acc)}
  .hint,.stage .controls{display:none!important}
  .cvwrap{position:relative}.cvwrap>.msg{position:absolute;left:10px;right:10px;bottom:4px;margin:0;min-height:0;font-size:11.5px;line-height:1.35;pointer-events:none;text-shadow:0 0 4px var(--bg),0 0 8px var(--bg),0 0 2px var(--bg)}
 }
+/* v80 masaüstü (Hüseyin: “baştan ele al”): sayfa kaymaz, uygulama ekran yüksekliği kadar; ince üst çubuk (açıklama Ayarlar → Nasıl oynanır'da); solda sahne kalan yüksekliği doldurur (kare tuval, container query), mesaj tuvalin üstünde; sağda kendi içinde kayan panel, sekmeler yapışkan; geniş ekranda 1720 px'e kadar yayılır */
+@media (min-width:941px) and (min-height:521px){
+ html,body{height:100%;overflow:hidden}
+ body{padding-block:0}
+ .app{max-width:1720px;height:100dvh;display:flex;flex-direction:column}
+ .top{flex:0 0 auto;flex-wrap:nowrap;align-items:center;padding-block:10px;gap:12px}
+ .top>div{display:flex;align-items:baseline;gap:14px;flex:1;min-width:0}
+ h1{font-size:26px}
+ .sub{margin:0}
+ .lede,.top #ledeBtn{display:none}
+ .grid{flex:1;min-height:0;padding-top:12px;padding-bottom:12px;grid-template-columns:minmax(0,1fr) clamp(480px,38vw,620px);gap:24px}
+ .stage{position:relative;top:auto;height:100%;min-height:0;align-self:stretch;gap:10px}
+ .cvwrap{flex:1 1 auto;min-height:0;max-width:none;width:100%;container-type:size;display:flex;align-items:center;justify-content:center}
+ .cvwrap #cv{width:min(100cqw,100cqh);height:min(100cqw,100cqh);aspect-ratio:auto}
+ .hint{margin:0;font-size:12.5px}
+ .rack{height:100%;overflow-y:auto;overscroll-behavior:contain;padding-right:8px;scrollbar-gutter:stable}
+ .cvwrap{position:relative}.cvwrap>.msg{position:absolute;left:12px;right:12px;bottom:6px;margin:0;min-height:0;pointer-events:none;text-shadow:0 0 4px var(--bg),0 0 8px var(--bg)}
+ /* Analiz sahnenin üstüne açılır: tuval yeniden boyutlanınca WebGL katmanında gri/beyaz dikdörtgen kalıyordu (eski “gri dikdörtgen” bulgusu) */
+ .stage{position:relative}
+ .stage>.anl{position:absolute;left:0;right:0;top:44px;z-index:8;max-height:calc(100% - 56px);overflow-y:auto;box-shadow:0 18px 40px rgba(0,0,0,.55)}
+ .rack .tabs{position:sticky;top:0;z-index:6;background:var(--bg)}
+ .tab{padding:10px 7px;font-size:11.5px}
+}
 @media (max-width:520px){#sWave small{display:none}}.gloss{margin-top:10px}.gloss summary{cursor:pointer;font-weight:600}.gloss dl{margin:8px 0 0;display:grid;grid-template-columns:max-content 1fr;gap:6px 12px;font-size:13px}.gloss dt{font-weight:600;color:var(--acc)}.gloss dd{margin:0;opacity:.85}
 </style>
 
