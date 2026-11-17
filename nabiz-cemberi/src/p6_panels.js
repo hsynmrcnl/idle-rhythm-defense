@@ -51,7 +51,8 @@ function setTab(t){if(t==='stage'&&!isPhone())t='studio';if(!tabOn(t)&&isPhone()
 /* telefon: mesaj satırı sahnenin altında yüzer, canvas zıplamaz; masaüstü: düğmelerin altında */
 /* v66: yatay telefonda da mesaj tuvalin üstüne biner (alttaki satır çemberi küçültüyordu) */
 const isLand=()=>matchMedia('(max-width:940px) and (max-height:520px) and (orientation:landscape)').matches;
-function placeMsg(){const m=$('msg'),cw=$('cvwrap');if(!m||!cw)return;if(isPhone()||isLand()){if(m.parentNode!==cw)cw.appendChild(m)}else{const st=cw.closest('.stage');if(st&&m.parentNode!==st)st.appendChild(m)}}
+const isDeskFull=()=>matchMedia('(min-width:941px) and (min-height:521px)').matches;
+function placeMsg(){const m=$('msg'),cw=$('cvwrap');if(!m||!cw)return;if(isPhone()||isLand()||isDeskFull()){if(m.parentNode!==cw)cw.appendChild(m)}else{const st=cw.closest('.stage');if(st&&m.parentNode!==st)st.appendChild(m)}}
 function syncDock(){const g=DOCK[tab];document.querySelectorAll('.dk').forEach(b=>{const on=b.dataset.tab===g;if(on!==(b.getAttribute('aria-current')==='page')){if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')}});
  const bd={studio:!$('collBadge').hidden||!$('studBadge').hidden,def:!$('defBadge').hidden,album:!$('bookBadge').hidden};Object.keys(bd).forEach(k=>{const d=$('d-'+k);const dot=d&&d.querySelector('.dot');if(dot&&dot.hidden===bd[k])dot.hidden=!bd[k]});
  document.querySelectorAll('.subnav [data-bd]').forEach(b=>b.classList.toggle('has',!$(b.dataset.bd+'Badge').hidden));const dc=$('demoChip');if(dc&&dc.hidden===demoMode)dc.hidden=!demoMode;
@@ -175,7 +176,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v79 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v80 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -392,8 +393,8 @@ const TUT=[
  {n:3,t:'Ritmi kur',p:'Ve son vuruş.',kind:'tap',kb:()=>cellClick(0,TSEQ()[2]),tgt:()=>tpad(0,TSEQ()[2])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[2]]>0},
  {n:4,t:'Başlat',p:'Ortadaki ▶’ye dokun (ya da Enter). İbre döndükçe her vuruş çalar.',kind:'tap',kb:()=>{if(!playing){startStop();updUI()}},tgt:torb,cond:()=>playing},
  {n:5,t:'Nota',p:'Her vuruş nota kazandırır. Notayla enstrümanlarını güçlendireceksin.',kind:'btn',btn:'Devam',tgt:()=>tel('stats')},
- {n:6,t:'İlk düşman',p:'Düşmanlar kenardan merkeze yürür; vuruşların onlara ateş eder. İzle…',kind:'auto',tgt:()=>tel('cvwrap'),cond:()=>S.kills>=1},
- {n:7,t:'Ritme vur',p:'İbre bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun (ya da boşluk tuşu).',pt:'İbre parlak bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun. Bir kez tam zamanında dokunman yeter.',kind:'tap',rv:1,tgt:()=>tel('cvwrap'),allow:e=>!orbHit(e),cond:()=>S.seri>=1},
+ {n:6,t:'İlk düşman',p:'Düşmanlar kenardan merkeze yürür; vuruşların onlara ateş eder. İzle…',kind:'auto',tgt:()=>tel('cv'),cond:()=>S.kills>=1},
+ {n:7,t:'Ritme vur',p:'İbre bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun (ya da boşluk tuşu).',pt:'İbre parlak bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun. Bir kez tam zamanında dokunman yeter.',kind:'tap',rv:1,tgt:()=>tel('cv'),allow:e=>!orbHit(e),cond:()=>S.seri>=1},
  {n:8,t:'Stüdyo',p:'Stüdyo’ya dokun: notayı burada harcarsın.',kind:'tap',tgt:()=>tsel('#d-studio','#t-studio'),prep:()=>{S.unl.studio=1;unlVis()},cond:()=>tab==='studio'},
  {n:9,t:'Yükselt',p:'Davul’u yükselt: her seviye vuruşları güçlendirir.',kind:'tap',tgt:()=>tel('lvb-davul'),prep:()=>{secGo('sahne');tLv0=lvOf('davul');const x=INS.find(y=>y.id==='davul');tNotaFor(lvQuote(x).c)},cond:()=>lvOf('davul')>tLv0},
  {n:10,t:'Otomatik ritim',p:'Otomatik ritim’e dokun: davul ritmini oyun senin yerine yazar.',kind:'tap',tgt:()=>tsel('#p-studio [data-act=alvl][data-i="0"][data-v="3"]','[data-act=alvl][data-i="0"][data-v="3"]'),prep:()=>{secGo('sahne');tNotaFor(Math.max(300,noteCost()*20))},cond:()=>S.rowm.A0===3},
@@ -418,7 +419,7 @@ const MINI={
  studio:[stTab('studio','Yeni: Stüdyo','Stüdyo’ya dokun: notayı burada harcarsın.'),stTap('#lvb-davul','Yükselt','Davul’u yükselt: her seviye vuruşları güçlendirir.')],
  coll:[stTab('coll','Yeni: Koleksiyon','Koleksiyon’a dokun: yeni enstrümanlar burada.'),stShow(['#collList .irow.locked','#collList > :first-child','#collList'],'Koleksiyon','Enstrüman açınca sahneye kendi ritmiyle gelir. Aileler ilerledikçe açılır.')],
  syn:[stTab('studio','Yeni: Uyum','Stüdyo’ya dokun.'),stTap('[data-act=autoAll]','Hepsini düzenle','Hepsini düzenle enstrümanları birbirine uydurur; tutan uyumlar çarpan verir.')],
- tap:[stTab('stage','Ritme vur','Sahneye dön.'),{t:'Ritme vur',p:'İbre bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun: seri bonusu.',kind:'tap',rv:1,tgt:()=>tel('cvwrap'),allow:e=>!orbHit(e),cond:()=>S.seri>=1,prep:()=>{S.seri=0}}],
+ tap:[stTab('stage','Ritme vur','Sahneye dön.'),{t:'Ritme vur',p:'İbre bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun: seri bonusu.',kind:'tap',rv:1,tgt:()=>tel('cv'),allow:e=>!orbHit(e),cond:()=>S.seri>=1,prep:()=>{S.seri=0}}],
  def:[stTab('def','Yeni: Savunma','Savunma’ya dokun: nabız, hasar ve menzil burada.'),stTap(['#defList .dtile.rec','#defList .dtile:not([disabled])'],'Savunma','Önerilen geliştirmeye dokun.'),stShow('#p-def .pulse, #p-def .dsl','Nabız','Düşman merkeze varırsa Nabız düşer; sıfırlanırsa bir dalga geri gidersin.')],
  rhy:[stTab('studio','Yeni: Tempo','Stüdyo’ya dokun.'),stSc('rhy','Tempo'),stShow('#p-studio [data-sec=rhy]','Tempo','Temanın sevdiği tempoda çalmak geliri ×1,25 yapar; ritim geliştirmeleri de burada.')],
  look:[stTab('look','Yeni: Görünüm','Görünüm’e dokun: tema, düzen ve sahne katmanları.'),stShow('#p-look','Görünüm','Her sahne katmanı geliri ×1,1 yapar; temanın sevdiği tempo ×1,25.')],
