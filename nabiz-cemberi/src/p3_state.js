@@ -1,7 +1,7 @@
 
 /* ================= state ================= */
 const mkPat=()=>Array.from({length:MAXSLOTS},()=>Array(18).fill(0));
-const freshRun=()=>{const A=mkPat();A[0][0]=1;A[0][8]=1;return{nota:25,slots:['davul',null,null,null],lv:{davul:1},pat:{A,B:mkPat(),S:mkPat(),F:mkPat()},edit:'A',bpm:90,bmax:90,seri:0,up:{},def:{},solo:{},solos:{},plan:null,needle:{},wave:1,runEarned:0,meter:'m44',scale:'minor',prog:Array(8).fill('pop'),prate:'beat',progAuto:true,rowm:{}}};
+const freshRun=()=>{const A=mkPat();A[0][0]=1;A[0][8]=1;return{nota:25,slots:['davul',null,null,null],lv:{davul:1},pat:{A,B:mkPat(),S:mkPat(),F:mkPat()},edit:'A',bpm:90,bmax:90,seri:0,tapN:0,up:{},def:{},solo:{},solos:{},plan:null,needle:{},wave:1,runEarned:0,meter:'m44',scale:'minor',prog:Array(8).fill('pop'),prate:'beat',progAuto:true,rowm:{}}};
 const freshMeta=()=>({v:3,hayran:0,albums:[],found:{},theme:'neon',themes:{neon:1},famOpen:{vur:1},layout:'circle',stage:{},fxo:{},orders:[],bestWave:1,kills:0,total:0,muted:false,buy:1,last:Date.now(),tut:{s:0,done:false},mn:{},auto:{lv:true,ord:true,ins:true,alb:false},efsane:0,cities:{},tours:0,city:0,sfx:true,lang:'tr',open:{},sfset:'yeni',dnum:true,harm:'zengin',ui:'kolay',det:{},unl:{},tipq:[],am:{yeni:true,nakarat:true,solo:true,k:{lv:1,rup:1,srup:1,tempo:0,def:0},b:0.5},d3:{own:D3_TEST?1:0,on:1,core:'kristal',cores:{kristal:1}}});
 const KEY='nabiz-cemberi-v3';
 let S=Object.assign(freshRun(),freshMeta());
@@ -264,6 +264,8 @@ function planAvg(kind){const pl=planArr();let tot=0;pl.forEach(t=>{const sec=SEC
  return tot/pl.length*contrastM()}
 const effSeri=()=>S.up.assist?Math.max(S.seri,6):S.seri;
 const seriM=()=>1+0.04*Math.min(effSeri(),12);
+/* v81 B: Ritme vur akışı — üst üste tam dokunuş gelir çarpanını büyütür, bırakınca söner (p5 logic); yalnız gerçek dokunuş, ff/sim'de 0 */
+const tapM=()=>1+Math.min(1.0,(S.tapN||0)*0.13);
 const upM=()=>['swing','echo','side','filter'].reduce((m,k)=>S.up[k]?m*1.15:m,1);
 const fanM=()=>1+0.05*S.hayran;
 const bookM=()=>1+0.05*Object.keys(S.found).length;
@@ -278,7 +280,7 @@ const tourGain=()=>Math.max(1,Math.round(2*Math.sqrt(S.hayran)+albumsN()));
 const canTour=()=>albumsN()>=TOUR_AL;
 /* sahne katmanları (Görünüm): albümden sonra da kalır, her biri gelire ×1,1 */
 const stageM=()=>Math.pow(1.1,SUP.filter(u=>S.stage[u.id]).length);
-const globalM=()=>seriM()*upM()*fanM()*bookM()*fitM()*meterM()*scaleM()*waveM()*tourM()*cityM()*stageM();
+const globalM=()=>seriM()*tapM()*upM()*fanM()*bookM()*fitM()*meterM()*scaleM()*waveM()*tourM()*cityM()*stageM();
 const curBpm=b=>S.bpm*tempoMulAt(b||0);
 const barDur=()=>60/S.bpm*MI.N/4;
 function rate(){return planAvg('n')*globalM()*planBonus()*(S.bpm*4/60)/MI.N}

@@ -303,6 +303,11 @@ const ETYPES={
  stajyer:{n:'Stajyer',hp:0.22,sp:0.07,dmg:3,b:0.35,r:0.55,shape:'dot',swarm:6,d:'Sürü halinde, bedava çalışır'},
  avukat:{n:'Avukat',hp:3,sp:0.035,dmg:18,b:2.5,r:1.2,shape:'hex',armor:true,d:'Zırhlı; Seri yarı işler'},
  sansurcu:{n:'Sansürcü',hp:1.6,sp:0.04,dmg:8,b:1.8,r:1.05,shape:'square',mute:true,d:'Sahneye ulaşırsa bir enstrümanı bir ölçü susturur'},
+ /* v81 A: orta oyunu dolduran, role mecbur bırakan düşmanlar (dalga 15/25/40'ta girer) */
+ bolen:{n:'Bölünen',hp:4.5,sp:0.05,dmg:14,b:2,r:1.25,split:'parca',d:'Ölünce iki parçaya ayrılır; Alan rolü süpürür'},
+ parca:{n:'Parça',hp:0.7,sp:0.11,dmg:4,b:0.3,r:0.5,d:'Bölünenin parçası'},
+ iyilesen:{n:'İyileşen',hp:6,sp:0.04,dmg:14,b:2.6,r:1.25,heal:1.2,d:'Vurulmazsa canı dolar; Yavaşlatıcı/Statik keser'},
+ zirhsans:{n:'Zırhlı Sansürcü',hp:7,sp:0.036,dmg:10,b:3,r:1.3,tough:0.5,mute:true,d:'Zırhlı ve susturucu; Delici deler, Kalkan emer'},
  denetci:{n:'Denetçi',hp:14,sp:0.03,dmg:40,b:12,r:1.9,shape:'boss',boss:true,noSlow:true,d:'Her 10. dalga; yavaşlamaz'},
  mudur:{n:'Müdür',hp:30,sp:0.028,dmg:60,b:25,r:2.2,shape:'boss',boss:true,spawn:'stajyer',d:'Her 25. dalga; stajyer çağırır'},
  ceo:{n:'CEO',hp:80,sp:0.024,dmg:120,b:60,r:2.6,shape:'boss',boss:true,spawn:'kurye',noSlow:true,d:'Her 50. dalga; kurye çağırır, yavaşlamaz'}
