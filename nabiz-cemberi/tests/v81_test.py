@@ -25,7 +25,7 @@ with sync_playwright() as pw:
     thr=p.evaluate("""()=>{const nb=window.__nb,got={bolen:0,iyilesen:0,zirhsans:0};
       // her türün ilk göründüğü dalga (eşiğin altında 0, üstünde birkaç dalgada mutlaka çıkar)
       Object.keys(got).forEach(ty=>{for(let w=1;w<=55;w++){const q=nb.waveComp(w);if(q.some(it=>it.ty===ty)){got[ty]=w;break}}});return got}""")
-    check(thr['bolen']==15 and 25<=thr['iyilesen']<=27 and 40<=thr['zirhsans']<=42,'yeni düşmanlar ~15/25/40 dalgada giriyor (%s)'%thr)
+    check(12<=thr['bolen']<=14 and 20<=thr['iyilesen']<=22 and 30<=thr['zirhsans']<=32,'yeni düşmanlar ~12/20/30 dalgada giriyor (%s)'%thr)
     # bölünme
     sp=p.evaluate("""(mk)=>{const nb=window.__nb,f=eval('('+mk+')');nb.enemies.length=0;nb.enemies.push(f({ty:'bolen',hp:-1,d:0.6}));nb.ff(0.05);return nb.enemies.filter(e=>e.ty==='parca').length}""",mk)
     check(sp==2,'bölünen ölünce iki parça çıktı (%s)'%sp)
