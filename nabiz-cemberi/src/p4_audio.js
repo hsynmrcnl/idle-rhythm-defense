@@ -214,7 +214,7 @@ function tap(){
  const tv=(()=>{try{const c=ovCur();return !!(c&&c.st.rv)}catch(e){return false}})();
  if(tv){const p=$('tutLP');if(p)p.textContent=T(Math.abs(d)<0.22?'Tam! Seri başladı.':d<0?'Biraz erken: ibre parlak bir vuruşun üstüne gelince dokun.':'Biraz geç: ibre parlak bir vuruşun üstüne gelince dokun.')}
  if(tv&&Math.abs(d)>=0.22&&++tvMiss>3){const p=$('tutLP');if(p)p.textContent=T('Tam! Seri başladı.')}
- if(Math.abs(d)<(tv?(tvMiss>3?9:0.22):0.085)){tvMiss=0;S.seri++;hitBar=true;const g=Math.max(5,rate()*0.6);earn(g);tapFx={t:'Tam',c:dispTheme().cv.acc,life:1,sub:'+♪ '+fmt(g)};tapP=1}
- else{S.seri=0;tapFx={t:d<0?'Erken':'Geç',c:dispTheme().cv.hot,life:1,sub:'seri sıfırlandı'};tapP=0.6}
+ if(Math.abs(d)<(tv?(tvMiss>3?9:0.22):0.085)){tvMiss=0;S.seri++;S.tapN=Math.min(8,(S.tapN||0)+1);hitBar=true;const g=Math.max(5,rate()*0.6);earn(g);tapFx={t:'Tam',c:dispTheme().cv.acc,life:1,sub:'+♪ '+fmt(g)};tapP=1}
+ else{S.seri=0;S.tapN=0;tapFx={t:d<0?'Erken':'Geç',c:dispTheme().cv.hot,life:1,sub:'seri sıfırlandı'};tapP=0.6}
  updUI();
 }

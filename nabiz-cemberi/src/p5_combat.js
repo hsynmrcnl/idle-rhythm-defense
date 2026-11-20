@@ -4,7 +4,7 @@ function squeal(si){const t=lastLogic;for(let k=0;k<WN;k++)wallE[k]*=0.96;if(t-l
 function doruk(si){const x=slotIns(si);if(!x)return;const col=insColor(x,dispTheme()),d=dmgOf(si,1)*GC.A*SOLO_M*4*globalMDmg();enemies.slice().forEach(e=>hit(e,d,col,null));vfx.push({k:'ring',col,life:1});const g=rate()*5;if(g>0)earn(g);dorukFlash=1;msg('DORUK! '+x.n+' sahneyi doldurdu · herkese hasar · +5 sn gelir')}
 const WN=48,wallE=new Float32Array(WN),wallD=new Float32Array(WN);
 const wallBase=()=>S.layout==='strip'?0:0.678,wallSpan=()=>S.layout==='strip'?0.47:0.3;
-function waveComp(w){const r=rng(w*7919+13);const bd=barDur();let n=Math.min(60,4+Math.floor(w*0.9));let boss=null;if(w%50===0)boss='ceo';else if(w%25===0)boss='mudur';else if(w%10===0)boss='denetci';if(boss)n=Math.ceil(n/2);const span=(6+Math.floor(w/10))*bd;const items=[];const bias=(cityOf()||{}).bias||{};const W=[['sansurcu',w>=9?0.1:0],['avukat',w>=6?0.15:0],['stajyer',w>=4?0.15:0],['kurye',w>=2?0.25:0]];let rest=1;W.forEach(q=>{q[1]*=bias[q[0]]||1;rest-=q[1]});W.push(['memur',Math.max(0.05,rest*(bias.memur||1))]);const tot=W.reduce((a,q)=>a+q[1],0);
+function waveComp(w){const r=rng(w*7919+13);const bd=barDur();let n=Math.min(60,4+Math.floor(w*0.9));let boss=null;if(w%50===0)boss='ceo';else if(w%25===0)boss='mudur';else if(w%10===0)boss='denetci';if(boss)n=Math.ceil(n/2);const span=(6+Math.floor(w/10))*bd;const items=[];const bias=(cityOf()||{}).bias||{};const W=[['sansurcu',w>=9?0.1:0],['avukat',w>=6?0.15:0],['stajyer',w>=4?0.15:0],['kurye',w>=2?0.25:0],['bolen',w>=15?0.1:0],['iyilesen',w>=25?0.1:0],['zirhsans',w>=40?0.1:0]];let rest=1;W.forEach(q=>{q[1]*=bias[q[0]]||1;rest-=q[1]});W.push(['memur',Math.max(0.05,rest*(bias.memur||1))]);const tot=W.reduce((a,q)=>a+q[1],0);
  for(let k=0;k<n;k++){let u=r()*tot,ty='memur';for(const [t,p] of W){if(u<p){ty=t;break}u-=p}items.push({ty,at:(k/n)*span+r()*bd*0.5,lane:r()})}if(boss)items.push({ty:boss,at:span*0.5,lane:r()});
  if(!boss&&w>=RAID_EVERY&&w%RAID_EVERY===0){const m=8+Math.floor(w/5),l0=r();for(let k=0;k<m;k++)items.push({ty:'kurye',at:span*0.55+k*bd*0.1,lane:l0+(k/m-0.5)*0.22,raid:m})}
  items.sort((a,b)=>a.at-b.at);return items}
@@ -13,11 +13,11 @@ function startWave(w,now){S.wave=w;if(w>S.bestWave){S.bestWave=w;const nf=nextFa
 function spawn(ty,now,w,lane,raid){const T=ETYPES[ty];const cnt=T.swarm||1;for(let k=0;k<cnt;k++){let hp=4*Math.pow(1.19,w-1)*T.hp;if(raid)hp=Math.max(hp,dps()*globalMDmg()*RAID_T/raid);const e={raid:!!raid,ty,hp,hpMax:hp,d:1+k*0.03,a:(lane!=null?lane:Math.random())+(cnt>1?(Math.random()-0.5)*0.08:0),sp:T.sp*(1+0.004*w),slow:0,slowT:0,stun:0,dot:0,dotT:0,flash:0,w,boss:!!T.boss,lastSp:now,wob:Math.random()*TAU,id:Math.random(),waved:false};e.a=((e.a%1)+1)%1;enemies.push(e);if(e.boss)wave.boss=e}}
 function laneDist(a,b){const d=Math.abs(a-b);return S.layout==='circle'?Math.min(d,1-d):d}
 function bounty(e){const T=ETYPES[e.ty];return(2*Math.pow(1.18,e.w-1)*T.b+rate()*0.4*T.b)*bountyM()}
-function kill(e,k,now){killSfx(e.boss);const g=bounty(e);earn(g);S.kills++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);if(S.dnum!==false&&pops.length<48)pops.push({e,t:'+♪ '+fmt(g),life:1,k:1});if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
+function kill(e,k,now){killSfx(e.boss);const g=bounty(e);earn(g);S.kills++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);{const _S=ETYPES[e.ty];if(_S.split&&enemies.length<80){const h0=4*Math.pow(1.19,e.w-1)*ETYPES[_S.split].hp;for(let i=0;i<2;i++)enemies.push({ty:_S.split,hp:h0,hpMax:h0,d:Math.max(0.05,e.d),a:((e.a+(i?0.05:-0.05))%1+1)%1,sp:ETYPES[_S.split].sp*(1+0.004*e.w),slow:0,slowT:0,stun:0,dot:0,dotT:0,flash:0,w:e.w,boss:false,lastSp:now,lastHit:now,wob:Math.random()*TAU,id:Math.random(),waved:true})}}if(S.dnum!==false&&pops.length<48)pops.push({e,t:'+♪ '+fmt(g),life:1,k:1});if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
 function leak(e,k,now){const T=ETYPES[e.ty];
  if(wave)wave.leaked=true;
  if(e.raid){/* akıncı: küçük, ölümcül olmayan hasar */let dmg=hpMax()*RAID_DMG;if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}{const h0=core.hp;core.hp=Math.max(Math.min(core.hp,hpMax()*RAID_FLOOR),core.hp-dmg);if(wave)wave.raidDmg=(wave.raidDmg||0)+(h0-core.hp)}retreatFlash=Math.max(retreatFlash,0.6);if(wave)wave.raidLeak++;enemies.splice(k,1);return}
- let dmg=T.dmg*(1+0.03*e.w);if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}core.hp-=dmg;retreatFlash=Math.max(retreatFlash,0.6);if(T.mute){const cands=S.slots.map((id,si)=>id?si:-1).filter(x=>x>=0);if(cands.length){const si=cands[Math.floor(Math.random()*cands.length)];muteUntil[si]=now+barDur();msg(slotIns(si).n+' bir ölçü susturuldu')}}enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;if(core.hp<=0)retreat(now)}
+ let dmg=T.dmg*(1+0.03*e.w);if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}core.hp-=dmg;retreatFlash=Math.max(retreatFlash,0.6);if(T.mute){if(core.sh>=25){core.sh-=25;if(!ffOn)msg('Kalkan susturmayı emdi')}else{const cands=S.slots.map((id,si)=>id?si:-1).filter(x=>x>=0);if(cands.length){const si=cands[Math.floor(Math.random()*cands.length)];muteUntil[si]=now+barDur();msg(slotIns(si).n+' bir ölçü susturuldu')}}}enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;if(core.hp<=0)retreat(now)}
 /* öğretici: ilk düşman ve Ritme vur'dan sonra arayüz adımlarında dalga durur */
 /* v63: yalnız ana öğretici dalgayı durdurur; kısa öğreticiler durdurmaz (bekleyen kısa öğretici idle oyunu donduruyordu, 4 persona) */
 const tutHold=()=>{if(ffOn)return false;const c=ovCur();return !!(c&&c.main&&c.st.n>=8)};
@@ -27,13 +27,14 @@ function wallHit(e){const k=Math.floor(e.a*WN)%WN;const E=wallE[k];if(E<=0.02)re
 const FAST=2.5;let fastNow=false;
 const fastOn=()=>!!(wave&&!demoMode&&wave.n<S.bestWave&&!wave.raid&&!wave.leaked);
 function logic(now){
- const dt=clamp(now-lastLogic,0,0.1);lastLogic=now;if(dt<=0||!wave)return;if(tutHold()){wave.startT+=dt;return}
+ const dt=clamp(now-lastLogic,0,0.1);lastLogic=now;if(S.tapN>0)S.tapN=Math.max(0,S.tapN-dt*1.8);if(dt<=0||!wave)return;if(tutHold()){wave.startT+=dt;return}
  fastNow=fastOn();const fk=fastNow?FAST:1;if(fastNow)wave.startT-=dt*(FAST-1);
  while(wave.queue.length&&wave.startT+wave.queue[0].at<=now){const it=wave.queue.shift();spawn(it.ty,now,wave.n,it.lane,it.raid)}
  const bd=barDur(),dec=Math.exp(-dt*2.2),gs=Math.min(0.6,globalSlow()+(planAt(curBar).sec.slow||0)),useWall=!!S.stage.wall,useBeams=!!S.stage.beams,beamDps=useBeams?dps()*0.03:0;
  for(let k=0;k<WN;k++){wallE[k]*=dec;wallD[k]*=dec}
  for(let k=enemies.length-1;k>=0;k--){const e=enemies[k];const T=ETYPES[e.ty];e.flash=Math.max(0,e.flash-dt*8);
   if(e.stun>0)e.stun-=dt;else{const sl=Math.min(0.85,(e.slowT>0?e.slow:0)+(T.noSlow?0:gs));e.d-=e.sp*(1-sl)*dt*fk;if(e.slowT>0)e.slowT-=dt}
+  if(T.heal&&e.hp<e.hpMax&&e.slowT<=0&&e.dotT<=0&&now-(e.lastHit||0)>1.1)e.hp=Math.min(e.hpMax,e.hp+T.heal*dt);
   if(S.stage.wave&&!e.waved&&e.d<0.8){e.waved=true;applySlow(e,0.25,1.0)}
   let dd=0;
   if(e.dotT>0){dd+=e.dot*dt;e.dotT-=dt}
@@ -57,7 +58,7 @@ function manualBlast(){if(chReady<0)return false;const on=onBarBeat();blast(on?C
 function blast(m){m=m||1;blastM=m;charge=0;chReady=-1;const th=dispTheme(),d=dps()*BLAST_S*globalMDmg()*m,col=goldOf(th);enemies.slice().forEach(e=>{if(enemies.includes(e))hit(e,d*(e.boss?0.5:1),col,null)});novaT=0;blastN++;kickP=1;
  if(ac&&playing&&!S.muted){const t=ac.currentTime+0.01;O('sine',90,t,1,0.9,drum,28,0.8);Nz(t,'lowpass',600,0,0.35,1,drum)}if(m===1&&!ffOn)msg('Merkez patladı · tüm sahneye hasar')}
 function inRange(){const r=range();return enemies.filter(e=>e.d<=r)}
-function hit(e,dmg,col,origin,kind){e.dnA=(e.dnA||0)+Math.min(dmg,Math.max(0,e.hp));e.hp-=dmg;e.flash=1;const k=enemies.indexOf(e);if(origin)vfx.push({k:kind||'tracer',o:origin,e,col,life:1});if(e.hp<=0&&k>=0)kill(e,k,lastLogic)}
+function hit(e,dmg,col,origin,kind,pierce){const _T=ETYPES[e.ty];if(_T.tough&&!pierce)dmg*=_T.tough;e.lastHit=lastLogic;e.dnA=(e.dnA||0)+Math.min(dmg,Math.max(0,e.hp));e.hp-=dmg;e.flash=1;const k=enemies.indexOf(e);if(origin)vfx.push({k:kind||'tracer',o:origin,e,col,life:1});if(e.hp<=0&&k>=0)kill(e,k,lastLogic)}
 function applySlow(e,amt,dur){if(ETYPES[e.ty].noSlow)return;e.slow=Math.max(e.slow,amt);e.slowT=Math.max(e.slowT,dur)}
 function pushWall(lane,energy,dmg){const k0=Math.floor(lane*WN)%WN;for(let o=-4;o<=4;o++){const k=(k0+o+WN)%WN,f=Math.exp(-o*o/5);wallE[k]=Math.min(1.6,wallE[k]+energy*f);wallD[k]=Math.max(wallD[k],dmg*f)}}
 function fire(si,s,v,pk,mult,art,raw){
@@ -75,10 +76,10 @@ function fire(si,s,v,pk,mult,art,raw){
  if(art==='bend'){near.d=Math.min(1,near.d+(near.boss?0.01:0.04))}if(art==='slap'&&!ETYPES[near.ty].noSlow)near.stun=Math.max(near.stun,0.3);if(art==='slide'&&byD[1])hit(byD[1],dmg*0.5,col,o);
  switch(x.role){
   case 'darbe':{hit(near,dmg,col,o);R.forEach(e=>{if(e!==near&&laneDist(e.a,near.a)<0.06&&Math.abs(e.d-near.d)<0.1)hit(e,dmg*0.3,col)});vfx.push({k:'burst',e:near,col,life:1});break}
-  case 'keskin':{const tg=R.slice().sort((a,b)=>b.hp-a.hp)[0];const crit=Math.random()<0.2+critB;hit(tg,dmg*(crit?2.5:1),col,o);if(crit)vfx.push({k:'crit',e:tg,col,life:1});break}
+  case 'keskin':{const tg=R.slice().sort((a,b)=>b.hp-a.hp)[0];const crit=Math.random()<0.2+critB;hit(tg,dmg*(crit?2.5:1),col,o,null,true);if(crit)vfx.push({k:'crit',e:tg,col,life:1});break}
   case 'seri':{const tg=R[Math.floor(Math.random()*R.length)];hit(tg,dmg*(ETYPES[tg.ty].armor?0.5:1),col,o);break}
   case 'alan':{const k=x.id==='gamelan'?0.5:0.35;R.forEach(e=>hit(e,dmg*k,col));vfx.push({k:'ring',o,col,life:1});break}
-  case 'delici':{R.forEach(e=>{if(laneDist(e.a,near.a)<0.04)hit(e,dmg,col)});vfx.push({k:'beam',a:near.a,col,life:1});break}
+  case 'delici':{R.forEach(e=>{if(laneDist(e.a,near.a)<0.04)hit(e,dmg,col,null,null,true)});vfx.push({k:'beam',a:near.a,col,life:1});break}
   case 'yavas':{hit(near,dmg*0.7,col,o);applySlow(near,slowPow(),1.5);break}
   case 'gudum':{const tg=R.slice().sort((a,b)=>b.sp-a.sp)[0];hit(tg,dmg,col,o,'homing');break}
   case 'zincir':{hit(near,dmg,col,o);const others=R.filter(e=>e!==near).sort((a,b)=>(laneDist(a.a,near.a)+Math.abs(a.d-near.d))-(laneDist(b.a,near.a)+Math.abs(b.d-near.d))).slice(0,2);let prev=near;others.forEach(e=>{hit(e,dmg*0.6,col);vfx.push({k:'chain',e1:prev,e,col,life:1});prev=e});break}
