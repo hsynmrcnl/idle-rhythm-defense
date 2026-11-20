@@ -299,6 +299,8 @@ function drawMarks(g,th){
   const tr=rOut+(th.ring==='vinyl'?0.09:0.05)*R;if(!D3)ctx.fillText(String(s+1),c+cs*tr,c+sn*tr)});
  const rr=g.r0+range()*(1.02*R-g.r0);ctx.setLineDash([2,6]);ctx.strokeStyle=hexA(th.cv.hot,0.3);ctx.lineWidth=1;ctx.beginPath();ctx.arc(c,c,rr,0,TAU);ctx.stroke();ctx.setLineDash([]);
 }
+/* v82 Ritme vur işareti: ibre parlak dilime (vuruşa) geldiğinde çekirdeğin çevresinde altın halka atar — ne zaman dokunulacağını gösterir */
+function drawTapCue(g,th){if(!playing||!ac||(tutHold&&tutHold())||!beats.length)return;const now=ac.currentTime;let near=2;for(const b of beats){const d=Math.abs(now-b);if(d<near)near=d}if(near>0.12)return;const o=orbAt(),k=1-near/0.12,gold=goldOf(th);ctx.save();if(!GLX){ctx.shadowColor=gold;ctx.shadowBlur=8+12*k}ctx.strokeStyle=hexA(gold,(0.45+0.55*k).toFixed(3));ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(o.x,o.y,o.r0*(1.16+0.14*k),0,TAU);ctx.stroke();ctx.restore()}
 function drawNeedle(g,th){
  const {R,c,r0,rIn,rOut,t}=g;
  if(th.needle==='tonearm'){
@@ -708,10 +710,10 @@ function drawScene(dt){
  if(S.stage.wave)drawWave(g,th);
  if(playing&&S.up.dolgu&&fillBar(curBar)&&g.layout==='circle'){ctx.strokeStyle=hexA(th.cv.warn||'#ffb13f',0.35+0.3*Math.sin(clock*12));ctx.lineWidth=3;ctx.beginPath();ctx.arc(g.c,g.c,g.rOut+5,0,TAU);ctx.stroke()}
  if(D3&&sv>=0){gOut();soloStage3(dt,sgeom(),g,th,sv)}
- else if(D3){drawRings(dt,g,th);drawMarks(g,th);drawNeedle(g,th);drawExtraNeedles(g,th);ground3(g,th);gOut();marks3(g,th);depth3(dt,g,th)}
+ else if(D3){drawRings(dt,g,th);drawMarks(g,th);drawNeedle(g,th);drawExtraNeedles(g,th);drawTapCue(g,th);ground3(g,th);gOut();marks3(g,th);depth3(dt,g,th)}
  else if(sv>=0){drawSoloStage(dt,sgeom(),th,sv);if(g.layout!=='strip')drawCoreS(dt,g,th)}
  else if(g.layout==='strip'){drawStrip(dt,g,th)}
- else{drawRings(dt,g,th);drawMarks(g,th);drawNeedle(g,th);drawExtraNeedles(g,th);drawCoreS(dt,g,th)}
+ else{drawRings(dt,g,th);drawMarks(g,th);drawNeedle(g,th);drawExtraNeedles(g,th);drawTapCue(g,th);drawCoreS(dt,g,th)}
  if(S.up.akor&&sv<0&&g.layout==='circle'){const lab=chordLabel(curBar,Math.floor(phase*MI.N)%MI.N),lp=D3?pj(g.c,g.c,coreZ3(g)+g.rOut*0.44):[g.c,g.c+g.r0*0.55];ctx.fillStyle=hexA(th.cv.acc,0.85);ctx.font='600 '+Math.max(9,Math.round(g.r0*0.3))+'px '+th.font.m;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lab,lp[0],lp[1])}
  if(crashFlash>0){crashFlash=Math.max(0,crashFlash-dt*2.5);ctx.fillStyle='rgba(255,255,255,'+(crashFlash*0.18).toFixed(3)+')';ctx.fillRect(-OX,-OY,CW,CH)}
  if(!D3)enemies.forEach(e=>drawEnemy(e,th,g));
@@ -825,7 +827,8 @@ function drawKbCell(g,th){if(kbSi>=S.slots.length)kbSi=0;if(kbS>=MI.N)kbS=0;cons
   if(e.key==='ArrowRight')kbS=(kbS+1)%N;else if(e.key==='ArrowLeft')kbS=(kbS+N-1)%N;else if(e.key==='ArrowDown'||e.key==='ArrowUp'){const occ=S.slots.map((id,i)=>id?i:-1).filter(i=>i>=0);if(occ.length){const j=occ.indexOf(kbSi),d=e.key==='ArrowDown'?1:-1;kbSi=occ[j<0?0:(j+d+occ.length)%occ.length]}}
   else if(e.key==='Enter'){e.preventDefault();cellClick(kbSi,kbS);setTimeout(kbSay,30);return}else mv=false;
   if(mv){e.preventDefault();kbSay()}})}
-recalc();core.hp=hpMax();ensureOrders();secCheck(true);unlCheck(unlQuiet);unlQuiet=false;unlVis();applyTheme();{let t0=null;try{t0=sessionStorage.getItem('nb-tab');sessionStorage.removeItem('nb-tab')}catch(e){}setTab(t0||(isPhone()?'stage':'studio'))}hintFor(null);tutShow();if(S.lang==='en'){document.documentElement.lang='en';$('app').lang='en';i18n(document.body);$('langBtn').textContent='TR'}
+recalc();core.hp=hpMax();ensureOrders();secCheck(true);unlCheck(unlQuiet);unlQuiet=false;unlVis();applyTheme();{let t0=null;try{t0=sessionStorage.getItem('nb-tab');sessionStorage.removeItem('nb-tab')}catch(e){}setTab(t0||(isPhone()?'stage':'studio'))}try{if(sessionStorage.getItem('nb-play')==='1'){sessionStorage.removeItem('nb-play');if(!playing){addEventListener('pointerdown',function _r(){try{ensureAudio()}catch(e){}if(!playing)startStop();updUI();removeEventListener('pointerdown',_r)},{once:true});setTimeout(()=>{if(!playing)msg(T('Dil değişti · dokun ya da ▶ ile devam et'))},400)}}}catch(e){}
+ hintFor(null);tutShow();if(S.lang==='en'){document.documentElement.lang='en';$('app').lang='en';i18n(document.body);$('langBtn').textContent='TR'}
 openShared();window.addEventListener('hashchange',()=>{if(/^#s=/.test(location.hash))openShared()});
 const away=Math.min((Date.now()-(S.last||Date.now()))/1000,8*3600);
 if(away>30){const g=rate()*away*0.5;if(g>=1){earn(g);setTimeout(()=>msg('Sen yokken döngün ♪ '+fmt(g)+' kazandırdı · kuşatma seni bekledi'),300)}}
