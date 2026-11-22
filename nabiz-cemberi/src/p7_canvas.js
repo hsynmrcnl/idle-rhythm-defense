@@ -822,7 +822,7 @@ const kbFocus=()=>document.activeElement===vis()&&soloView()<0;
 function kbSay(){const x=slotIns(kbSi),v=S.pat[S.edit][kbSi]&&S.pat[S.edit][kbSi][kbS];msg(T('Yer')+' '+(kbSi+1)+' · '+(x?x.n:T('boş'))+' · '+T('adım')+' '+(kbS+1)+' · '+(v?T('vuruş var'):T('vuruş yok')))}
 function drawKbCell(g,th){if(kbSi>=S.slots.length)kbSi=0;if(kbS>=MI.N)kbS=0;const [x,y]=cellPos(kbSi,kbS,g),r=Math.max(9,(g.t||g.rowH||0.04*L)*0.55);ctx.save();ctx.strokeStyle=th.cv.ink;ctx.lineWidth=3;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();ctx.restore()}
 {const cv=vis();cv.tabIndex=0;cv.setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight ArrowUp ArrowDown Enter Space');cv.setAttribute('aria-label',cv.getAttribute('aria-label')+' '+T('Oklarla hücre seç, Enter ile vuruş koy, Boşluk ile ritme vur.'));
- cv.addEventListener('focus',()=>{if(soloView()<0)kbSay()});
+ cv.addEventListener('focus',()=>{/* v85: yalnız klavye odağında; fare/dokunuş da tuvali odaklıyordu ve tıklanan hücreyle ilgisiz bayat "Yer 1 · adım 1" yazıyordu (öğretici adım 3) */let kv=true;try{kv=cv.matches(':focus-visible')}catch(e){}if(kv&&soloView()<0)kbSay()});
  cv.addEventListener('keydown',e=>{if(!kbFocus())return;const N=MI.N,ns=S.slots.length;let mv=true;
   if(e.key==='ArrowRight')kbS=(kbS+1)%N;else if(e.key==='ArrowLeft')kbS=(kbS+N-1)%N;else if(e.key==='ArrowDown'||e.key==='ArrowUp'){const occ=S.slots.map((id,i)=>id?i:-1).filter(i=>i>=0);if(occ.length){const j=occ.indexOf(kbSi),d=e.key==='ArrowDown'?1:-1;kbSi=occ[j<0?0:(j+d+occ.length)%occ.length]}}
   else if(e.key==='Enter'){e.preventDefault();cellClick(kbSi,kbS);setTimeout(kbSay,30);return}else mv=false;
