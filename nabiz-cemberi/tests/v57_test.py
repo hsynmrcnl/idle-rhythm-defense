@@ -29,9 +29,10 @@ with sync_playwright() as pw:
     bad = []
     for k in range(4):
         g = p.evaluate(GEO)
-        if not (g['h'][0] + g['h'][2] / 2 < 422 and g['b'][0] >= 422 - 1): bad.append((k, g))
+        # v88: yatayda hücre adımı sağ kolondaki pedi hedefler; balon da sağ kolonda, hedefin üstünde (sahneyi örtmez, hedefi örtmez)
+        if not (g['b'][0] >= 422 - 1 and g['b'][1] + g['b'][3] <= g['h'][1] + 1): bad.append((k, g))
         p.keyboard.press('Enter'); p.wait_for_timeout(450)
-    check(not bad, 'yatayda dört hücre adımında balon sahnenin dışında, sağ yarıda %s' % bad[:1])
+    check(not bad, 'yatayda dört hücre adımında balon sahnenin dışında, sağ kolonda hedefin üstünde %s' % bad[:1])
     ctx.close()
     # masaüstü: Tab balonda kalır
     ctx = b.new_context(viewport={'width': 1366, 'height': 768}); p = ctx.new_page()

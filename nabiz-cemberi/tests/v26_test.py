@@ -98,7 +98,7 @@ with sync_playwright() as pw:
     p.tap('#d-album'); p.wait_for_timeout(150)
     check(dock() == ['stage', 'studio', 'def', 'album', 'look'] and found > 0 and p.is_visible('#p-album .subnav [data-tab=book]'), 'Görünüm ve Albüm açıldı; kalıp bulunduğu için Kitap Albüm’le geldi (%s)' % dock())
     # kaydet, yeniden aç: açılanlar kalır
-    p.evaluate("()=>{const S=window.__nb.S;S.tipq=['look'];localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
+    p.evaluate("()=>{const S=window.__nb.S;S.tipq=['look'];S.tipw={look:S.bestWave};S.tabSeen={};localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
     p.reload(); p.wait_for_timeout(500)
     check(dock() == ['stage', 'studio', 'def', 'album', 'look'] and card() == 'Yeni: Görünüm', 'yeniden açınca açılanlar ve bekleyen öğretici yerinde (%s)' % card())
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
