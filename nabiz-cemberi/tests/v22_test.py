@@ -48,9 +48,9 @@ with sync_playwright() as pw:
     # telefon: Sahne pedinde seviye düğmeleri
     ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); p = ctx.new_page(); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
-    p.goto(URL); p.wait_for_timeout(400); p.evaluate(SEED); p.evaluate("()=>window.__nb.renderPanels()"); p.wait_for_timeout(100)
+    p.goto(URL); p.wait_for_timeout(400); p.evaluate(SEED); p.evaluate("()=>{window.__nb.renderPanels();window.__nb.slotOpen(0)}"); p.wait_for_timeout(100)  # v90: pedler enstrüman panelinde
     check(p.locator('#pads [data-act=alvl]').count() in (1, 3), 'telefon Sahne pedinde seviye düğmeleri (v55: aynı desende tek Otomatik ritim)')
-    p.evaluate("()=>{document.querySelector('#pads [data-act=padNext]').click()}"); p.wait_for_timeout(50)
+    p.evaluate("()=>{document.querySelector('#iSheet [data-act=sbNext]').click()}"); p.wait_for_timeout(50)
     p.tap('#pads [data-act=alvl][data-v="3"]'); p.wait_for_timeout(80)
     check(p.evaluate("()=>window.__nb.S.pat.A[1].slice(0,16).join('')") == '0000100000001000', 'pedden Yoğun trampet ritmini yazdı')
     sc = p.evaluate("()=>document.scrollingElement.scrollHeight-innerHeight")

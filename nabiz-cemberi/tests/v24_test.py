@@ -52,7 +52,7 @@ with sync_playwright() as pw:
         check(p.evaluate("()=>window.__nb.anlOn"), 'üst bilgiye dokununca Analiz açılıyor')
         p.tap('#stats'); p.wait_for_timeout(100)
         # solo sahnesi: çip ile çıkış; nota seçili değilken araç çubuğu yok, seçince neon simge, açınca sahne daralmıyor
-        p.evaluate(SOLO); p.evaluate("()=>window.__nb.setEdit('S')"); p.wait_for_timeout(200)
+        p.evaluate(SOLO); p.evaluate("()=>{const nb=window.__nb;nb.setEdit('S');nb.slotOpen(nb.soloEdSlot>=0?nb.soloEdSlot:0)}"); p.wait_for_timeout(200)  # v90: pedler enstrüman panelinde
         check(p.is_visible('#soloChip') and p.evaluate("()=>window.__nb.soloView()") >= 0, 'solo sahnesinde “Solodan çık” çipi görünüyor')
         check(p.locator('#pads .padtb').count() == 0 and 'Nota seçili değil' not in p.inner_text('#pads') and not p.is_visible('#soloTbWrap'), 'nota seçili değilken araç satırı yok, sahne daralmıyor')
         cv0 = p.evaluate("()=>document.getElementById('cv').getBoundingClientRect().height")
@@ -94,9 +94,9 @@ with sync_playwright() as pw:
         p.click('#p-studio .subnav [data-tab=coll]'); p.wait_for_timeout(120)
         fb = p.evaluate("()=>[...document.querySelectorAll('#famBar .sb')].map(e=>[e.dataset.f,e.classList.contains('locked'),e.textContent.trim()])")
         check(len(fb) == 6 and all(t == '' for _, _, t in fb) and [l for _, l, _ in fb] == [False, False, True, True, True, True], 'altı aile yazısız simgeyle, kilitliler işaretli (%s)' % fb)
-        ir = p.evaluate("""()=>{const r=document.querySelector('#collList .irow .own').closest('.irow'),nm=r.querySelector('.nm').getBoundingClientRect(),o=r.querySelector('.own').getBoundingClientRect(),ie=r.querySelector('.ie').getBoundingClientRect();
-          return {same:Math.abs((o.top+o.bottom)/2-(nm.top+nm.bottom)/2)<14,right:o.right>innerWidth-40,ie:ie.left>nm.left,h:r.getBoundingClientRect().height,n:document.querySelectorAll('#collList .irow').length}}""")
-        check(ir['same'] and ir['right'] and ir['ie'] and ir['h'] < 64 and ir['n'] == 12, '“Sahnede” başlık hizasında en sağda, etki adın yanında, satır %dpx' % ir['h'])
+        ir = p.evaluate("""()=>{const r=document.querySelector('#collList .irow:not(.locked)'),nm=r.querySelector('.nm').getBoundingClientRect(),o=nm,ie=r.querySelector('.ie').getBoundingClientRect();
+          return {same:Math.abs((o.top+o.bottom)/2-(nm.top+nm.bottom)/2)<22,right:o.right>innerWidth-40,ie:ie.left>nm.left,h:r.getBoundingClientRect().height,n:document.querySelectorAll('#collList .irow').length}}""")
+        check(ir['ie'] and ir['h'] < 64 and ir['n'] == 12, 'açık enstrüman satırı sıkı: etki adın yanında, satır %dpx (v90: durum etiketi yok, yalnız Aç)' % ir['h'])
         p.tap('#famBar [data-f=tus]'); p.wait_for_timeout(100)
         t = p.inner_text('#collList')
         check('albüm' in t and p.locator('#collList [data-act=openFam][data-f=tus]').count() == 1 and p.locator('#collList .irow').count() == 0, 'kilitli aileye dokununca açılma koşulları ve Aileyi aç')
@@ -122,12 +122,12 @@ with sync_playwright() as pw:
     p.click('[data-act=amTog][data-k=yeni]'); p.wait_for_timeout(50)
     check(p.evaluate("()=>window.__nb.S.am.yeni") is False, 'anahtar kapatıyor')
     p.evaluate("()=>{const S=window.__nb.S;S.slots.push(null);window.__nb.renderPanels()}")
-    p.click('[data-act=tab][data-tab=coll]'); p.click('#collList [data-act=place][data-id=clap]'); p.wait_for_timeout(80)
+    p.evaluate("()=>window.__nb.slotOpen(4)"); p.select_option('#iAct select[data-slot="4"]', 'clap'); p.evaluate("()=>window.__nb.slotClose()"); p.wait_for_timeout(80)  # v90: yerleştirme enstrüman panelinden
     row = lambda i: p.evaluate("i=>window.__nb.S.pat.A[i].slice(0,16).join('')", i)
     check(row(4).count('1') == 0, 'kapalıyken sahneye giren el çırpma boş geliyor')
     p.evaluate("()=>{const S=window.__nb.S;S.slots[4]=null;S.ui='detay';window.__nb.renderPanels()}")
     p.click('[data-act=tab][data-tab=studio]'); p.click('[data-act=amTog][data-k=yeni]'); p.wait_for_timeout(50)
-    p.click('[data-act=tab][data-tab=coll]'); p.click('#collList [data-act=place][data-id=clap]'); p.wait_for_timeout(80)
+    p.evaluate("()=>window.__nb.slotOpen(4)"); p.select_option('#iAct select[data-slot="4"]', 'clap'); p.evaluate("()=>window.__nb.slotClose()"); p.wait_for_timeout(80)  # v90: yerleştirme enstrüman panelinden
     check(row(4).count('1') >= 1, 'açıkken Detaylı’da da ritimle geliyor (%s)' % row(4))
     p.evaluate("()=>{const S=window.__nb.S;S.ui='kolay';window.__nb.renderPanels()}")
     p.click('[data-act=tab][data-tab=studio]'); p.wait_for_timeout(50)
@@ -189,7 +189,7 @@ with sync_playwright() as pw:
     check('New instrument rhythm' in t and 'what to buy' in t.lower() and not left, 'Otomatik ve bölüm çubuğu İngilizce %s' % left)
     p.click('#p-studio .subnav [data-tab=coll]'); p.wait_for_timeout(100)
     t = p.inner_text('#p-coll')
-    check('On stage' in t and 'Percussion' in t and 'Sahnede' not in t, 'Koleksiyon İngilizce')
+    check('Percussion' in t and 'Sahnede' not in t, 'Koleksiyon İngilizce')
     p.click('#d-def'); p.wait_for_timeout(100)
     t = p.inner_text('#defStatus')
     check('enemies' in t and 'dmg/s' in t and 'düşman' not in t, 'Kuşatma İngilizce: ' + t.replace('\n', ' '))

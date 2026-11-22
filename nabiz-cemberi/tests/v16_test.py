@@ -120,7 +120,7 @@ with sync_playwright() as pw:
         p.on('pageerror', lambda e: errs.append(str(e)))
         p.goto(URL); p.wait_for_timeout(500); p.evaluate(SEED); p.wait_for_timeout(100)
         # pedden vuruş ekle → ped başlığındaki geri al ile birebir iade
-        p.evaluate("()=>{window.__nb.renderPanels()}")
+        p.evaluate("()=>{window.__nb.renderPanels();window.__nb.slotOpen(0)}")  # v90: pedler enstrüman panelinde
         free = p.evaluate("()=>{const a=window.__nb.S.pat.A[0];for(let s=0;s<16;s++)if(!a[s])return s;return -1}")
         n0 = p.evaluate("()=>window.__nb.S.nota")
         p.click('#pads [data-act=pad][data-s="%d"]' % free); p.wait_for_timeout(50)

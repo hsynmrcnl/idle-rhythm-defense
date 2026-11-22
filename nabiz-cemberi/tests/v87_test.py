@@ -15,7 +15,7 @@ fails=[]
 def check(ok,what):
     print(('  ok  ' if ok else '  FAIL ')+what)
     if not ok: fails.append(what)
-M="""()=>{const pd=document.getElementById('pads'),q=pd.querySelector('.pad'),c=document.getElementById('cv').getBoundingClientRect(),
+M="""()=>{const pd=document.getElementById('slotBar'),q=pd.querySelector('.sbt'),c=document.getElementById('cv').getBoundingClientRect(),
  tabs=[...document.querySelectorAll('.rack .tabs .tab')].filter(t=>t.offsetParent),ts=document.querySelector('.rack .tabs').getBoundingClientRect(),
  pr=pd.getBoundingClientRect(),rk=document.getElementById('rack').getBoundingClientRect();
  return {par:pd.parentNode.id||pd.parentNode.className,vis:!!pd.offsetParent&&pr.height>0,pad:q&&q.offsetParent?[Math.round(q.getBoundingClientRect().width),Math.round(q.getBoundingClientRect().height)]:null,
@@ -30,19 +30,19 @@ with sync_playwright() as pw:
         p.goto(URL);p.wait_for_timeout(500)
         p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.tutm=0;S.muted=true;nb.unlVis();nb.setTab('studio');nb.renderPanels()}");p.wait_for_timeout(400)
         m=p.evaluate(M);tag='%dx%d'%(w,h)
-        check(m['par']=='rack' and m['vis'],'%s: ped sırası sağ panelde görünür (%s)'%(tag,m['par']))
-        check(m['pad'] and m['pad'][0]>=minpw-10 and m['pad'][1]>=34,'%s: ped hücresi dokunulabilir boyda (%s)'%(tag,m['pad']))
+        check(m['par']=='rack' and m['vis'],'%s: 8 yer şeridi sağ panelde görünür (%s)'%(tag,m['par']))
+        check(m['pad'] and m['pad'][0]>=minpw-14 and m['pad'][1]>=40,'%s: yer düğmesi dokunulabilir boyda (%s)'%(tag,m['pad']))
         check(m['cv']>=mincv,'%s: sahne küçülmedi (%d px)'%(tag,m['cv']))
-        check(abs(m['padBottom']-m['rackBottom'])<=4,'%s: ped şeridi panelin altına yapışık (%d/%d)'%(tag,m['padBottom'],m['rackBottom']))
+        check(abs(m['padBottom']-m['rackBottom'])<=4,'%s: yer şeridi panelin altına yapışık (%d/%d)'%(tag,m['padBottom'],m['rackBottom']))
         check(m['rows']==1,'%s: sekmeler tek satır (%d)'%(tag,m['rows']))
         # pede dokun → vuruş değişir
         v0=p.evaluate("()=>{const S=window.__nb.S;return S.pat[S.edit][0][2]||0}")
-        p.locator('#pads .pad').nth(2).click();p.wait_for_timeout(250)
+        p.evaluate("()=>window.__nb.slotOpen(0)");p.wait_for_timeout(200);p.locator('#pads .pad').nth(2).click();p.wait_for_timeout(250);p.evaluate("()=>window.__nb.slotClose()")
         v1=p.evaluate("()=>{const S=window.__nb.S;return S.pat[S.edit][0][2]||0}")
         check(v0!=v1,'%s: pede dokununca vuruş değişiyor (%s→%s)'%(tag,v0,v1))
         # Savunma'da ped yok
         p.evaluate("()=>window.__nb.setTab('def')");p.wait_for_timeout(300);m=p.evaluate(M)
-        check(not m['vis'],'%s: Savunma sekmesinde ped şeridi yok'%tag)
+        check(m['vis'],'%s: Savunma sekmesinde de yer şeridi var (ana ekranın parçası, v90)'%tag)
         # Ayarlar kaydırılınca sekmeler üstte
         p.evaluate("()=>window.__nb.setTab('set')");p.wait_for_timeout(250)
         p.evaluate("()=>{document.getElementById('rack').scrollTop=500}");p.wait_for_timeout(250);m=p.evaluate(M)
@@ -50,7 +50,7 @@ with sync_playwright() as pw:
         # dikeye dön → ped sahnedeki yerine
         p.set_viewport_size({'width':390,'height':844});p.wait_for_timeout(500)
         p.evaluate("()=>{window.__nb.setTab('stage');window.__nb.renderPanels()}");p.wait_for_timeout(300);m=p.evaluate(M)
-        check(m['par']!='rack','%s → dikey: pedler sahnedeki yerine döndü (%s)'%(tag,m['par']))
+        check(m['par']!='rack','%s → dikey: yer şeridi sahnedeki yerine döndü (%s)'%(tag,m['par']))
         ctx.close()
     check(not er,'sayfa hatası yok %s'%er[:2])
     b.close()
