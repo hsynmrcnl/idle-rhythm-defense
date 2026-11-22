@@ -39,7 +39,7 @@ with sync_playwright() as pw:
     p.click('#anl [data-a=close]')
     # menajer adı
     p.evaluate("()=>{window.__nb.S.albMax=1;window.__nb.renderPanels()}")
-    p.click('[data-act=tab][data-tab=album]'); p.wait_for_timeout(50)
+    p.evaluate("()=>window.__nb.setTab('album')"); p.wait_for_timeout(50)
     check('Menajer: otomatik geliştir' in p.text_content('#mnBox'), 'menajer kademesi: otomatik geliştir')
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     b.close()

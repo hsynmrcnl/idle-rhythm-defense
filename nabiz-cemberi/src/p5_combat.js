@@ -17,7 +17,7 @@ function startWave(w,now){S.wave=w;if(w>S.bestWave){S.bestWave=w;const nf=nextFa
 function spawn(ty,now,w,lane,raid){const T=ETYPES[ty];const cnt=T.swarm||1;for(let k=0;k<cnt;k++){let hp=4*Math.pow(1.19,w-1)*T.hp;if(raid)hp=Math.max(hp,dps()*globalMDmg()*RAID_T/raid);const e={raid:!!raid,ty,hp,hpMax:hp,d:1+k*0.03,a:(lane!=null?lane:Math.random())+(cnt>1?(Math.random()-0.5)*0.08:0),sp:T.sp*(1+0.004*w),slow:0,slowT:0,stun:0,dot:0,dotT:0,flash:0,w,boss:!!T.boss,lastSp:now,wob:Math.random()*TAU,id:Math.random(),waved:false};e.a=((e.a%1)+1)%1;enemies.push(e);if(e.boss)wave.boss=e}}
 function laneDist(a,b){const d=Math.abs(a-b);return S.layout==='circle'?Math.min(d,1-d):d}
 function bounty(e){const T=ETYPES[e.ty];return(2*Math.pow(1.18,e.w-1)*T.b+rate()*0.4*T.b)*bountyM()}
-function kill(e,k,now){killSfx(e.boss);const g=bounty(e);earn(g);S.kills++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);{const _S=ETYPES[e.ty];if(_S.split&&enemies.length<80){const h0=4*Math.pow(1.19,e.w-1)*ETYPES[_S.split].hp;for(let i=0;i<2;i++)enemies.push({ty:_S.split,hp:h0,hpMax:h0,d:Math.max(0.05,e.d),a:((e.a+(i?0.05:-0.05))%1+1)%1,sp:ETYPES[_S.split].sp*(1+0.004*e.w),slow:0,slowT:0,stun:0,dot:0,dotT:0,flash:0,w:e.w,boss:false,lastSp:now,lastHit:now,wob:Math.random()*TAU,id:Math.random(),waved:true})}}if(S.dnum!==false&&pops.length<48)pops.push({e,t:'+♪ '+fmt(g),life:1,k:1});if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
+function kill(e,k,now){killSfx(e.boss);const g=bounty(e);earn(g);S.kills++;if(e.lastSi!=null&&e.lastSi<MAXSLOTS)STA.k[e.lastSi]++;enemies.splice(k,1);if(wave&&wave.boss===e)wave.boss=null;spawnDeath(e);{const _S=ETYPES[e.ty];if(_S.split&&enemies.length<80){const h0=4*Math.pow(1.19,e.w-1)*ETYPES[_S.split].hp;for(let i=0;i<2;i++)enemies.push({ty:_S.split,hp:h0,hpMax:h0,d:Math.max(0.05,e.d),a:((e.a+(i?0.05:-0.05))%1+1)%1,sp:ETYPES[_S.split].sp*(1+0.004*e.w),slow:0,slowT:0,stun:0,dot:0,dotT:0,flash:0,w:e.w,boss:false,lastSp:now,lastHit:now,wob:Math.random()*TAU,id:Math.random(),waved:true})}}if(S.dnum!==false&&pops.length<48)pops.push({e,t:'+♪ '+fmt(g),life:1,k:1});if(e.boss)msg(ETYPES[e.ty].n+' susturuldu · ♪ '+fmt(g))}
 function leak(e,k,now){const T=ETYPES[e.ty];
  if(wave)wave.leaked=true;
  if(e.raid){/* akıncı: küçük, ölümcül olmayan hasar */let dmg=hpMax()*RAID_DMG;if(core.sh>0){const a=Math.min(core.sh,dmg);core.sh-=a;dmg-=a}{const h0=core.hp;core.hp=Math.max(Math.min(core.hp,hpMax()*RAID_FLOOR),core.hp-dmg);if(wave)wave.raidDmg=(wave.raidDmg||0)+(h0-core.hp)}retreatFlash=Math.max(retreatFlash,0.6);if(wave)wave.raidLeak++;enemies.splice(k,1);return}
@@ -49,6 +49,7 @@ function logic(now){
   if(e.d<=0){const rc=retreatCount;leak(e,k,now);if(retreatCount!==rc)break}
  }
  const secNow=planAt(curBar).sec;core.hp=Math.min(hpMax(),core.hp+regen()*dt*(secNow.regen||1));
+ {const a=1-Math.exp(-dt/6),id=1/Math.max(dt,1e-3);for(let i=0;i<MAXSLOTS;i++){STA.rd[i]+=(STA.ad[i]*id-STA.rd[i])*a;STA.rn[i]+=(STA.an[i]*id-STA.rn[i])*a;STA.ad[i]=0;STA.an[i]=0}}
  if(S.stage.mirror)core.sh=Math.min(shieldMax(),core.sh+2*dt);
  if(!wave.queue.length&&enemies.length===0&&!wave.done){wave.done=true;wave.nextAt=now+bd/fk;if(wave.raid){if(!wave.raidLeak){const g=Math.max(10,rate()*RAID_BONUS);earn(g);msg(T('Baskın püskürtüldü')+' · +♪ '+fmt(g))}else{/* baskının aldığı nabız dalga bitince geri gelir: baskın anlık gerilim, kalıcı ceza değil (nabız kendiliğinden dolmuyor) */core.hp=Math.min(hpMax(),core.hp+(wave.raidDmg||0));msg(T('Baskın geçti')+' · '+wave.raidLeak+' '+T('akıncı sızdı')+' · '+T('nabız toparlandı'))}}}
  if(wave.done&&now>=wave.nextAt)startWave(wave.n+1,now);
@@ -62,10 +63,14 @@ function manualBlast(){if(chReady<0)return false;const on=onBarBeat();blast(on?C
 function blast(m){m=m||1;blastM=m;charge=0;chReady=-1;const th=dispTheme(),d=dps()*BLAST_S*globalMDmg()*m,col=goldOf(th);enemies.slice().forEach(e=>{if(enemies.includes(e))hit(e,d*(e.boss?0.5:1),col,null)});novaT=0;blastN++;kickP=1;
  if(ac&&playing&&!S.muted){const t=ac.currentTime+0.01;O('sine',90,t,1,0.9,drum,28,0.8);Nz(t,'lowpass',600,0,0.35,1,drum)}if(m===1&&!ffOn)msg('Merkez patladı · tüm sahneye hasar')}
 function inRange(){const r=range();return enemies.filter(e=>e.d<=r)}
-function hit(e,dmg,col,origin,kind,pierce){const _T=ETYPES[e.ty];if(_T.tough&&!pierce)dmg*=_T.tough;e.lastHit=lastLogic;e.dnA=(e.dnA||0)+Math.min(dmg,Math.max(0,e.hp));e.hp-=dmg;e.flash=1;const k=enemies.indexOf(e);if(origin)vfx.push({k:kind||'tracer',o:origin,e,col,life:1});if(e.hp<=0&&k>=0)kill(e,k,lastLogic)}
+/* v91: yer başına istatistik (Savunma › Dalga › Enstrümanlar): hasar ve nota bu karede birikir (ad/an), logic'te hareketli ortalamaya (rd/rn, ~6 sn) döner; öldürme dönem boyunca (k, albümde sıfır) */
+const STA={ad:new Float64Array(MAXSLOTS),an:new Float64Array(MAXSLOTS),rd:new Float64Array(MAXSLOTS),rn:new Float64Array(MAXSLOTS),k:new Float64Array(MAXSLOTS),tmp:new Float64Array(MAXSLOTS)};
+function hit(e,dmg,col,origin,kind,pierce){const _T=ETYPES[e.ty];if(_T.tough&&!pierce)dmg*=_T.tough;e.lastHit=lastLogic;const dd=Math.min(dmg,Math.max(0,e.hp));e.dnA=(e.dnA||0)+dd;{const si=origin&&origin.si!=null?origin.si:hitSi;if(si>=0&&si<MAXSLOTS){STA.ad[si]+=dd;e.lastSi=si}}e.hp-=dmg;e.flash=1;const k=enemies.indexOf(e);if(origin)vfx.push({k:kind||'tracer',o:origin,e,col,life:1});if(e.hp<=0&&k>=0)kill(e,k,lastLogic)}
 function applySlow(e,amt,dur){if(ETYPES[e.ty].noSlow)return;e.slow=Math.max(e.slow,amt);e.slowT=Math.max(e.slowT,dur)}
 function pushWall(lane,energy,dmg){const k0=Math.floor(lane*WN)%WN;for(let o=-4;o<=4;o++){const k=(k0+o+WN)%WN,f=Math.exp(-o*o/5);wallE[k]=Math.min(1.6,wallE[k]+energy*f);wallD[k]=Math.max(wallD[k],dmg*f)}}
-function fire(si,s,v,pk,mult,art,raw){
+/* v91: fire süresince vuran yer (kaynaksız Alan/zincir/delici vuruşları da istatistiğe yazılır; efekt değişmez) */
+let hitSi=-1;function fire(si,s,v,pk,mult,art,raw){hitSi=si;try{return fire0(si,s,v,pk,mult,art,raw)}finally{hitSi=-1}}
+function fire0(si,s,v,pk,mult,art,raw){
  const x=slotIns(si);if(!x)return;const t=lastLogic;if(muteUntil[si]>t)return;mult=(mult||1)*(ART_M[art]||1);
  const lane=S.layout==='strip'?(s+0.5)/MI.N:(s+0.5)/MI.N;
  let dmg=(raw?fillRowDmg(si,v):hitDmg(pk,si,s,v))*GC[pk]*mult;const col=insColor(x,dispTheme()),o={si,s};
@@ -101,7 +106,8 @@ function onStep(q){
  const b=q.b||0,sa=soloActive(b),pa=planAt(b);let dyn=dynAt(b);if(nk===1)curBar=b;const fb=nk===1&&fillBar(b);
  if(pa.barIn===0){const tm=transM(pa.idx);if(tm>1){dyn*=tm;if(q.s===0&&nk===1){transFlash=1;transText=T('GEÇİŞ')+' ×'+fm(tm)}}if(q.s===0&&nk===1&&b>0&&fillBar(b-1)&&fillHits()>=4){crashFlash=1;enemies.forEach(e=>applySlow(e,1,0.4));vfx.push({k:'ring',col:'#ffffff',life:0.8})}}
  if(q.s===0&&nk===1){if(sa>=0&&soloNow!==sa){soloFlash=1;msg('Solo: '+slotIns(sa).n)}soloNow=sa;if(pa.barIn===0&&(S.up.sef||pa.sec.solo||bActive())){secFlash=1;secName=T(pa.sec.n)}}
- for(let i=0;i<S.slots.length;i++){const x=slotIns(i);if(!x)continue;if(needleOf(i)!==nk)continue;if(muteUntil[i]>q.t)continue;const soloing=pa.sec.solo&&isSolo(i);let v,pkk=q.pk;if(soloing){const dp=duetPart(i);if(dp<0&&sa!==i)continue;if(x.fam!=='vur'&&hasSoloNotes(i)){const off=(pa.barIn%2)*MI.N+q.s;let gs=0;if(duetPlays(i,off)){const A=analyzeSolo(i),dm=dp>=0?1.2:1,R=soloRows();A.ns.forEach((nt,j)=>{const a=artEff(x,nt.art),L=noteLenEff(nt);
+ let sLi=-1,sG0=0;STA.tmp.fill(0);
+ for(let i=0;i<S.slots.length;i++){if(sLi>=0)STA.tmp[sLi]+=g-sG0;sLi=i;sG0=g;const x=slotIns(i);if(!x)continue;if(needleOf(i)!==nk)continue;if(muteUntil[i]>q.t)continue;const soloing=pa.sec.solo&&isSolo(i);let v,pkk=q.pk;if(soloing){const dp=duetPart(i);if(dp<0&&sa!==i)continue;if(x.fam!=='vur'&&hasSoloNotes(i)){const off=(pa.barIn%2)*MI.N+q.s;let gs=0;if(duetPlays(i,off)){const A=analyzeSolo(i),dm=dp>=0?1.2:1,R=soloRows();A.ns.forEach((nt,j)=>{const a=artEff(x,nt.art),L=noteLenEff(nt);
    if(nt.t===off){const m=SOLO_M*dyn*A.hab[j]*A.mult*dm;gs+=hitNota('S',i,1)*m*(ART_M[a]||1);flash[i][q.s]=1;spawnPart(i,q.s);fire(i,q.s,1,'S',m,a)}
    else if(off>nt.t&&off<nt.t+L){const k=off-nt.t,p=tickPow(x,k,a);if(p<0){squeal(i);return}if(p<=0)return;const m=SOLO_M*dyn*p*A.mult*dm;gs+=hitNota('S',i,1)*m;fire(i,q.s,1,'S',m,a==='fb'?'fb':'none');if(S.up.sdoruk&&k===3&&L>=4&&nr(nt)>=R-Math.ceil(R/3))doruk(i)}})}g+=gs;continue}v=S.pat.S[i][q.s];pkk='S'}else{const fr=fb&&fillZone(q.s)&&x.fam==='vur';v=fr?S.pat.F[i][q.s]:p[i][q.s];if(v&&!allowed(pa.sec,x,i))continue;if(fr&&v){const sm=dyn;g+=fillRowVal(i,v)*sm;flash[i][q.s]=1;spawnPart(i,q.s);if(x.id==='davul'||x.fam==='vur'&&x.dmg>=4)kickP=Math.max(kickP,v===2?1:0.85);fire(i,q.s,v,pkk,sm,null,true);chargeHit(i,q.s,v,x);continue}}if(!v)continue;const sm=(soloing?SOLO_M:1)*dyn;g+=hitNota(pkk,i,v)*sm;
   if(vis||soloing){flash[i][q.s]=1;spawnPart(i,q.s)}
@@ -109,6 +115,7 @@ function onStep(q){
   if(x.role==='delici'||x.role==='titresim')bassP=1;
   fire(i,q.s,v,pkk,sm);chargeHit(i,q.s,v,x);
  }
+ if(sLi>=0)STA.tmp[sLi]+=g-sG0;{const sf=M*planBonus();for(let i=0;i<MAXSLOTS;i++)if(STA.tmp[i])STA.an[i]+=STA.tmp[i]*sf}
  earn(g*M*planBonus());
 }
 const globalMDmg=()=>tourM();
