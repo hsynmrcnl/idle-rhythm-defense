@@ -42,7 +42,7 @@ with sync_playwright() as pw:
     check('Ruh hâli' in a and 'Ritim tipi' in a and 'Groove · kıta' in a, 'Analiz’de Kolay terimleri')
     p.click('#anl [data-a=close]')
     p.evaluate("()=>{window.__nb.S.albMax=1;window.__nb.renderPanels()}")
-    p.click('[data-act=tab][data-tab=album]'); p.wait_for_timeout(50)
+    p.evaluate("()=>window.__nb.setTab('album')"); p.wait_for_timeout(50)
     check('oyun baştan başlar' in p.text_content('#albumBox') and 'albümden sonra açılır' in p.text_content('#tourBox'), 'albüm ve turne metni sade')
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     # telefon: Sahne pedinde seviye düğmeleri

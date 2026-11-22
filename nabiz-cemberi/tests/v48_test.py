@@ -49,7 +49,7 @@ with sync_playwright() as pw:
         p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.unl.album=1;S.unl.asst=1;S.auto.asst=true;S.runEarned=2e7;nb.setHp(1);nb.hintStall();nb.hintCheck()}")
         check(p.is_visible('#hintChip') and 'Albüm' in p.text_content('#hintChip') and 'hayran' in p.text_content('#hintChip'), 'albüm hazır önerisi (%s)' % p.text_content('#hintChip'))
         p.click('#hintChip'); p.wait_for_timeout(300)
-        check(p.evaluate("()=>document.getElementById('app').dataset.tab") == 'album' and p.evaluate("()=>window.__nb.S.runEarned") >= 2e7, 'dokununca Albüm sekmesi açıldı, albüm kendiliğinden çıkmadı')
+        check(p.evaluate("()=>document.getElementById('app').dataset.tab+'/'+document.getElementById('p-def').dataset.sub") == 'def/alb' and p.evaluate("()=>window.__nb.S.runEarned") >= 2e7, 'dokununca Albüm sekmesi açıldı, albüm kendiliğinden çıkmadı')
         check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
         ctx.close()
     b.close()

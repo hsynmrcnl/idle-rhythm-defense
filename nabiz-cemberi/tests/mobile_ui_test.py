@@ -80,7 +80,7 @@ with sync_playwright() as pw:
             p.screenshot(path=os.path.join(OUT, 'v13_stage.png'))
             # dock: 5 buton, aynı renk; aktif olan kendi neonunda
             n = p.locator('.dk').count(); check(n == 5, 'dock’ta 5 düğme (%d)' % n)
-            for k, sub in [('studio', 'coll'), ('def', None), ('album', 'book'), ('look', None)]:
+            for k, sub in [('studio', 'coll'), ('def', None), ('look', None)]:  # v91: Albüm Savunma'nın alt sekmesi; plak düğmesi Kitap (v91_test)
                 p.click('#d-' + k); p.wait_for_timeout(120)
                 st = p.evaluate("k=>({tab:document.getElementById('app').dataset.tab,cur:[...document.querySelectorAll('.dk')].filter(b=>b.getAttribute('aria-current')==='page').map(b=>b.id),col:[...document.querySelectorAll('.dk:not([aria-current])')].map(b=>getComputedStyle(b).color)})", k)
                 check(st['tab'] == k and st['cur'] == ['d-' + k] and len(set(st['col'])) == 1, 'dock → %s, yalnız o parlıyor, diğerleri aynı renk' % k)
@@ -92,7 +92,7 @@ with sync_playwright() as pw:
                     check(p.evaluate("()=>document.getElementById('app').dataset.tab") == sub, 'dock son alt sekmeyi hatırlıyor (%s)' % sub)
                     p.screenshot(path=os.path.join(OUT, 'v13_%s.png' % sub))
             # sayfa kaymaz, sekme kendi alanında kayar; her sekme kendi konumunu hatırlar
-            for k in ['studio', 'def', 'album', 'look']:
+            for k in ['studio', 'def', 'album', 'look']:  # d-album = Kitap (v91)
                 p.click('#d-' + k); p.wait_for_timeout(80)
                 check(p.evaluate("()=>document.scrollingElement.scrollHeight<=innerHeight"), 'sayfa gövdesi kaymıyor (%s)' % k)
             p.click('#d-studio'); want = p.evaluate("()=>{const r=document.getElementById('rack');r.scrollTop=Math.min(800,r.scrollHeight-r.clientHeight);return r.scrollTop}"); p.click('#d-def'); p.wait_for_timeout(80)
