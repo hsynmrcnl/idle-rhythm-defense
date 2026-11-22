@@ -39,8 +39,11 @@ with sync_playwright() as pw:
     check(r[2],'oyuncu sekmeye kendisi girdiyse kısa öğretici düşüyor')
     check(r[3],'Albüm kısa öğreticisi bayatlasa da kalıyor')
     check(r[4],'taze kısa öğretici gösteriliyor')
+    # 2b) Asistan kriz dışında da ucuz hayatta kalma alır (nota yığılmasın)
+    k=p.evaluate("""()=>{const nb=window.__nb,S=nb.S;S.tipq=[];S.unl.def=1;S.def={};S.nota=1e7;nb.recalc();nb.setHp(1);let k=null;for(let i=0;i<8;i++){k=nb.asstPick(S.nota*0.25);if(!k||k.act==='def')break;nb.hintApplyK(k)}return k?{a:k.act,id:k.id}:null}""")
+    check(k and k['a']=='def' and k['id'] in ('nabiz','tamir','menzil','kalkan'),'Asistan nabız tamken ucuz hayatta kalma alıyor (%s)'%k)
     # 3) kısa öğretici açıkken rakam kısayolu çalışır ve balonu kapatır
-    p.evaluate("()=>window.__nb.setTab('studio')");p.wait_for_timeout(600)
+    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tipq=['def'];S.tutm=0;S.tipw={def:S.bestWave};S.tabSeen={};nb.miniGapT=0;nb.setTab('studio')}");p.wait_for_timeout(600)
     shown=p.evaluate("()=>!document.getElementById('tutL').hidden")
     p.keyboard.press('4');p.wait_for_timeout(400)
     s=p.evaluate("()=>({tab:document.getElementById('app').dataset.tab,q:window.__nb.S.tipq.length})")

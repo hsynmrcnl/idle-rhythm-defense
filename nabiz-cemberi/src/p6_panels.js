@@ -309,13 +309,15 @@ function hintPick(){try{const low=core.hp/hpMax()<0.6&&S.unl.def;let c=null;if(!
 const hintApply=k=>rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':'',slot:k.slot?'1':''}});
 function hintBuy(){const k=hintK;if(k&&k.alb){setTab('album');$('hintChip').hidden=true;hintK=null;return}if(!k||S.nota<k.cost)return;hintApply(k);msg(T('Alındı')+': '+T(k.n)+' · ♪ '+fmt(k.cost));hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300)}
 /* v49 Asistan (docs/denge_d15.md seçenek 2): dalga 15'te ücretsiz açılır; menajerin otomatik geliştirmesi alınana kadar 20 sn'de bir notanın en çok %25'iyle en verimli geliştirmeyi alır. Nabız %60 altındaysa önce hayatta kalma, değilse gelir ve savunma sırayla (Analiz sıralaması). */
-const ASST_T=20000,ASST_B=0.25;let asstT=Date.now(),asstFlip=false,asstSurv=false;
+const ASST_T=20000,ASST_B=0.25,ASST_CHEAP=0.02;let asstT=Date.now(),asstFlip=false,asstSurv=false;
 const asstOn=own=>!!(S.unl&&S.unl.asst&&!(S.mn&&S.mn.lv)&&(own||S.auto&&S.auto.asst!==false));
 function asstPick(lim0){const lim=lim0==null?S.nota*ASST_B:lim0,ok=k=>k&&k.cost>0&&k.cost<=lim;let k=null;
  /* v84: nabız düşükken savunmayı sırayla al — önce Tamir (nabzı pasif doldurur; Nabız yalnız tavanı artırır, anlık can vermez), sonra Kalkan (yalnız kalkan enstrümanı çalıyorsa işe yarar), en son Nabız. Kritikte (<%35) her turda savunma (42 Mn yatarken nabız %6'da kalıyordu); hafifte (<%60) gelir/savunma dönüşümlü. */
  if(core.hp/hpMax()<0.6&&S.unl.def){const crit=core.hp/hpMax()<0.35,hk=typeof hasRolePlaying==='function'&&hasRolePlaying('kalkan'),pri=id=>id==='tamir'?0:id==='kalkan'?(hk?1:3):2;
   k=anlCands().filter(x=>x.act==='def'&&['tamir','kalkan','nabiz'].includes(x.id)&&ok(x)).sort((x,y)=>pri(x.id)-pri(y.id)||x.cost-y.cost)[0]||null;if(k&&(crit||!asstSurv)){asstSurv=true;return k}}
  asstSurv=false;{const ni=newInsCand();if(ok(ni))return ni}
+ /* v88: kriz dışında da ucuz hayatta kalma (eldeki notanın %2'sinden ucuz Tamir/Nabız/Menzil, kalkan enstrümanı çalıyorsa Kalkan) — oyuncu turu: ♪13 Mn yatarken Nabız Sv1 (♪680) alınmamıştı, nota yığılıp orta oyun ya kolay ya duvar oluyordu; anlRank yalnız hasar/sn'ye bakıp katlanan Hasar'a yöneliyordu */
+ if(S.unl.def){const hk=typeof hasRolePlaying==='function'&&hasRolePlaying('kalkan'),cap=S.nota*ASST_CHEAP;const c=anlCands().filter(x=>x.act==='def'&&(['tamir','nabiz','menzil'].includes(x.id)||(hk&&x.id==='kalkan'))&&ok(x)&&x.cost<=cap).sort((x,y)=>x.cost-y.cost)[0];if(c)return c}
  if(!k){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'),lim);k=asstFlip&&ok(r.def)?r.def:ok(r.inc)?r.inc:ok(r.def)?r.def:null;if(k)asstFlip=k!==r.def}
  return k}
 /* v79: nota birikince Görünüm'de alınabilecek 3D sahne ya da temayı bir kez haber verir (oyuncu turu: Asistan görünüm almaz, ♪11 Mn yatıyordu; karar: Asistan zevk alımı yapmaz, oyuncuya söylenir) */
