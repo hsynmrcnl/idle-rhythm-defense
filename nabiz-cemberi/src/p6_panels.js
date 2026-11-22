@@ -176,7 +176,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v85 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v86 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -948,5 +948,13 @@ $('tap').addEventListener('click',()=>{tap();$('tap').blur()});
 $('mute').addEventListener('click',()=>{S.muted=!S.muted;syncFx();$('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');msg(S.muted?'Ses kapalı, döngü yine de kazandırıyor ve savunuyor':'Ses açık')});
 const isField=el=>el&&/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&!isField(document.activeElement)){e.preventDefault();if(!e.repeat)tap()}});
+/* v86: klavye kısayolları — 1–7 sekmeler, 0 Ayarlar, 9 Analiz (oyuncu turu: panelden sekmeye ~9 Shift+Tab, Ayarlar/Analiz'e kısayol yoktu). Öğretici katmanı açıkken çalışmaz. Odak seçilen sekme düğmesine gelir, Tab oradan panele iner. */
+const KB_TABS=['stage','studio','coll','def','book','look','album'];
+document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat||!/^[0-9]$/.test(e.key)||isField(document.activeElement))return;const L=$('tutL');if(L&&!L.hidden)return;const d=e.key;
+ if(d==='9'){e.preventDefault();anlTry();$('stats').focus();return}
+ const t=d==='0'?'set':KB_TABS[+d-1];if(!t)return;e.preventDefault();
+ if(t==='stage'&&!isPhone()){$('cv').focus();return}
+ if(t!=='set'&&!tabOn(t)){msg(T('Bu bölüm henüz açılmadı'));return}
+ setTab(t==='set'&&tab==='set'?backTab():t);const b=$(t==='set'?'t-set':'t-'+t);if(b&&b.offsetParent)b.focus()});
 document.addEventListener('keyup',e=>{if(e.code==='Space'&&!isField(document.activeElement))e.preventDefault()});
 
