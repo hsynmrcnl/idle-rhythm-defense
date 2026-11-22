@@ -49,7 +49,7 @@ with sync_playwright() as pw:
     # albüm iki dokunuş
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.runEarned=2e7;nb.setTab('album');nb.renderPanels()}"); p.wait_for_timeout(200)
     p.click('#aBtn'); p.wait_for_timeout(200)
-    check(p.evaluate("()=>window.__nb.S.runEarned") >= 2e7 and 'Emin' in p.text_content('#aBtn'), 'ilk dokunuş albümü çıkarmadı, onay istedi')
+    check(p.evaluate("()=>window.__nb.S.runEarned") >= 2e7 and 'Tekrar bas' in p.text_content('#aBtn') and p.locator('#aWarn').count()==1, 'ilk dokunuş albümü çıkarmadı, onay istedi')
     p.click('#aBtn'); p.wait_for_timeout(300)
     check(p.evaluate("()=>window.__nb.S.albums.length") == 1, 'ikinci dokunuşta albüm çıktı')
     # albüm çipi 3x eşikte, ilerleme sürerken
