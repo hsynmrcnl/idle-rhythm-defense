@@ -38,11 +38,11 @@ with sync_playwright() as pw:
         p.evaluate("()=>{window.__nb.S.tut.done=true}"); p.wait_for_timeout(150)
         # v26: yeni oyunda dock'ta yalnız Sahne; geri kalan ölçümler için her şey açılır
         dk = p.evaluate("()=>[...document.querySelectorAll('.dk')].filter(d=>!d.hidden).map(d=>d.id)")
-        check(dk == ['d-stage'], 'yeni oyunda dock’ta yalnız Sahne (%s)' % dk)
+        check(dk == ['d-stage', 'd-set'], 'yeni oyunda dock’ta yalnız Sahne ve Ayarlar (%s)' % dk)  # v92: Ayarlar dock'ta
         p.evaluate("()=>window.__nb.unlockAll()"); p.wait_for_timeout(100)
         m = p.evaluate("""()=>{const r=q=>document.querySelector(q).getBoundingClientRect();const cv=r('#cv');
           return {scroll:document.scrollingElement.scrollHeight-innerHeight,cvW:cv.width,cvH:cv.height,cvR:cv.right,vw:innerWidth,
-          cvB:cv.bottom,dock:r('#dock').top,gear:r('#t-set').right,top:!!document.querySelector('.top h1').offsetParent,
+          cvB:cv.bottom,dock:r('#dock').top,gear:!!document.getElementById('d-set').offsetParent,top:!!document.querySelector('.top h1').offsetParent,
           hidden:['#play','#tap','#mute','#demo','#langBtn','.tabs'].every(q=>{const e=document.querySelector(q);return !e.offsetParent||getComputedStyle(e).display==='none'})}}""")
         check(m['scroll'] <= 0, 'sahne kaydırmasız (fazla %dpx)' % m['scroll'])
         # v24: tuval sahne alanını kenardan kenara doldurur, oyun karesi (L) ortada
@@ -55,7 +55,7 @@ with sync_playwright() as pw:
           off:st.getBoundingClientRect().top-g.getBoundingClientRect().top-parseFloat(getComputedStyle(g).paddingTop),top:getComputedStyle(st).top}}""")
         check(pd['last'] <= pd['dock'] and abs(pd['off']) < 1, 'son ped sırası dock’un üstünde, sahne kaymıyor (alt %d / dock %d, kayma %.0f, top %s)' % (pd['last'], pd['dock'], pd['off'], pd['top']))
         check(not m['top'] and m['hidden'], 'başlık, EN, alttaki Başlat, Ritme vur, Ses, Örnek şarkı ve üst sekmeler gizli')
-        check(m['gear'] >= m['vw'] - 20, 'Ayarlar sağ üstte')
+        check(m['gear'], 'Ayarlar dock’ta (v92)')
         # boş yere dokun → ritme vur (çalmıyorken uyarı verir)
         cv = p.locator('#cv').bounding_box()
         p.mouse.click(cv['x'] + 6, cv['y'] + 6); p.wait_for_timeout(100)
@@ -79,31 +79,34 @@ with sync_playwright() as pw:
         if w == 390:
             p.screenshot(path=os.path.join(OUT, 'v13_stage.png'))
             # dock: 5 buton, aynı renk; aktif olan kendi neonunda
-            n = p.locator('.dk').count(); check(n == 5, 'dock’ta 5 düğme (%d)' % n)
-            for k, sub in [('studio', 'coll'), ('def', None), ('look', None)]:  # v91: Albüm Savunma'nın alt sekmesi; plak düğmesi Kitap (v91_test)
+            n = p.locator('.dk').count(); check(n == 4, 'dock’ta 4 düğme (%d)' % n)  # v92: Sahne · Savunma·Albüm · Müzik·Görünüm · Ayarlar
+            for k, tb, sub, sp in [('look', 'studio', 'look', 'studio'), ('def', 'def', None, None), ('set', 'set', None, None)]:  # v92: dock düğmesi → sekme → alt sekme
                 p.click('#d-' + k); p.wait_for_timeout(120)
                 st = p.evaluate("k=>({tab:document.getElementById('app').dataset.tab,cur:[...document.querySelectorAll('.dk')].filter(b=>b.getAttribute('aria-current')==='page').map(b=>b.id),col:[...document.querySelectorAll('.dk:not([aria-current])')].map(b=>getComputedStyle(b).color)})", k)
-                check(st['tab'] == k and st['cur'] == ['d-' + k] and len(set(st['col'])) == 1, 'dock → %s, yalnız o parlıyor, diğerleri aynı renk' % k)
+                check(st['tab'] == tb and st['cur'] == ['d-' + k] and len(set(st['col'])) == 1, 'dock → %s, yalnız o parlıyor, diğerleri aynı renk' % k)
                 if sub:
-                    p.click('#p-%s .subnav [data-tab=%s]' % (k, sub)); p.wait_for_timeout(120)
+                    p.click('#p-%s .subnav [data-tab=%s]' % (sp, sub)); p.wait_for_timeout(120)
                     st = p.evaluate("()=>({tab:document.getElementById('app').dataset.tab,cur:document.querySelector('.dk[aria-current]').id})")
                     check(st['tab'] == sub and st['cur'] == 'd-' + k, 'alt sekme %s, dock %s’de kalıyor' % (sub, k))
                     p.click('#d-stage'); p.click('#d-' + k); p.wait_for_timeout(80)
                     check(p.evaluate("()=>document.getElementById('app').dataset.tab") == sub, 'dock son alt sekmeyi hatırlıyor (%s)' % sub)
                     p.screenshot(path=os.path.join(OUT, 'v13_%s.png' % sub))
+                    p.click('#p-look .subnav [data-tab=studio]'); p.wait_for_timeout(80)
+            p.click('#d-set'); p.wait_for_timeout(80)  # döngü Ayarlar'da bitti: ikinci dokunuş
+            check(p.evaluate("()=>document.getElementById('app').dataset.tab") != 'set', 'Ayarlar’a ikinci dokunuş önceki sekmeye döndürüyor')
             # sayfa kaymaz, sekme kendi alanında kayar; her sekme kendi konumunu hatırlar
-            for k in ['studio', 'def', 'album', 'look']:  # d-album = Kitap (v91)
+            for k in ['look', 'def', 'set']:  # v92 dock
                 p.click('#d-' + k); p.wait_for_timeout(80)
                 check(p.evaluate("()=>document.scrollingElement.scrollHeight<=innerHeight"), 'sayfa gövdesi kaymıyor (%s)' % k)
-            p.click('#d-studio'); want = p.evaluate("()=>{const r=document.getElementById('rack');r.scrollTop=Math.min(800,r.scrollHeight-r.clientHeight);return r.scrollTop}"); p.click('#d-def'); p.wait_for_timeout(80)
+            p.click('#d-look'); want = p.evaluate("()=>{const r=document.getElementById('rack');r.scrollTop=Math.min(800,r.scrollHeight-r.clientHeight);return r.scrollTop}"); p.click('#d-def'); p.wait_for_timeout(80)
             st0 = p.evaluate("()=>document.getElementById('rack').scrollTop")
-            p.click('#d-studio'); p.wait_for_timeout(80)
+            p.click('#d-look'); p.wait_for_timeout(80)
             st1 = p.evaluate("()=>document.getElementById('rack').scrollTop")
             check(st0 == 0 and want > 0 and abs(st1 - want) < 2, 'sekme değişince üstten açılır, Stüdyo konumunu hatırlar (%d, %d / %d)' % (st0, st1, want))
             # v14 Stüdyo: yeni oyunda yalnız Sahne; koşullar sağlanınca bölümler sırayla açılır
             def go_studio():
-                p.click('#d-studio'); p.wait_for_timeout(80)
-                if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'studio': p.click('#p-coll .subnav [data-tab=studio]'); p.wait_for_timeout(80)
+                p.click('#d-look'); p.wait_for_timeout(80)
+                if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'studio': p.evaluate("()=>window.__nb.setTab('studio')"); p.wait_for_timeout(80)
             go_studio()
             vis = lambda: p.evaluate("()=>[...document.querySelectorAll('#p-studio [data-sec]')].filter(e=>!e.hidden).map(e=>e.dataset.sec)")
             check(vis() == ['sahne'], 'yeni oyunda Stüdyo’da yalnız Sahne var (%s)' % vis())
@@ -111,7 +114,7 @@ with sync_playwright() as pw:
             check(p.evaluate("()=>!document.querySelector('#p-studio [data-sec=sahne] .info').hidden"), 'ⓘ açıklamayı açıyor')
             p.click('#d-def'); p.wait_for_timeout(80)
             p.evaluate("()=>{const S=window.__nb.S;S.lv.trampet=1;S.slots[1]='trampet';window.__nb.renderPanels()}"); p.wait_for_timeout(400)
-            check(p.evaluate("()=>!document.querySelector('#d-studio .dot').hidden"), 'yeni bölüm açılınca Stüdyo simgesinde nokta')
+            check(p.evaluate("()=>!document.querySelector('#d-look .dot').hidden"), 'yeni bölüm açılınca Müzik·Görünüm simgesinde nokta')
             go_studio()
             check(vis() == ['sahne', 'auto', 'syn'] and p.locator('#p-studio .card.isnew .newtag').count() == 2, '2. enstrümanla Uyum ve Otomatik “Yeni” etiketiyle açılıyor (%s)' % vis())
             p.evaluate("()=>{const S=window.__nb.S;S.bestWave=12;S.up.sef=1;window.__nb.renderPanels()}"); p.wait_for_timeout(400)
@@ -142,7 +145,7 @@ with sync_playwright() as pw:
             p.mouse.click(cx, cy); p.wait_for_timeout(200)
             # Ayarlar: dişli aç/kapa, örnek şarkı sahneye götürür, çip ile çıkılır
             def open_set():
-                if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'set': p.click('#t-set')
+                if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'set': p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}")
                 p.wait_for_timeout(120)
             open_set()
             check(p.evaluate("()=>document.getElementById('app').dataset.tab") == 'set' and p.locator('#p-set [data-act=saveCode]').count() == 1, 'dişli Ayarlar’ı açıyor, Kayıt orada')
@@ -180,9 +183,9 @@ with sync_playwright() as pw:
     p.goto(URL); p.wait_for_timeout(600); p.evaluate("()=>{window.__nb.S.tut.done=true;window.__nb.unlockAll()}"); p.wait_for_timeout(100)
     d = p.evaluate("()=>({dock:getComputedStyle(document.getElementById('dock')).display,tabs:getComputedStyle(document.querySelector('.tabs')).display,tap:!!document.getElementById('tap').offsetParent,h1:getComputedStyle(document.querySelector('.top h1')).display})")
     check(d['dock'] == 'none' and d['tabs'] != 'none' and d['tap'] and d['h1'] != 'none', 'masaüstü düzeni aynı (dock yok, sekmeler ve düğmeler yerinde)')
-    p.click('#t-set'); p.wait_for_timeout(100)
+    p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(100)
     check(p.evaluate("()=>!document.getElementById('p-set').hidden"), 'masaüstünde dişli Ayarlar’ı açıyor')
-    p.click('#t-set'); p.wait_for_timeout(100)
+    p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(100)
     check(p.evaluate("()=>document.getElementById('app').dataset.tab") == 'studio', 'dişliye tekrar basınca önceki sekmeye dönüyor')
     cv = p.locator('#cv').bounding_box(); p.mouse.click(cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2); p.wait_for_timeout(200)
     check(p.evaluate("()=>window.__nb.playing") and p.inner_text('#play') == 'Durdur', 'masaüstünde de ortadaki ▶ başlatıyor, alttaki düğme Durdur oluyor')

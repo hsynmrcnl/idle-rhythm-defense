@@ -28,16 +28,16 @@ with sync_playwright() as pw:
         check(bs==['Dalga','Geliştirme','Albüm'],'%s: Savunma alt sekmeleri görünür (%s)'%(nm,bs))
         v=p.evaluate(VIS);check(v['siege'] and v['istat'] and not v['ord'] and not v['dup'] and not v['alb'],'%s: Dalga — durum ve enstrümanlar (%s)'%(nm,v))
         p.click('#defSub [data-v=gel]');p.wait_for_timeout(150);v=p.evaluate(VIS)
-        check(v['dup'] and v['ord'] and not v['siege'] and not v['alb'],'%s: Geliştirme — geliştirmeler ve siparişler (siparişler 3. adımda sağ üst düğmeye)'%nm)
+        check(v['dup'] and not v['ord'] and not v['siege'] and not v['alb'],'%s: Geliştirme — geliştirmeler (siparişler v92’den beri sağ üst düğmede)'%nm)
         p.click('#defSub [data-v=alb]');p.wait_for_timeout(150);v=p.evaluate(VIS)
         check(v['alb'] and v['mn'] and v['tour'] and not v['dup'] and not v['siege'],'%s: Albüm — albüm, menajer, turne'%nm)
         p.evaluate("()=>{window.__nb.setTab('studio');window.__nb.setTab('album')}");p.wait_for_timeout(150)
         t=p.evaluate("()=>({tab:document.getElementById('app').dataset.tab,sub:document.getElementById('p-def').dataset.sub})")
         check(t=={'tab':'def','sub':'alb'},'%s: eski album sekmesi Savunma › Albüm’e yönleniyor (%s)'%(nm,t))
         if mob:
-            d=p.evaluate("()=>{const d=document.getElementById('d-album');return d.getAttribute('aria-label')}")
-            p.click('#d-album');p.wait_for_timeout(150)
-            check(d=='Kitap' and p.evaluate("()=>document.getElementById('app').dataset.tab")=='book','telefon: plak düğmesi Kitap’ı açıyor (%s)'%d)
+            d=p.evaluate("()=>{const d=document.getElementById('d-def');return d.getAttribute('aria-label')}")
+            p.click('#d-def');p.wait_for_timeout(150)
+            check(d=='Savunma · Albüm' and p.evaluate("()=>document.getElementById('app').dataset.tab")=='def','telefon: kalkan düğmesi Savunma · Albüm (%s)'%d)
         else:
             check(not p.evaluate("()=>!!document.getElementById('t-album').offsetParent"),'masaüstü: ayrı Albüm sekmesi yok')
         # istatistik: çal, ileri sar, tablo dolu; Alan (Zil) hasarı da sayılıyor

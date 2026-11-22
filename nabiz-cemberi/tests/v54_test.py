@@ -45,8 +45,8 @@ with sync_playwright() as pw:
     p.wait_for_timeout(400)
     s1 = p.evaluate("()=>window.__nb.tutStep")
     check(s1 > s0 and p.evaluate("()=>window.__nb.S.lv.davul") == 1 and p.evaluate("()=>window.__nb.TUT[window.__nb.tutStep].kind") == 'tap', 'Boşluk’a art arda basmak Ritme vur’u geçirdi ama Yükselt adımını atlatmadı (%d → %d)' % (s0, s1))
-    p.keyboard.press('Enter'); p.wait_for_timeout(400)
-    check(p.evaluate("()=>window.__nb.tutStep") == s1 + 1 and p.evaluate("()=>window.__nb.S.lv.davul") == 2, 'Yükselt adımı Enter ile ilerliyor')
+    p.keyboard.press('Enter'); p.wait_for_timeout(400); p.keyboard.press('Enter'); p.wait_for_timeout(400)  # v92: önce Davul (panel açılır), sonra Yükselt
+    check(p.evaluate("()=>window.__nb.tutStep") == s1 + 2 and p.evaluate("()=>window.__nb.S.lv.davul") == 2, 'Davul ve Yükselt adımları Enter ile ilerliyor')
     # 3) Asistan çoklu alım + ileri sarma
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.tutm=0;S.auto.asst=true;S.nota=1e6;nb.recalc()}")
     r = p.evaluate("()=>{const nb=window.__nb,S=nb.S,n0=S.nota,l0=JSON.stringify([S.lv,S.def,S.up,S.slots]);nb.asstReset();nb.autoTick();return {sp:n0-S.nota,ch:l0!==JSON.stringify([S.lv,S.def,S.up,S.slots]),m:document.getElementById('msg').textContent}}")

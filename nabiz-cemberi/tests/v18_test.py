@@ -80,7 +80,7 @@ with sync_playwright() as pw:
     p.click('#slotList [data-act=solo][data-i="3"]'); p.wait_for_timeout(80)
     check(p.evaluate("()=>(window.__nb.S.solos[3]||{notes:[]}).notes.length") > 0 and 'Yeniden yaz' in p.text_content('#soloBox'), 'Solo açılınca keman solosu kendiliğinden yazılıyor')
     # Koleksiyon sade
-    p.click('[data-act=tab][data-tab=coll]'); p.wait_for_timeout(50)
+    p.evaluate("()=>window.__nb.setTab('coll')"); p.wait_for_timeout(50)
     t = p.text_content('#collList')
     check('nefes' not in t and 'Saldırı' in t, 'Koleksiyon sade: değerler yok, sade rol')
     # Görünüm: efekt laboratuvarı Detay'da
@@ -89,12 +89,12 @@ with sync_playwright() as pw:
     p.click('[data-sec=fx] > .dl'); p.wait_for_timeout(50)
     check(p.locator('#fxBox [data-act=sfset]').count() == 2, 'Efekt laboratuvarı Detay ile açılıyor')
     # Ayarlar → Detaylı: her şey açık, Detay bağlantısı yok
-    p.click('#t-set'); p.wait_for_timeout(50)
+    p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(50)
     p.click('#setBox [data-act=ui][data-v=detay]'); p.wait_for_timeout(80)
     p.click('[data-act=tab][data-tab=studio]'); p.wait_for_timeout(50)
     d = p.evaluate("()=>({dl:document.querySelectorAll('#rack .dl').length,groove:document.querySelector('[data-sec=groove]').hidden,sel:!!document.getElementById('selMeter')})")
     check(d['dl'] == 0 and not d['groove'] and d['sel'], 'Detaylı: Groove kartı ve ölçü listesi görünür, Detay bağlantısı yok')
-    p.click('#t-set'); p.click('#setBox [data-act=ui][data-v=kolay]'); p.wait_for_timeout(50)
+    p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.click('#setBox [data-act=ui][data-v=kolay]'); p.wait_for_timeout(50)
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
 
     # ---------- telefon ----------
@@ -104,7 +104,7 @@ with sync_playwright() as pw:
         p = ctx.new_page(); errs = []
         p.on('pageerror', lambda e: errs.append(str(e)))
         p.goto(URL); p.wait_for_timeout(400); p.evaluate(SEED); p.wait_for_timeout(100)
-        p.click('#d-studio'); p.wait_for_timeout(150)
+        p.click('#d-look'); p.wait_for_timeout(150)
         o = p.evaluate("""()=>{const rk=document.getElementById('rack');const over=[...rk.querySelectorAll('#p-studio *')].filter(e=>e.offsetParent&&e.getBoundingClientRect().right>innerWidth+1).map(e=>e.className||e.tagName).slice(0,4);
           return{over,sw:document.scrollingElement.scrollWidth-innerWidth,rsw:rk.scrollWidth-rk.clientWidth}}""")
         check(not o['over'] and o['sw'] <= 0 and o['rsw'] <= 0, 'Stüdyo Kolay ekrana sığıyor, yana kaymıyor %s' % o['over'])

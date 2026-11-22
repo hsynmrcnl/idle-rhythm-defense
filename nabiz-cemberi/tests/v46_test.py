@@ -42,7 +42,7 @@ with sync_playwright() as pw:
         check(st() >= 6 and p.evaluate("()=>window.__nb.playing"), 'yatayda öğretici dört hücre ve ▶ ile ilerliyor (adım %d)' % st())
         p.evaluate("()=>{const nb=window.__nb;nb.S.tut.done=true;nb.unlockAll();nb.S.tipq=[]}"); p.wait_for_timeout(300)
         check(p.is_visible('#t-set'), 'dişli görünüyor')
-        p.click('#t-set'); p.wait_for_timeout(200)
+        p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(200)
         check(p.is_visible('#p-set'), 'dişli Ayarlar’ı açıyor')
         rk = p.evaluate("()=>{const r=document.getElementById('rack');return [r.scrollHeight>r.clientHeight,getComputedStyle(r).overflowY]}")
         check(rk[1] == 'auto', 'panel kendi içinde kayar (%s)' % rk)

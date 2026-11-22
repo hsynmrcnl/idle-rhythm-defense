@@ -98,7 +98,7 @@ with sync_playwright() as pw:
 
     # Kolay'da yeni enstrüman ritimle gelir; Detaylı'da boş gelir
     p.evaluate(SEED); p.evaluate("()=>{const S=window.__nb.S;S.slots=['davul','trampet','hihat',null];S.lv={davul:10,trampet:10,hihat:10};window.__nb.renderPanels()}")
-    p.click('[data-act=tab][data-tab=coll]'); p.wait_for_timeout(50)
+    p.evaluate("()=>window.__nb.setTab('coll')"); p.wait_for_timeout(50)
     p.click('#collList [data-act=lv][data-id=clap]'); p.wait_for_timeout(80)
     si = p.evaluate("()=>window.__nb.S.slots.indexOf('clap')")
     check(si == 3 and row(p, 'A', 3).count('1') >= 1, 'Kolay: el çırpma sahneye ritmiyle geldi (%s)' % (row(p, 'A', 3) if si == 3 else si))
@@ -113,14 +113,14 @@ with sync_playwright() as pw:
     # telefon: satır düğmeleri sığıyor
     ctx = b.new_context(viewport={'width': 375, 'height': 667}, is_mobile=True, has_touch=True); p = ctx.new_page(); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
-    p.goto(URL); p.wait_for_timeout(400); p.evaluate(SEED); p.click('#d-studio'); p.wait_for_timeout(100)
+    p.goto(URL); p.wait_for_timeout(400); p.evaluate(SEED); p.click('#d-look'); p.wait_for_timeout(100)
     p.tap('[data-act=autoAll]'); p.wait_for_timeout(80)
     o = p.evaluate("()=>[...document.querySelectorAll('#p-studio *')].filter(e=>e.offsetParent&&e.getBoundingClientRect().right>innerWidth+1).map(e=>(e.tagName+'.'+e.className+' '+(e.textContent||'').slice(0,20)+' '+Math.round(e.getBoundingClientRect().right)))")
     check(not o and p.evaluate("()=>window.__nb.S.pat.A[0].some(v=>v)"), 'telefon 375: Hepsini düzenle çalışıyor, taşma yok %s' % o[:4])
     p.screenshot(path=os.path.join(OUT, 'v19_phone.png'))
     p.evaluate("()=>{window.__nb.S.lang='en';localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(window.__nb.S))}")
     with p.expect_navigation(): p.reload()
-    p.wait_for_timeout(300); p.click('#d-studio'); p.wait_for_timeout(100)
+    p.wait_for_timeout(300); p.click('#d-look'); p.wait_for_timeout(100)
     t = p.text_content('#p-studio')
     check('Arrange all' in t and 'Dense' in t and 'Lively' in t and 'Hepsini' not in t, 'İngilizce')
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))

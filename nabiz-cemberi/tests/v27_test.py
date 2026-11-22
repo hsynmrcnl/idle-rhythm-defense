@@ -47,9 +47,9 @@ with sync_playwright() as pw:
     p.evaluate(SEED); p.reload(); p.wait_for_timeout(500)
     check(p.evaluate("()=>window.__nb.D3") and p.evaluate("()=>window.__nb.is3D()"), 'sahne 3D çiziliyor')
     check(p.evaluate(INK) > 0.05, 'sahnede çizim var (%.2f)' % p.evaluate(INK))
-    g = p.evaluate("()=>{const r=q=>document.querySelector(q).getBoundingClientRect(),a=r('#t-set'),v=r('#v3d');return {gr:a.right,gb:a.bottom,vr:v.right,vt:v.top,vw:v.width,pr:document.getElementById('v3d').getAttribute('aria-pressed')}}")
-    check(p.is_visible('#v3d') and abs(g['gr'] - g['vr']) < 4 and g['vt'] >= g['gb'] and g['vw'] >= 36 and g['pr'] == 'true',
-          '3D düğmesi Ayarlar dişlisinin altında, basılı (%s)' % g)
+    g = p.evaluate("()=>{const r=q=>document.querySelector(q).getBoundingClientRect(),a=r('#cvwrap'),v=r('#v3d'),c=r('#corner');return {wr:a.right,wt:a.top,vr:v.right,vt:v.top,vb:v.bottom,ct:c.top,vw:v.width,pr:document.getElementById('v3d').getAttribute('aria-pressed')}}")
+    check(p.is_visible('#v3d') and g['wr'] - g['vr'] < 20 and g['vt'] - g['wt'] < 20 and g['vb'] <= g['ct'] and g['vw'] >= 36 and g['pr'] == 'true',
+          '3D düğmesi sahnenin sağ üstünde, Sipariş/Kitap düğmelerinin üstünde, basılı (%s)' % g)  # v92: dişli dock'a geçti
     # 3D'de sahneye dokunmak ritim yerleştirmez, Ritme vur olur
     x, y = p.evaluate(CELL, 2)
     before = p.evaluate("()=>window.__nb.S.pat.A[0].slice(0,16)")
@@ -77,7 +77,7 @@ with sync_playwright() as pw:
     check(p.evaluate("()=>window.__nb.S.d3.on") == 1 and p.evaluate("()=>window.__nb.S.pat.A[0][2]") == 1, 'seçim ve vuruş kayıtta kalıyor')
 
     # Görünüm: 3D/2D ve merkez görünümleri
-    p.click('#d-look'); p.wait_for_timeout(200)
+    p.evaluate("()=>window.__nb.setTab('look')"); p.wait_for_timeout(200)  # v92: dock'ta Müzik·Görünüm önce Müzik'i açar
     t = p.inner_text('#d3Box')
     check(all(k in t for k in ('3D', '2D', 'Kristal', 'Küre', 'Güneş', 'Plak', 'Kullanılıyor')) and '5 Mn' in t and '50 Mn' in t and '500 Mn' in t,
           'Görünüm’de 3D/2D ve merkezler (Küre ♪5 Mn, Güneş ♪50 Mn, Plak ♪500 Mn)')

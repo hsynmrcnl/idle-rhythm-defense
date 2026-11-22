@@ -53,7 +53,7 @@ with sync_playwright() as pw:
         check(p.evaluate("()=>window.__nb.blastN") == n0 + 1 and p.evaluate("()=>window.__nb.chReady") < 0 and p.evaluate("()=>window.__nb.playing") == pl, 'dolu şarjda merkeze dokunmak patlatır, müzik durmaz')
         check(p.evaluate("()=>window.__nb.blastM") in (1, 1.5), 'patlama çarpanı 1 ya da 1,5')
         # ayar kapalı
-        p.click('#t-set'); p.wait_for_timeout(100); p.click('#p-set [data-act=tens][data-v="0"]'); p.wait_for_timeout(100)
+        p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(100); p.click('#p-set [data-act=tens][data-v="0"]'); p.wait_for_timeout(100)
         h1 = p.evaluate("()=>window.__nb.dngSnd"); p.evaluate("()=>window.__nb.setHp(0.1)"); p.wait_for_timeout(1500)
         check(p.evaluate("()=>window.__nb.S.tens") is False and p.evaluate("()=>window.__nb.dngSnd") == h1 and p.evaluate("()=>window.__nb.dangerF") > 15000, 'Ayarlar → Gerilim efektleri kapalıyken sessiz')
         check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
