@@ -179,7 +179,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v88 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v89 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -363,7 +363,7 @@ function updUI(){
  {const pa=planAt(curBar);document.querySelectorAll('#planChips .chip').forEach((e,i)=>e.classList.toggle('on',i===pa.idx))}
  if(playing&&soloNow===soloEdSlot&&$('soloCv'))drawSoloEd();
  const th=albumTh(),pr=Math.min(1,S.runEarned/th),bar=$('aBar');
- if(bar){bar.style.width=(pr*100).toFixed(1)+'%';$('aTxt').textContent='♪ '+fmt(S.runEarned)+' / '+fmt(th)+' · +'+fansFor()+' hayran';$('aBtn').classList.toggle('ready',pr>=1)}
+ if(bar){bar.style.width=(pr*100).toFixed(1)+'%';/* v89 (A): ödül gelir olarak; eşik altında eşikte verilecek hayran (eskiden o anki küçük sayı) */const f=pr>=1?fansFor():fansAt(),g='×'+fm(fanM())+' → ×'+fm(1+0.05*(S.hayran+f)),h=pr>=1?'<b class="ok">'+T('Hazır')+'</b> · +'+f+' '+T('hayran')+' · '+T('gelir')+' '+g:'♪ '+fmt(S.runEarned)+' / '+fmt(th)+' · '+T('eşikte')+' +'+f+' '+T('hayran')+' ('+g+')',at=$('aTxt');if(at.innerHTML!==h)at.innerHTML=h;$('aBtn').classList.toggle('ready',pr>=1)}
  if($('dWave')){$('dWave').textContent=S.wave;$('dEn').textContent=enemies.length;$('dDps').textContent=fmt(dps());$('dHp').textContent=Math.round(core.hp)+'/'+hpMax();$('dSh').textContent=Math.round(core.sh)+'/'+Math.round(shieldMax());$('dHpBar').style.width=(hpf*100).toFixed(1)+'%';$('dShBar').style.width=(clamp(core.sh/hpMax(),0,1)*100).toFixed(1)+'%'}
  S.orders.forEach((o,k)=>{if(!o.tpl){return}const t=OTPL.find(x=>x.id===o.tpl);if(!t)return;const rq=t.req(o);let all=true,nOk=0;rq.forEach((q,j)=>{const li=$('oq'+k+'_'+j);const ok=!!q.ok();if(ok)nOk++;else all=false;if(li)li.classList.toggle('ok',ok)});const oc=$('oc'+k);if(oc)oc.textContent=nOk+'/'+rq.length;const card=$('ord'+k),btn=$('odb'+k);if(card)card.classList.toggle('ok',all);if(btn)btn.classList.toggle('ready',all)});
  const nf=nextFam();if(nf&&famCanOpen(nf[0])&&tab!=='coll')$('collBadge').hidden=false;
@@ -650,7 +650,7 @@ function rackAct(b){const act=b.dataset.act;
   /* v63: albüm oyunu baştan başlatır; iki dokunuş (tek dokunuşla onaysız çıkıyordu) */
   if(S.runEarned<albumTh()){releaseAlbum();return}
   if(albArm){albArm=false;clearTimeout(albT);releaseAlbum();return}
-  albArm=true;const o=b.textContent;b.textContent=T('Emin misin? Oyun baştan başlar · tekrar bas');albT=setTimeout(()=>{albArm=false;b.textContent=o},4000);return}
+  /* v89 (A): düğme yerinde kalır (uzun metin onu kaydırıp ikinci tıkı ıskalatıyordu), uyarı altta ayrı satırda */albArm=true;const o=b.textContent;b.style.minWidth=b.offsetWidth+'px';b.textContent=T('Tekrar bas');const ar=b.closest('.arow');let w=$('aWarn');if(!w&&ar){w=document.createElement('p');w.id='aWarn';w.className='note warn';ar.after(w)}if(w)w.textContent=T('Oyun baştan başlar. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır.');albT=setTimeout(()=>{albArm=false;b.textContent=o;b.style.minWidth='';const x=$('aWarn');if(x)x.remove()},6000);return}
  else if(act==='fxreset'){delete S.fxo[dispTheme().id];renderPanels();return}
  else if(act==='waveBack'){setWave(S.wave-5);msg('Dalga '+S.wave+' · geri çekilmek ücretsiz');return}
  else if(act==='waveFwd'){setWave(S.wave+5);msg('Dalga '+S.wave);return}

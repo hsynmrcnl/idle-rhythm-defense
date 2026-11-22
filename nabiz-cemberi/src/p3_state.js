@@ -294,7 +294,9 @@ const tempoCost=()=>Math.round(300*Math.pow(3,(S.bmax-90)/10));
 const slotCost=()=>Math.round(2000*Math.pow(10,S.slots.length-4));
 const defCost=u=>Math.round(u.c*Math.pow(u.g,S.def[u.id]||0));
 const albumTh=()=>Math.round(1.5e7*Math.pow(4,albumsN()));
-const fansFor=()=>Math.max(1,Math.floor(10*Math.sqrt(S.runEarned/albumTh())));
+/* v89 (B): her albümün hayranı bir öncekinden %50 fazla (10, 15, 20…); eskiden hep ~10, göreli kazanç ×1,50→×1,33→×1,25 düşüyordu. fansAt: eşikte verilecek */
+let ALB_GROW=0.5;const fansAt=()=>Math.floor(10*(1+ALB_GROW*albumsN()));
+const fansFor=()=>Math.max(1,Math.floor(10*(1+ALB_GROW*albumsN())*Math.sqrt(S.runEarned/albumTh())));
 function lvQuote(x){const L=lvOf(x.id);if(!L)return{n:1,c:x.u,unlock:true};const c0=x.lb*Math.pow(GROW,L);let n=S.buy;if(n===0)n=Math.max(1,Math.floor(Math.log(S.nota*(GROW-1)/c0+1)/Math.log(GROW)));return{n,c:Math.round(c0*(Math.pow(GROW,n)-1)/(GROW-1))}}
 const hpMax=()=>100+60*(S.def.nabiz||0);
 const shieldMax=()=>(50+50*(S.def.kalkan||0))*(S.stage.mirror?1.5:1);

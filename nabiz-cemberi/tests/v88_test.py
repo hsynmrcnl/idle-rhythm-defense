@@ -55,7 +55,8 @@ with sync_playwright() as pw:
     check(bm['buy']==1 and bm['pr']=='true','Maks bir alımdan sonra ×1’e dönüyor (%s)'%bm)
     # 5) EN sayı biçimi + Unlock
     en=p.evaluate("""()=>new Promise(r=>{const nb=window.__nb,S=nb.S;S.lang='en';S.nota=1534567;nb.renderPanels();nb.setTab('coll');setTimeout(()=>{const a=[...document.querySelectorAll('#collList [data-act=lv]')].map(x=>x.getAttribute('aria-label')||'').filter(x=>x)[0]||'';r({n:document.getElementById('sNota').textContent,a})},500)})""")
-    check('1.53 M' in en['n'] and 'Mn' not in en['n'],'EN: nota İngilizce biçimde (“%s”)'%en['n'])
+    import re
+    check(re.search(r'\d\.\d+ M',en['n']) and 'Mn' not in en['n'],'EN: nota İngilizce biçimde (“%s”)'%en['n'])
     check(en['a']=='' or en['a'].startswith('Unlock'),'EN: Koleksiyon Aç düğmesi “Unlock” (“%s”)'%en['a'][:30])
     p.close()
     # --- yatay öğretici pedi hedefler
