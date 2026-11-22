@@ -176,7 +176,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v83 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v84 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -309,8 +309,9 @@ function hintBuy(){const k=hintK;if(k&&k.alb){setTab('album');$('hintChip').hidd
 const ASST_T=20000,ASST_B=0.25;let asstT=Date.now(),asstFlip=false,asstSurv=false;
 const asstOn=own=>!!(S.unl&&S.unl.asst&&!(S.mn&&S.mn.lv)&&(own||S.auto&&S.auto.asst!==false));
 function asstPick(lim0){const lim=lim0==null?S.nota*ASST_B:lim0,ok=k=>k&&k.cost>0&&k.cost<=lim;let k=null;
- /* düşük nabızda bir hayatta kalma, bir gelir/savunma sırayla (hep nabız alıp takılmasın); yeni enstrüman her durumda */
- if(core.hp/hpMax()<0.6&&S.unl.def&&!asstSurv){k=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)&&ok(x)).sort((x,y)=>x.cost-y.cost)[0]||null;if(k){asstSurv=true;return k}}
+ /* v84: nabız düşükken savunmayı sırayla al — önce Tamir (nabzı pasif doldurur; Nabız yalnız tavanı artırır, anlık can vermez), sonra Kalkan (yalnız kalkan enstrümanı çalıyorsa işe yarar), en son Nabız. Kritikte (<%35) her turda savunma (42 Mn yatarken nabız %6'da kalıyordu); hafifte (<%60) gelir/savunma dönüşümlü. */
+ if(core.hp/hpMax()<0.6&&S.unl.def){const crit=core.hp/hpMax()<0.35,hk=typeof hasRolePlaying==='function'&&hasRolePlaying('kalkan'),pri=id=>id==='tamir'?0:id==='kalkan'?(hk?1:3):2;
+  k=anlCands().filter(x=>x.act==='def'&&['tamir','kalkan','nabiz'].includes(x.id)&&ok(x)).sort((x,y)=>pri(x.id)-pri(y.id)||x.cost-y.cost)[0]||null;if(k&&(crit||!asstSurv)){asstSurv=true;return k}}
  asstSurv=false;{const ni=newInsCand();if(ok(ni))return ni}
  if(!k){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'),lim);k=asstFlip&&ok(r.def)?r.def:ok(r.inc)?r.inc:ok(r.def)?r.def:null;if(k)asstFlip=k!==r.def}
  return k}
