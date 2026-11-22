@@ -304,11 +304,16 @@ const regen=()=>(S.def.tamir||0)+(S.stage.core?0.5:0)+(S.stage.mirror?0:0);
 const bountyM=()=>1+0.25*(S.def.ganimet||0);
 const globalSlow=()=>Math.min(0.5,(S.stage.stars?0.1:0)+(BK[S.edit].slow||0));
 
-function fmt(n){if(!isFinite(n))return '∞';n=Math.floor(n);const u=[[1e18,' Kn'],[1e15,' Kt'],[1e12,' T'],[1e9,' Mr'],[1e6,' Mn']];for(const [v,s] of u)if(n>=v)return(n/v).toLocaleString('tr-TR',{maximumFractionDigits:2})+s;return n.toLocaleString('tr-TR')}
-const fm=m=>m.toLocaleString('tr-TR',{maximumFractionDigits:2});
+/* v88: EN modunda sayılar İngilizce biçimde (4,187 · ×1.79 · 1.5 M · 1.2 B); eskiden hep tr-TR + Mn/Mr */
+const LOC=()=>S&&S.lang==='en'?'en-US':'tr-TR';
+function fmt(n){if(!isFinite(n))return '∞';n=Math.floor(n);const en=S&&S.lang==='en',u=en?[[1e18,' Qi'],[1e15,' Qa'],[1e12,' T'],[1e9,' B'],[1e6,' M']]:[[1e18,' Kn'],[1e15,' Kt'],[1e12,' T'],[1e9,' Mr'],[1e6,' Mn']];for(const [v,s] of u)if(n>=v)return(n/v).toLocaleString(LOC(),{maximumFractionDigits:2})+s;return n.toLocaleString(LOC())}
+const fm=m=>m.toLocaleString(LOC(),{maximumFractionDigits:2});
 const pct=b=>'+%'+Math.round(b*100);
 let msgT=0;
-function msg(t){$('msg').textContent=T(t);clearTimeout(msgT);msgT=setTimeout(()=>{$('msg').textContent=''},3600)}
+/* v88: öncelikli mesaj (yeni düşman haberi): süresince sıradan mesajlar onu ezmez (ileri sarmadan sonra açılış/Asistan mesajları siliyordu) */
+let msgHold=0;
+function msg(t){if(Date.now()<msgHold)return;$('msg').textContent=T(t);clearTimeout(msgT);msgT=setTimeout(()=>{$('msg').textContent=''},3600)}
+function msgP(t,ms){msgHold=0;msg(t);msgHold=Date.now()+ms;clearTimeout(msgT);msgT=setTimeout(()=>{$('msg').textContent='';msgHold=0},ms)}
 
 /* ================= orders ================= */
 const OTPL=[
