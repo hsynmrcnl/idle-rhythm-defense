@@ -640,19 +640,11 @@ input[type=range]{width:100%;accent-color:var(--acc)}
  /* v66: kaydırılan içerik sabit dil/dişli düğmelerinin altına girmesin: kayan alan düğmelerin altından başlar */
  .rack{height:calc(100% - 44px);margin-top:44px;overflow-y:auto;overscroll-behavior:contain;padding-top:0}
  .hint,.stage .controls{display:none!important}
- /* v87 (B2, lab https://claude.ai/artifact/Wf5pso4NWGGqXL6WYNECV2): ped sırası Stüdyo'da sağ panelin altında yapışkan şerit (renderPads → padsHome taşır); sahne küçülmez. Sekmeler tek satır, yana kayar, yapışkan (Ayarlar kaydırılınca kayboluyordu). */
- .rack>.pads:not([hidden]){display:grid!important;position:sticky;bottom:0;z-index:7;background:var(--bg);grid-template-columns:repeat(8,minmax(0,1fr));gap:4px 3px;padding:5px 0 3px;margin-top:8px;border-top:1px solid var(--line)}
- .app:not([data-tab="studio"]) .rack>.pads{display:none!important}
- .rack .padhead{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;min-height:32px}
- .rack .padhead .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;flex:1}
- .rack .padhead .btn{min-width:40px;min-height:32px;padding:2px 8px}
- .rack .pad{min-height:34px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-family:var(--f-m);font-size:10.5px;padding:0;cursor:pointer;position:relative}
- .rack .pad.g{border-left:2px solid var(--muted)}
- .rack .pad[data-v="1"]{background:var(--c);border-color:var(--c);color:var(--bg)}
- .rack .pad[data-v="2"]{background:var(--c);border-color:#fff;box-shadow:inset 0 0 0 2px #fff;color:var(--bg);font-weight:600}
- .rack .pad.cur::after{content:"";position:absolute;left:4px;right:4px;bottom:3px;height:2px;background:var(--acc);border-radius:1px}
- .rack .pad.cur[data-v]:not([data-v="0"])::after{background:var(--bg)}
- .rack .pad.sel{outline:2px solid var(--hot);outline-offset:-2px}
+ /* v87 (B2) → v90: yatayda 8 yer şeridi sağ panelin altında yapışkan (slotHome taşır); enstrüman paneli ve Koleksiyon sağ kolonda alttan açılır, sahne küçülmez. Sekmeler tek satır, yapışkan. */
+ .rack>.slotbar{position:sticky;bottom:0;z-index:7;background:var(--bg);margin-top:8px;border-top:1px solid var(--line);padding:5px 0 3px}
+ .rack>.slotbar .sbt{height:46px}
+ #iSheet,#cSheet{position:fixed;left:auto;right:max(8px,env(safe-area-inset-right,0px));width:calc(100vw - min(58vw,100dvh + 8px) - 28px);max-height:82%}
+ #cSheet{height:82%}
  .rack .tabs{position:sticky;top:0;z-index:8;background:var(--bg);flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none}
  .rack .tabs::-webkit-scrollbar{display:none}
  .rack .tabs .tab{flex:0 0 auto}
@@ -682,6 +674,45 @@ input[type=range]{width:100%;accent-color:var(--acc)}
  .tab{padding:10px 7px;font-size:11.5px}
 }
 @media (max-width:520px){#sWave small{display:none}}.gloss{margin-top:10px}.gloss summary{cursor:pointer;font-weight:600}.gloss dl{margin:8px 0 0;display:grid;grid-template-columns:max-content 1fr;gap:6px 12px;font-size:13px}.gloss dt{font-weight:600;color:var(--acc)}.gloss dd{margin:0;opacity:.85}
+
+/* v90: ana ekranda 8 sahne yeri şeridi + enstrüman paneli + Koleksiyon sayfası (lab https://claude.ai/artifact/LbjvM4HxaPDPDv4oNvJe6n) */
+.slotbar{padding:6px 0 4px}
+.sbh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+.sbn{font-family:var(--f-m);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.collb{min-height:32px!important;padding:3px 10px!important;font-size:12px!important;border-color:var(--acc)!important;color:var(--acc)!important}
+.sb8{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
+.sbt{height:56px;min-width:0;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-family:var(--f-b,inherit);font-size:9.5px;padding:2px 1px;position:relative}
+.sbt .d{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.sbt .nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbt .lv{font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.sbt.sel{border-color:var(--c,var(--acc));box-shadow:inset 0 0 0 1px var(--c,var(--acc))}
+.sbt.empty,.sbt.lock{border-style:dashed;color:var(--muted)}
+.sbt svg{width:15px;height:15px;color:var(--dim)}
+.sbt.can{border-color:var(--acc);animation:sbcan 1.1s ease-in-out infinite}.sbt.can svg{color:var(--acc)}
+@keyframes sbcan{50%{border-color:var(--line);box-shadow:0 0 10px color-mix(in srgb,var(--acc) 55%,transparent)}}
+@media (prefers-reduced-motion:reduce){.sbt.can{animation:none}}
+.sbt:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.isheet{position:absolute;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:1px solid var(--acc);border-radius:16px 16px 0 0;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));max-height:72%;overflow:auto;box-shadow:0 -10px 30px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:8px}
+.isheet[hidden]{display:none!important}
+.csheet{height:min(70%,560px)}
+.shh{display:flex;align-items:center;gap:8px}.shh h3{margin:0;font-family:var(--f-d,inherit);font-size:16px}.shh .cnt{flex:1;min-width:0}
+.isheet .pads:not([hidden]){display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px 3px;padding:0}
+.isheet .padhead{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:13px;min-height:36px}
+.isheet .padhead .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.isheet .padhead .btn{min-width:38px;min-height:36px;padding:2px 8px}
+.isheet .padlv{grid-column:1/-1}
+.isheet .pad{min-height:38px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-family:var(--f-m);font-size:11px;padding:0;cursor:pointer;position:relative}
+.isheet .pad.g{border-left:2px solid var(--muted)}
+.isheet .pad[data-v="1"]{background:var(--c);border-color:var(--c);color:var(--bg)}
+.isheet .pad[data-v="2"]{background:var(--c);border-color:#fff;box-shadow:inset 0 0 0 2px #fff;color:var(--bg);font-weight:600}
+.isheet .pad.cur::after{content:"";position:absolute;left:4px;right:4px;bottom:3px;height:2px;background:var(--acc);border-radius:1px}
+.isheet .pad.cur[data-v]:not([data-v="0"])::after{background:var(--bg)}
+.isheet .pad.sel{outline:2px solid var(--hot);outline-offset:-2px}
+.iact{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.isheet .sotb:not([hidden]){display:flex!important;position:relative;right:auto;bottom:auto;grid-column:1/-1;justify-content:flex-end;align-items:center;gap:8px}
+.isheet .sotp{max-width:100%}.iact select{min-height:36px}
+.csheet #famBar{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;flex:0 0 auto;margin:0}.csheet #famBar .sb{flex:1 0 44px}.csheet #collList{flex:0 0 auto}
+.csheet #cBody{display:flex;flex-direction:column;gap:8px;min-height:0;flex:1;overflow:auto}
 </style>
 
 <div class="app" lang="tr" id="app" data-tab="studio">
@@ -707,7 +738,9 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       </div>
       <div class="anl" id="anl" role="region" aria-label="Analiz" hidden></div>
       <div class="cvwrap" id="cvwrap"><button class="demochip" id="demoChip" hidden>Örnek şarkı · çık</button><button class="hintchip" id="hintChip" hidden aria-live="polite"></button><button class="stchip" id="soloChip" hidden aria-label="Solo düzenlemeden çık">✓ Solodan çık</button><button class="v3d" id="v3d" hidden aria-pressed="true" aria-label="3D sahne" title="3D sahne">3D</button><canvas id="cv" aria-label="Ritim sıralayıcı ve savunma sahnesi. Çember düzeninde halkalar, şerit düzeninde satırlar enstrümanları gösterir; düşmanlar kenarlardan sahneye yaklaşır."></canvas></div>
-      <div class="pads" id="pads" hidden aria-label="Seçili sahne yerinin adımları"></div>
+      <div class="slotbar" id="slotBar"><div class="sbh"><span class="sbn" id="sbName"></span><button class="btn collb" id="collBtn" data-act="collOpen" aria-haspopup="dialog">Koleksiyon</button></div><div class="sb8" id="sb8" role="group" aria-label="Sahne yerleri"></div></div>
+      <div class="isheet" id="iSheet" hidden role="dialog" aria-label="Sahne yeri"><div id="iLock"></div><div class="pads" id="pads" hidden aria-label="Seçili sahne yerinin adımları"></div><div class="iact" id="iAct"></div></div>
+      <div class="isheet csheet" id="cSheet" hidden role="dialog" aria-label="Koleksiyon"><div class="shh"><h3>Koleksiyon</h3><span class="cnt" id="cHead"></span><button class="btn ghost" data-act="collClose" aria-label="Kapat">✕</button></div><div id="cBody"></div></div>
       <p class="hint" id="hint"></p>
       <div class="controls">
         <button class="btn primary" id="play">Başlat</button>
