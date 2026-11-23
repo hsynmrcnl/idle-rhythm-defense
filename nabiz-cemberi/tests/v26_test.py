@@ -58,7 +58,7 @@ with sync_playwright() as pw:
     p.tap('#stats'); p.wait_for_timeout(150)
     check(not p.evaluate("()=>window.__nb.anlOn") and 'dalga 14' in p.inner_text('#msg'), 'Analiz henüz kapalı, ne zaman açılacağı yazıyor')
     p.evaluate("()=>{const S=window.__nb.S;S.kills=1}"); p.wait_for_timeout(400)
-    check(mk() == 'studio' and card() == 'Yeni: Enstrüman paneli' and dock() == ['stage', 'look', 'set'], 'ilk susturucuyla Müzik açıldı, kısa öğretici enstrüman panelini gösteriyor (%s)' % card())  # v92
+    check(mk() == 'studio' and card() == 'Yeni: Enstrüman paneli' and dock() == ['stage', 'set'], 'ilk susturucuyla (v95: Müzik ikinci enstrümanla), kısa öğretici enstrüman panelini gösteriyor (%s)' % card())  # v92
     p.screenshot(path=os.path.join(OUT, 'v26_studio_card.png'))
     hole_tap()
     check(p.evaluate("()=>window.__nb.iOpen") and card() == 'Yükselt', 'Davul paneli açıldı, ikinci adım Yükselt')
@@ -74,7 +74,7 @@ with sync_playwright() as pw:
     drop(); p.wait_for_timeout(200)
     p.evaluate("()=>{window.__nb.collClose();window.__nb.setTab('studio')}"); p.wait_for_timeout(150)
     sec = p.evaluate("()=>[...document.querySelectorAll('#secBar .sb')].map(e=>e.dataset.k)")
-    check(sec == ['sahne', 'auto', 'syn'] and p.locator('[data-act=autoAll]').count() == 1, 'Otomatik, Uyum ve Hepsini düzenle geldi (%s)' % sec)
+    check(sec == ['auto', 'syn'] and p.locator('[data-act=autoAll]').count() == 1, 'Otomatik, Uyum ve Hepsini düzenle geldi (%s)' % sec)
     p.evaluate("()=>{window.__nb.S.bestWave=8}")
     try: p.wait_for_function("()=>window.__nb.S.tipq.length>=3", timeout=4000)
     except Exception: pass
@@ -110,7 +110,7 @@ with sync_playwright() as pw:
     tabs = lambda: p.evaluate("()=>[...document.querySelectorAll('.tabs .tab:not(.mob)')].filter(e=>!e.hidden).map(e=>e.dataset.tab)")
     check(tabs() == [] and p.is_visible('#p-lock') and not p.is_visible('#p-studio') and not p.is_visible('#tap'), 'yeni oyunda sekme yok, Stüdyo yerine bekleme notu, Ritme vur düğmesi yok')
     p.evaluate("()=>{window.__nb.S.tut.done=true;window.__nb.S.kills=1}"); p.wait_for_timeout(400)
-    check(tabs() == ['studio'] and p.is_visible('#p-studio') and not p.is_visible('#p-lock') and mk() == 'studio', 'ilk susturucuyla Stüdyo sekmesi açıldı, kısa öğretici sırada')
+    check(tabs() == [] and mk() == 'studio', 'ilk susturucuyla kısa öğretici sırada (v95: Müzik ikinci enstrümanla)')
     p.screenshot(path=os.path.join(OUT, 'v26_desktop.png'))
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     p.close()

@@ -37,7 +37,9 @@ with sync_playwright() as pw:
     lv0 = p.evaluate("()=>window.__nb.S.lv.davul")
     p.evaluate("()=>window.__nb.setTab('studio')"); p.wait_for_timeout(200)
     p.evaluate("()=>{const S=window.__nb.S;S.tipq=['look'];S.tutm=1;window.__nb.tutTick()}"); p.wait_for_timeout(300)
-    bb = p.locator('#lvb-davul').bounding_box()
+    p.evaluate("()=>window.__nb.slotOpen(0)"); p.wait_for_timeout(200)  # v95: Yükselt enstrüman panelinde
+    p.evaluate("()=>{const S=window.__nb.S;S.tipq=['look'];S.tutm=1;window.__nb.tutTick()}"); p.wait_for_timeout(300)
+    bb = p.locator('#iAct [data-lvq]').bounding_box()
     p.mouse.click(bb['x'] + bb['width'] / 2, bb['y'] + bb['height'] / 2); p.wait_for_timeout(300)
     check(p.is_hidden('#tutL') and p.evaluate("()=>window.__nb.S.lv.davul") > lv0, 'kısa öğreticinin dışına dokunmak onu kapattı ve Yükselt işledi (Sv %d → %d)' % (lv0, p.evaluate("()=>window.__nb.S.lv.davul")))
     p.evaluate("()=>{const S=window.__nb.S;S.tipq=['look','book'];S.tutm=0;window.__nb.tutTick()}"); p.wait_for_timeout(300)

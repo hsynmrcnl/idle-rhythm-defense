@@ -32,13 +32,14 @@ with sync_playwright() as pw:
     p.goto(URL); p.wait_for_timeout(400); p.evaluate(SEED); p.wait_for_timeout(50)
 
     # tek satır: davul Yoğun → her vuruş başı
-    nb = p.evaluate("()=>[...document.querySelectorAll('#slotList .ezopts')].map(e=>e.querySelectorAll('[data-act=alvl]').length)")
+    nb = p.evaluate("()=>[0,1,2,3].map(i=>{window.__nb.slotOpen(i);return document.querySelectorAll('#pads [data-act=alvl][data-i=\"'+i+'\"]').length})")  # v95: enstrüman panelinden
     check(len(nb) == 4 and all(n in (1, 3) for n in nb) and nb[0] == 1, 'her satırda Sade · Hareketli · Yoğun ya da tek Otomatik ritim (v55: %s)' % nb)
     n0 = p.evaluate("()=>window.__nb.S.nota")
-    p.click('#slotList [data-act=alvl][data-i="0"][data-v="3"]'); p.wait_for_timeout(50)
+    p.evaluate("()=>window.__nb.slotOpen(0)"); p.wait_for_timeout(60)
+    p.click('#pads [data-act=alvl][data-i="0"][data-v="3"]'); p.wait_for_timeout(50)
     check(row(p, 'A', 0) == '2000100010001000' and p.evaluate("()=>window.__nb.S.rowm.A0") == 3 and p.evaluate("()=>window.__nb.S.nota") < n0,
           'davul Yoğun: dört vuruş başı, ölçü başı vurgulu (v35), bedel ödendi (%s)' % row(p, 'A', 0))
-    check(p.evaluate("()=>document.querySelector('#slotList [data-act=alvl][data-i=\"0\"][data-v=\"3\"]').getAttribute('aria-pressed')") == 'true', 'seçili seviye işaretli')
+    check(p.evaluate("()=>document.querySelector('#pads [data-act=alvl][data-i=\"0\"][data-v=\"3\"]').getAttribute('aria-pressed')") == 'true', 'seçili seviye işaretli')
 
     # Hepsini düzenle: uyumlar kendiliğinden
     p.click('[data-act=autoAll]'); p.wait_for_timeout(80)
@@ -52,7 +53,8 @@ with sync_playwright() as pw:
 
     # geri al: Hepsini düzenle tek adımda geri gelir, bedel iade
     before = p.evaluate("()=>({p:JSON.stringify(window.__nb.S.pat.A),n:window.__nb.S.nota})")
-    p.click('#slotList [data-act=alvl][data-i="2"][data-v="1"]'); p.wait_for_timeout(50)
+    p.evaluate("()=>window.__nb.slotOpen(2)"); p.wait_for_timeout(60)
+    p.click('#pads [data-act=alvl][data-i="2"][data-v="1"]'); p.wait_for_timeout(50)
     check(row(p, 'A', 2).count('1') < nf[2], 'hi-hat Sade daha seyrek (%s)' % row(p, 'A', 2))
     p.click('#undoBox [data-act=undo]'); p.wait_for_timeout(50)
     after = p.evaluate("()=>({p:JSON.stringify(window.__nb.S.pat.A),n:window.__nb.S.nota})")
@@ -62,8 +64,9 @@ with sync_playwright() as pw:
     p.evaluate("()=>{const S=window.__nb.S;S.pat.A[2]=S.pat.A[2].map((v,s)=>s%4===2?1:0);S.rowm.A2='m';window.__nb.recalc();window.__nb.renderPanels()}")
     manual = row(p, 'A', 2)
     p.click('[data-act=autoAll]'); p.wait_for_timeout(80)
-    check(row(p, 'A', 2) == manual and 'elle' in p.text_content('#slotList') and 'korundu' in p.text_content('#msg'), 'Hepsini düzenle elle satıra dokunmuyor')
-    p.click('#slotList [data-act=alvl][data-i="2"][data-v="3"]'); p.wait_for_timeout(50)
+    check(row(p, 'A', 2) == manual and 'elle' in (p.text_content('#pads') + p.text_content('#slotList')) and 'korundu' in p.text_content('#msg'), 'Hepsini düzenle elle satıra dokunmuyor')
+    p.evaluate("()=>window.__nb.slotOpen(2)"); p.wait_for_timeout(60)
+    p.click('#pads [data-act=alvl][data-i="2"][data-v="3"]'); p.wait_for_timeout(50)
     check(p.evaluate("()=>window.__nb.S.rowm.A2") == 3, 'satırın kendi düğmesi elle işaretini kaldırıyor')
 
     # nota yetmezse kısaltır
@@ -114,6 +117,7 @@ with sync_playwright() as pw:
     ctx = b.new_context(viewport={'width': 375, 'height': 667}, is_mobile=True, has_touch=True); p = ctx.new_page(); errs = []
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(400); p.evaluate(SEED); p.click('#d-look'); p.wait_for_timeout(100)
+    p.tap('#secBar [data-k=syn]'); p.wait_for_timeout(80)  # v95: Hepsini düzenle Uyum'da
     p.tap('[data-act=autoAll]'); p.wait_for_timeout(80)
     o = p.evaluate("()=>[...document.querySelectorAll('#p-studio *')].filter(e=>e.offsetParent&&e.getBoundingClientRect().right>innerWidth+1).map(e=>(e.tagName+'.'+e.className+' '+(e.textContent||'').slice(0,20)+' '+Math.round(e.getBoundingClientRect().right)))")
     check(not o and p.evaluate("()=>window.__nb.S.pat.A[0].some(v=>v)"), 'telefon 375: Hepsini düzenle çalışıyor, taşma yok %s' % o[:4])

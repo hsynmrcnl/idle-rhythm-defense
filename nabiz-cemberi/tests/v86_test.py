@@ -48,7 +48,7 @@ with sync_playwright() as pw:
     check(s['tab']=='set','yazı alanında rakam sekme değiştirmiyor (%s)'%s)
     p.keyboard.press('Escape');p.wait_for_timeout(200)
     # .seg odak halkası içe (kırpılmasın)
-    p.evaluate("()=>window.__nb.setTab('studio')");p.wait_for_timeout(250)
+    p.evaluate("()=>{window.__nb.setTab('stage');window.__nb.slotOpen(0)}");p.wait_for_timeout(250)  # v95: ×1/×10/Maks enstrüman panelinde
     off=p.evaluate("""()=>{const b=[...document.querySelectorAll('.seg button')].find(x=>x.offsetParent);if(!b)return null;b.focus();return (b.matches(':focus-visible')?'':'(fv yok) ')+getComputedStyle(b).outlineOffset}""")
     check(off is not None and off.startswith('-'),'.seg düğmesinde odak halkası içe (%s)'%off)
     col=p.evaluate("""()=>{const c=document.querySelector('.chip:not(.on)');if(!c)return 'yok';const m=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim();const d=document.createElement('span');d.style.color=m;document.body.appendChild(d);const mc=getComputedStyle(d).color;d.remove();return getComputedStyle(c).color===mc?'muted':getComputedStyle(c).color}""")
