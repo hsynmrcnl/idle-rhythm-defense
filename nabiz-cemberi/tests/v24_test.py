@@ -68,8 +68,8 @@ with sync_playwright() as pw:
         check(p.evaluate("()=>window.__nb.S.edit") == 'A' and not p.is_visible('#soloChip') and p.evaluate("()=>window.__nb.soloView()") < 0, 'çip soloyu kapatıp önceki desene döndürüyor')
         if w == 390: p.screenshot(path=os.path.join(OUT, 'v24_stage.png'))
         # Stüdyo: sabit üst bar, bölüm düğmeleri tek bölüm gösterir
-        p.click('#d-studio'); p.wait_for_timeout(150)
-        if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'studio': p.click('#p-coll .subnav [data-tab=studio]'); p.wait_for_timeout(100)
+        p.click('#d-look'); p.wait_for_timeout(150)
+        if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'studio': p.evaluate("()=>window.__nb.setTab('studio')"); p.wait_for_timeout(100)
         shown = lambda: p.evaluate("()=>[...document.querySelectorAll('#p-studio [data-sec]')].filter(e=>e.offsetParent).map(e=>e.dataset.sec)")
         check(shown() == ['sahne'], 'Stüdyo açılınca yalnız Sahne görünüyor (%s)' % shown())
         btns = p.evaluate("()=>[...document.querySelectorAll('#secBar .sb')].map(e=>e.dataset.k)")
@@ -84,14 +84,14 @@ with sync_playwright() as pw:
         check(not o, 'Stüdyo yana taşmıyor %s' % o)
         # öğretici seviye adımı gizli bölümdeki düğmeyi vurguluyorsa o bölüme geçer
         p.tap('#secBar [data-k=auto]'); p.wait_for_timeout(80)
-        p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=1;S.tipq=['studio'];window.__nb.renderPanels()}")
-        try: p.wait_for_selector('#lvb-davul', state='visible', timeout=2500)
+        p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=1;S.lv.trampet=1;S.slots[1]='trampet';S.unl.syn=1;S.tipq=['syn'];S.tutm=1;window.__nb.miniGapT=0;window.__nb.renderPanels()}")  # v92: Uyum kısa öğreticisi gizli Sahne bölümündeki Hepsini düzenle'yi gösterir
+        try: p.wait_for_selector('#p-studio [data-act=autoAll]', state='visible', timeout=2500)
         except Exception: pass
-        check(p.is_visible('#lvb-davul') and shown() == ['sahne'], 'öğretici vurguladığı düğmenin bölümünü açıyor (%s)' % shown())
+        check(p.is_visible('#p-studio [data-act=autoAll]') and shown() == ['sahne'], 'öğretici vurguladığı düğmenin bölümünü açıyor (%s)' % shown())
         p.evaluate("()=>{const S=window.__nb.S;S.tipq=[];S.tutm=0}"); p.wait_for_timeout(150)
         p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=30;S.tipq=[];window.__nb.renderPanels()}")
         # Koleksiyon: aile simgeleri, kilitli ailede koşullar, açık ailede sıkı satır
-        p.click('#p-studio .subnav [data-tab=coll]'); p.wait_for_timeout(120)
+        p.evaluate("()=>window.__nb.setTab('coll')"); p.wait_for_timeout(200)  # v92: Koleksiyon ana ekranda sayfa
         fb = p.evaluate("()=>[...document.querySelectorAll('#famBar .sb')].map(e=>[e.dataset.f,e.classList.contains('locked'),e.textContent.trim()])")
         check(len(fb) == 6 and all(t == '' for _, _, t in fb) and [l for _, l, _ in fb] == [False, False, True, True, True, True], 'altı aile yazısız simgeyle, kilitliler işaretli (%s)' % fb)
         ir = p.evaluate("""()=>{const r=document.querySelector('#collList .irow:not(.locked)'),nm=r.querySelector('.nm').getBoundingClientRect(),o=nm,ie=r.querySelector('.ie').getBoundingClientRect();
@@ -181,14 +181,14 @@ with sync_playwright() as pw:
     p.reload(); p.wait_for_timeout(400)
     st = p.inner_text('#stats')
     check('/s' in st and '/sn' not in st and 'WAVE' in st.upper(), 'üst bilgi İngilizce: ' + st.replace('\n', ' '))
-    p.click('#d-studio'); p.wait_for_timeout(100)
-    if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'studio': p.click('#p-coll .subnav [data-tab=studio]')
+    p.click('#d-look'); p.wait_for_timeout(100)
+    if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'studio': p.evaluate("()=>window.__nb.setTab('studio')")
     p.tap('#secBar [data-k=auto]'); p.wait_for_timeout(100)
     t = p.inner_text('#autoBox') + ' ' + p.inner_text('#secBar')
     left = [x for x in ['Yeni enstrüman', 'Akorlar', 'Menajer', 'Neyi alsın', 'Harcama', 'Seviye', 'Savunma', 'Geliştirme', 'Otomatik', 'Ruh hâli', 'Uyum'] if x in t]
     check('New instrument rhythm' in t and 'what to buy' in t.lower() and not left, 'Otomatik ve bölüm çubuğu İngilizce %s' % left)
-    p.click('#p-studio .subnav [data-tab=coll]'); p.wait_for_timeout(100)
-    t = p.inner_text('#p-coll')
+    p.evaluate("()=>window.__nb.setTab('coll')"); p.wait_for_timeout(200)
+    t = p.inner_text('#cSheet')
     check('Percussion' in t and 'Sahnede' not in t, 'Koleksiyon İngilizce')
     p.click('#d-def'); p.wait_for_timeout(100)
     t = p.inner_text('#defStatus')

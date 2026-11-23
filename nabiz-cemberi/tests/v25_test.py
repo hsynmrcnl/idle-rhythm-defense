@@ -34,7 +34,7 @@ with sync_playwright() as pw:
         p.goto(URL); p.wait_for_timeout(400); p.evaluate(SEED)
         p.reload(); p.wait_for_timeout(400)
         check(p.evaluate("()=>window.__nb.S.albums.length") == 1, 'ilerlemiş kayıt yüklü')
-        p.click('#t-set'); p.wait_for_timeout(100)
+        p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(100)
         btn = '#p-set [data-act=reset]'
         check(p.is_visible(btn) and p.inner_text(btn) == 'Oyunu sıfırla', 'Ayarlar’da “Oyunu sıfırla” görünüyor')
         p.click(btn); p.wait_for_timeout(100)
@@ -57,7 +57,7 @@ with sync_playwright() as pw:
     ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); p = ctx.new_page()
     p.goto(URL); p.wait_for_timeout(300)
     p.evaluate("()=>{const S=window.__nb.S;S.lang='en';S.tut={s:0,done:true};localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
-    p.reload(); p.wait_for_timeout(400); p.click('#t-set'); p.wait_for_timeout(100)
+    p.reload(); p.wait_for_timeout(400); p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(100)
     t = p.inner_text('#p-set')
     check('Reset the game' in t and 'Everything is erased' in t and 'sıfırla' not in t.lower(), 'sıfırlama İngilizce')
     b.close()

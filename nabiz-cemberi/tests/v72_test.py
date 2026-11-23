@@ -33,7 +33,7 @@ with sync_playwright() as pw:
     p.evaluate("()=>{window.__nb.miniGapT=0}"); p.wait_for_timeout(400)
     check(p.is_visible('#tutL'), 'bekleme bitince sıradaki geliyor')
     p.evaluate("()=>{const S=window.__nb.S;S.tipq=[];S.tutm=0}"); p.wait_for_timeout(200)
-    p.evaluate("()=>window.__nb.setTab('def')"); p.click('#t-set'); p.wait_for_timeout(150)
+    p.evaluate("()=>window.__nb.setTab('def')"); p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(150)
     p.evaluate("()=>{const nb=window.__nb;delete nb.S.unl.def;nb.unlVis()}")
     p.keyboard.press('Escape'); p.wait_for_timeout(200)
     check(p.is_hidden('#p-lock') and p.is_visible('#p-studio'), 'Ayarlar’dan dönülecek sekme kilitliyse Stüdyo açılıyor')

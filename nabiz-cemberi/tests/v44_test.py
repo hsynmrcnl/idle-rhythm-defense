@@ -43,7 +43,7 @@ with sync_playwright() as pw:
     p.click('#tutSkipL'); p.wait_for_timeout(300)
     check(p.evaluate("()=>window.__nb.S.tipq.length") == 0 and p.is_hidden('#tutL'), 'Atla sıradaki bütün kısa öğreticileri geçti')
     p.evaluate("()=>{const S=window.__nb.S;S.unl={studio:1,coll:1,syn:1,tap:1};window.__nb.unlVis()}")
-    p.click('#t-set'); p.wait_for_timeout(150); p.click('#p-set [data-act=demoGo][data-k="0"]'); p.wait_for_timeout(400)
+    p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(150); p.click('#p-set [data-act=demoGo][data-k="0"]'); p.wait_for_timeout(400)
     p.evaluate("()=>window.__nb.setTab('album')"); p.wait_for_timeout(200); p.click('#demo'); p.wait_for_timeout(400)
     check(p.evaluate("()=>document.getElementById('app').dataset.tab") == 'set' and p.is_hidden('#p-lock'), 'örnek şarkıdan Albüm’deyken dönünce girilen sekme (Ayarlar) açık, boş panel yok (v67)')
     p.fill('#saveCode', 'bozuk@@@kod')

@@ -30,7 +30,7 @@ with sync_playwright() as pw:
     p.evaluate("()=>{const S=window.__nb.S;S.pat.A[0].fill(0);[0,4,8,12].forEach(s=>S.pat.A[0][s]=1);S.pat.A[1].fill(0);S.pat.A[1][0]=2;S.pat.A[2].fill(0);S.pat.A[2][6]=1}")
     code = p.evaluate("async()=>await window.__nb.zipJson(window.__nb.songOf())")
     check(len(code) < 1500 and code[0] in '12', 'bağlantı kısa (%d karakter)' % len(code))
-    p.click('#t-set'); p.wait_for_timeout(150); p.click('#p-set [data-act=share]'); p.wait_for_timeout(300)
+    p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.wait_for_timeout(150); p.click('#p-set [data-act=share]'); p.wait_for_timeout(300)
     url = p.evaluate("()=>document.getElementById('shareUrl').value")
     check(url.startswith(URL) and '#s=' in url, 'Ayarlar → Paylaş bağlantı üretir')
     check(not errs, 'gönderen: sayfa hatası yok ' + '; '.join(errs))

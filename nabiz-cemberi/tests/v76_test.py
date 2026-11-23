@@ -38,7 +38,7 @@ with sync_playwright() as pw:
     check(r[0] and r[1] > 0, 'kısa öğretici açıkken Asistan alım yaptı (%s)' % r)
     p.evaluate("()=>{const S=window.__nb.S;S.tipq=[];S.tutm=0;window.__nb.setTab('studio')}"); p.wait_for_timeout(300)
     t = p.evaluate("()=>{const bar=document.querySelector('.tabs').getBoundingClientRect();return [...document.querySelectorAll('.tabs .tab')].filter(e=>e.offsetParent).map(e=>{const r=e.getBoundingClientRect();return [e.textContent.trim(),r.left>=bar.left-1&&r.right<=bar.right+1]})}")
-    check(len(t) >= 5 and all(ok for _, ok in t), 'masaüstünde bütün sekmeler tam görünüyor (%s)' % [n for n, ok in t if not ok])
+    check(len(t) >= 3 and all(ok for _, ok in t), 'masaüstünde bütün sekmeler tam görünüyor (%s)' % [n for n, ok in t if not ok])
     check(not errs, 'sayfa hatası yok %s' % errs[:2])
     b.close()
 srv.shutdown()
