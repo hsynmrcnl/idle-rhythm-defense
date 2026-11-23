@@ -642,7 +642,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
  .hint,.stage .controls{display:none!important}
  /* v87 (B2) → v90: yatayda 8 yer şeridi sağ panelin altında yapışkan (slotHome taşır); enstrüman paneli ve Koleksiyon sağ kolonda alttan açılır, sahne küçülmez. Sekmeler tek satır, yapışkan. */
  .rack>.slotbar{position:sticky;bottom:0;z-index:7;background:var(--bg);margin-top:8px;border-top:1px solid var(--line);padding:5px 0 3px}
- .rack>.slotbar .sbt{height:46px}
+ .rack>.slotbar .sbt{height:42px}
  #iSheet,#cSheet{position:fixed;left:auto;right:max(8px,env(safe-area-inset-right,0px));width:calc(100vw - min(58vw,100dvh + 8px) - 28px);max-height:82%}
  #cSheet{height:82%}
  .rack .tabs{position:sticky;top:0;z-index:8;background:var(--bg);flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none}
@@ -680,8 +680,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .sbh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
 .sbn{font-family:var(--f-m);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .collb{min-height:32px!important;padding:3px 10px!important;font-size:12px!important;border-color:var(--acc)!important;color:var(--acc)!important}
-.sb8{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
-.sbt{height:56px;min-width:0;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-family:var(--f-b,inherit);font-size:9.5px;padding:2px 1px;position:relative}
+.sb8{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.sbt{height:44px;min-width:0;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-family:var(--f-b,inherit);font-size:11px;padding:2px 4px;position:relative}
 .sbt .d{width:9px;height:9px;border-radius:50%;background:var(--c)}
 .sbt .nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sbt .lv{font-family:var(--f-m);font-size:9px;color:var(--muted)}
