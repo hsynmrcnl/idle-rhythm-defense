@@ -374,7 +374,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
  .top>*{display:none!important}
  .top>.gear{display:inline-flex!important;position:absolute;top:0;right:0;z-index:7}
  .tabs,.hint{display:none}
- .stats{margin-right:48px}
+ .stats{margin-right:0}
  .controls{display:none}
  /* sayfa kaymaz; her sekme kendi alanında kayar (iOS/Android adres çubuğu oynamaz, kısa sayfa hiç kaymaz) */
  html,body{overflow:hidden;overscroll-behavior:none}
@@ -729,7 +729,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 /* v92: Müzik·Görünüm, sağ üstte Sipariş/Kitap düğmeleri (yanınca altın), dock'ta Ayarlar; Koleksiyon/Kitap sekmeleri ve telefonda dişli yok */
 #t-coll,#t-book{display:none!important}
 #p-look .topbar{margin-bottom:8px}
-.corner{position:absolute;right:10px;top:52px;z-index:6;display:flex;flex-direction:column;gap:8px}
+.corner{position:absolute;right:10px;top:8px;z-index:6;display:flex;flex-direction:column;gap:8px}
 .cbt{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
 .cbt svg{width:20px;height:20px}.cbt[hidden]{display:none}
 .cbt.glow{color:#ffc94d;border-color:#ffc94d;box-shadow:0 0 12px rgba(255,201,77,.55);animation:cbglow 1.4s ease-in-out infinite}
@@ -737,7 +737,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 @media (prefers-reduced-motion:reduce){.cbt.glow{animation:none}}
 .cbt:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 #oSheet #orderList,#bSheet #bookBox{flex:1;min-height:0;overflow:auto}#oSheet .olist{align-content:start;grid-auto-rows:min-content}#oSheet .olist>*{flex:0 0 auto}
-@media (max-width:700px){#t-set{display:none!important}.corner{top:52px}}
+#cvwrap:has(#v3d:not([hidden])) .corner{top:56px}
+@media (max-width:700px){#t-set{display:none!important}.corner{top:6px}#cvwrap:has(#v3d:not([hidden])) .corner{top:54px}}
 </style>
 
 <div class="app" lang="tr" id="app" data-tab="studio">
