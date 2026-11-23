@@ -51,7 +51,8 @@ with sync_playwright() as pw:
     check(p.evaluate("()=>window.__nb.undoN") == 0 and p.is_disabled('#undoBox [data-act=undo]'), 'başta geri alınacak bir şey yok, düğme kapalı')
     # halkayı temizle (iade alır), sonra geri al (iadeyi geri öder)
     before = p.evaluate("()=>({pat:JSON.stringify(window.__nb.S.pat.A),n:window.__nb.S.nota})")
-    p.click('#slotList [data-act=clearRow][data-i="2"]'); p.wait_for_timeout(50)
+    p.evaluate("()=>window.__nb.slotOpen(2)"); p.wait_for_timeout(100)  # v95: Sahne listesi yok, enstrüman panelinden
+    p.click('#iAct [data-act=clearRow][data-i="2"]'); p.wait_for_timeout(50)
     mid = p.evaluate("()=>({pat:JSON.stringify(window.__nb.S.pat.A),n:window.__nb.S.nota,u:window.__nb.undoN})")
     check(mid['pat'] != before['pat'] and mid['n'] > before['n'] and mid['u'] == 1, 'halka temizlendi, iade alındı, geri al yığınında 1 adım')
     check(not p.is_disabled('#undoBox [data-act=undo]'), 'geri al düğmesi açıldı')
@@ -67,7 +68,9 @@ with sync_playwright() as pw:
         check(S('scale') == sc0, 'gam değişimi geri alındı (%s → %s → %s)' % (sc0, other[0], S('scale')))
     # satın alma geri alınmaz
     lv0 = S("lv.davul"); u0 = p.evaluate("()=>window.__nb.undoN")
-    p.click('#lvb-davul'); p.wait_for_timeout(50)
+    p.evaluate("()=>window.__nb.slotOpen(0)"); p.wait_for_timeout(100)
+    p.click('#iAct [data-lvq]'); p.wait_for_timeout(50)
+    p.evaluate("()=>window.__nb.slotClose()")
     check(S("lv.davul") > lv0 and p.evaluate("()=>window.__nb.undoN") == u0, 'seviye satın alma geri al yığınına girmiyor')
 
     # Analiz paneli

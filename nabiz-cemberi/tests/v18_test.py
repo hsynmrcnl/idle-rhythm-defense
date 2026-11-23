@@ -45,17 +45,9 @@ with sync_playwright() as pw:
     p.goto(URL); p.wait_for_timeout(400)
     check(p.evaluate("()=>window.__nb.S.ui") == 'kolay', 'yeni oyun Kolay’da başlıyor')
     p.evaluate(SEED); p.wait_for_timeout(100)
-    # Sahne: sade satır
-    m = p.evaluate("""()=>({clear:document.querySelectorAll('#slotList [data-act=clearRow]').length,needle:document.querySelectorAll('#slotList [data-act=needle]').length,
-      roles:[...document.querySelectorAll('#slotList .role')].map(e=>e.textContent),bars:document.querySelectorAll('#slotList .nb').length,lv:!!document.getElementById('lvb-davul')})""")
-    check(m['clear'] == 0 and m['needle'] == 0 and m['lv'], 'Sahne sade: temizle ve ibre düğmesi yok, seviye düğmesi var')
-    check(set(m['roles']) <= {'Saldırı', 'Alan', 'Koruma', 'Destek', 'Gelir'} and m['bars'] >= 3, 'roller sade etiketli, nefes çubukları var (%s)' % m['roles'])
-    # Detay › yalnız o kartı açar
-    p.click('[data-sec=sahne] > .dl'); p.wait_for_timeout(50)
-    check(p.evaluate("()=>document.querySelectorAll('#slotList [data-act=clearRow]').length") >= 3 and p.evaluate("()=>window.__nb.S.det.sahne") == 1, 'Sahne’de Detay › tam görünümü açıyor')
+    # v95: Müzik'te Sahne kartı yok (8 yer ve enstrüman paneli aynı işi görüyor)
+    check(not p.is_visible('[data-sec=sahne]'), 'Sahne kartı Müzik’te yok')
     check(p.evaluate("()=>!!document.getElementById('bpmR')"), 'diğer kartlar Kolay kalıyor (tempo sürgüsü)')
-    p.click('[data-sec=sahne] > .dl'); p.wait_for_timeout(50)
-    check(p.evaluate("()=>document.querySelectorAll('#slotList [data-act=clearRow]').length") == 0, '‹ Sade görünüm geri dönüyor')
     # Ritim stüdyosu: sürgü, sınır, en çok iki geliştirme
     r = p.evaluate("()=>{const e=document.getElementById('bpmR');return{max:+e.max,min:+e.min,tiles:document.querySelectorAll('#rhyList .tile').length}}")
     check(r['min'] == 70 and r['max'] == 120 and 1 <= r['tiles'] <= 2, 'tempo sürgüsü 70–120, önerilen %d geliştirme' % r['tiles'])
@@ -77,7 +69,8 @@ with sync_playwright() as pw:
     u = p.evaluate("()=>({groove:document.querySelector('[data-sec=groove]').hidden,txt:document.getElementById('synChips').textContent})")
     check(u['groove'] and 'Groove' in u['txt'] and 'Sıradaki' in u['txt'], 'Uyum ve Groove tek kart, sıradaki uyum ipucu var')
     # Solo: Solo düğmesi melodik enstrümana solo yazar
-    p.click('#slotList [data-act=solo][data-i="3"]'); p.wait_for_timeout(80)
+    p.evaluate("()=>window.__nb.slotOpen(3)"); p.wait_for_timeout(100)  # v95: Solo düğmesi enstrüman panelinde
+    p.click('#iAct [data-act=solo][data-i="3"]'); p.wait_for_timeout(80)
     check(p.evaluate("()=>(window.__nb.S.solos[3]||{notes:[]}).notes.length") > 0 and 'Yeniden yaz' in p.text_content('#soloBox'), 'Solo açılınca keman solosu kendiliğinden yazılıyor')
     # Koleksiyon sade
     p.evaluate("()=>window.__nb.setTab('coll')"); p.wait_for_timeout(50)

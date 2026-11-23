@@ -50,7 +50,8 @@ with sync_playwright() as pw:
     check(shown and s['tab']=='def' and s['q']==0,'kısa öğretici açıkken 4 → Savunma, balon kapandı (%s, gösterildi %s)'%(s,shown))
     # 4) Maks tek seferlik
     p.evaluate("()=>{const S=window.__nb.S;S.tipq=[];S.nota=1e9;S.buy=0;window.__nb.setTab('studio');window.__nb.renderPanels()}");p.wait_for_timeout(300)
-    p.locator('#slotList [data-act=lv]').first.click();p.wait_for_timeout(300)
+    p.evaluate("()=>window.__nb.slotOpen(0)");p.wait_for_timeout(200)  # v95: Yükselt ve ×1/×10/Maks enstrüman panelinde
+    p.locator('#iAct [data-lvq]').click();p.wait_for_timeout(300)
     bm=p.evaluate("()=>({buy:window.__nb.S.buy,pr:document.querySelector('#buyMode [data-v=\"1\"]').getAttribute('aria-pressed')})")
     check(bm['buy']==1 and bm['pr']=='true','Maks bir alımdan sonra ×1’e dönüyor (%s)'%bm)
     # 5) EN sayı biçimi + Unlock

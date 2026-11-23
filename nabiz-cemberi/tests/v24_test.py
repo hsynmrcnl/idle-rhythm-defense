@@ -71,15 +71,16 @@ with sync_playwright() as pw:
         p.click('#d-look'); p.wait_for_timeout(150)
         if p.evaluate("()=>document.getElementById('app').dataset.tab") != 'studio': p.evaluate("()=>window.__nb.setTab('studio')"); p.wait_for_timeout(100)
         shown = lambda: p.evaluate("()=>[...document.querySelectorAll('#p-studio [data-sec]')].filter(e=>e.offsetParent).map(e=>e.dataset.sec)")
-        check(shown() == ['sahne'], 'Stüdyo açılınca yalnız Sahne görünüyor (%s)' % shown())
+        check(shown() == ['auto'], 'Stüdyo açılınca yalnız Otomatik görünüyor (%s)' % shown())
         btns = p.evaluate("()=>[...document.querySelectorAll('#secBar .sb')].map(e=>e.dataset.k)")
-        check(btns[:2] == ['sahne', 'auto'] and 'rhy' in btns and 'syn' in btns, 'üst barda bölüm düğmeleri (%s)' % btns)
+        check(btns[:2] == ['auto', 'rhy'] and 'rhy' in btns and 'syn' in btns, 'üst barda bölüm düğmeleri (%s)' % btns)
         p.tap('#secBar [data-k=auto]'); p.wait_for_timeout(100)
         check(shown() == ['auto'], 'Otomatik düğmesi yalnız Otomatik bölümünü açıyor (%s)' % shown())
-        p.tap('#secBar [data-k=sahne]'); p.wait_for_timeout(100)
-        p.evaluate("()=>{document.getElementById('rack').scrollTop=400}"); p.wait_for_timeout(100)
+        p.tap('#secBar [data-k=rhy]'); p.wait_for_timeout(100)
+        p.evaluate("()=>{const d=document.createElement('div');d.id='tmpSp';d.style.height='1500px';document.getElementById('p-studio').appendChild(d);document.getElementById('rack').scrollTop=400}"); p.wait_for_timeout(100)  # v95: Müzik kısaldı, kaydırma için geçici boşluk
         sk = p.evaluate("()=>{const t=document.querySelector('#p-studio .topbar').getBoundingClientRect(),r=document.getElementById('rack').getBoundingClientRect();return {t:t.top,r:r.top,st:document.getElementById('rack').scrollTop}}")
         check(sk['st'] > 0 and abs(sk['t'] - sk['r']) < 2, 'aşağı kayınca üst bar sabit kalıyor (%s)' % sk)
+        p.evaluate("()=>document.getElementById('tmpSp').remove()")
         o = p.evaluate("()=>[...document.querySelectorAll('#p-studio *')].filter(e=>e.offsetParent&&e.getBoundingClientRect().right>innerWidth+1).map(e=>e.className).slice(0,4)")
         check(not o, 'Stüdyo yana taşmıyor %s' % o)
         # öğretici seviye adımı gizli bölümdeki düğmeyi vurguluyorsa o bölüme geçer
@@ -87,7 +88,7 @@ with sync_playwright() as pw:
         p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=1;S.lv.trampet=1;S.slots[1]='trampet';S.unl.syn=1;S.tipq=['syn'];S.tutm=1;window.__nb.miniGapT=0;window.__nb.renderPanels()}")  # v92: Uyum kısa öğreticisi gizli Sahne bölümündeki Hepsini düzenle'yi gösterir
         try: p.wait_for_selector('#p-studio [data-act=autoAll]', state='visible', timeout=2500)
         except Exception: pass
-        check(p.is_visible('#p-studio [data-act=autoAll]') and shown() == ['sahne'], 'öğretici vurguladığı düğmenin bölümünü açıyor (%s)' % shown())
+        check(p.is_visible('#p-studio [data-act=autoAll]') and shown() == ['syn'], 'öğretici vurguladığı düğmenin bölümünü açıyor (%s)' % shown())
         p.evaluate("()=>{const S=window.__nb.S;S.tipq=[];S.tutm=0}"); p.wait_for_timeout(150)
         p.evaluate("()=>{const S=window.__nb.S;S.lv.davul=30;S.tipq=[];window.__nb.renderPanels()}")
         # Koleksiyon: aile simgeleri, kilitli ailede koşullar, açık ailede sıkı satır
