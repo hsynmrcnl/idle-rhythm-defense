@@ -43,7 +43,7 @@ with sync_playwright() as pw:
     # --- telefon: dock, alt gezinme, sayfalar
     lk=p.evaluate("()=>{const nb=window.__nb,S=nb.S;nb.unlockAll();S.tipq=[];S.tutm=0;S.muted=true;S.unl.ord=0;S.unl.book=0;S.unl.album=0;S.found={};S.bestWave=1;S.runEarned=0;nb.unlVis();nb.setTab('stage');nb.renderPanels();return [document.getElementById('ordBtn').hidden,document.getElementById('bookBtn').hidden]}");p.wait_for_timeout(300)
     dk=p.evaluate("()=>[...document.querySelectorAll('.dk')].filter(d=>d.offsetParent).map(d=>d.id)")
-    check(dk==['d-stage','d-def','d-look','d-set'] and not p.is_visible('#t-set'),'telefon: dock dört düğme, sağ üstte dişli yok (%s)'%dk)
+    check(dk==['d-stage','d-def','d-look','d-shop','d-set'] and not p.is_visible('#t-set'),'telefon: dock dört düğme, sağ üstte dişli yok (%s)'%dk)
     check(lk==[True,True],'Sipariş/Kitap kilitliyken düğme yok (%s)'%lk)
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.unl.ord=1;S.unl.book=1;S.unl.album=1;S.bestWave=30;nb.unlVis()}");p.wait_for_timeout(200)
     check(p.is_visible('#ordBtn') and p.is_visible('#bookBtn'),'açılınca sağ üstte Sipariş ve Kitap düğmeleri')
@@ -69,7 +69,7 @@ with sync_playwright() as pw:
     p=b.new_page(viewport={'width':1366,'height':768});p.on('pageerror',lambda e:er.append(str(e)));p.goto(URL);p.wait_for_timeout(500)
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.tutm=0;S.muted=true;nb.unlVis();nb.renderPanels()}");p.wait_for_timeout(300)
     tb=p.evaluate("()=>[...document.querySelectorAll('.tabs .tab')].filter(b=>b.offsetParent).map(b=>b.dataset.tab)")
-    check(tb==['studio','def','look'] and p.inner_text('#t-studio').startswith('Müzik') and p.is_visible('#t-set'),'masaüstü: sekmeler Müzik · Savunma · Görünüm, dişli üstte (%s)'%tb)
+    check(tb==['studio','def','look','shop'] and p.inner_text('#t-studio').startswith('Müzik') and p.is_visible('#t-set'),'masaüstü: sekmeler Müzik · Savunma · Görünüm, dişli üstte (%s)'%tb)
     check(p.is_visible('#ordBtn') and p.is_visible('#bookBtn') and p.is_visible('#collBtn'),'masaüstü: Sipariş/Kitap sağ üstte, Koleksiyon şeridin üstünde')
     p.keyboard.press('5');p.wait_for_timeout(200);check(p.is_visible('#bSheet'),'5 Kitap sayfasını açıyor')
     p.keyboard.press('3');p.wait_for_timeout(200);check(p.is_visible('#cSheet') and not p.is_visible('#bSheet'),'3 Koleksiyon sayfasını açıyor (diğeri kapanıyor)')

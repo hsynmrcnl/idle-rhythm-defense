@@ -24,7 +24,7 @@ with sync_playwright() as pw:
     p = b.new_page(viewport={'width': 1280, 'height': 800})
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(500)
-    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.tutm=0;S.nota=2e7;nb.recalc();nb.setTab('look');nb.renderPanels()}")
+    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.tutm=0;S.nota=2e7;nb.recalc();nb.setTab('shop');nb.renderPanels()}")
     check(p.locator('[data-id=lcd]').count() > 0, 'Cep LCD Görünüm’de listeleniyor')
     p.evaluate("()=>{window.__nb.S.themes.lcd=1;window.__nb.renderPanels()}")
     p.click('[data-act=theme][data-id=lcd]'); p.wait_for_timeout(300)

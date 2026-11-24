@@ -1,10 +1,10 @@
 /* ================= panels ================= */
 let tab='studio',soloSel=-1,soloEdSlot=-1,soloDrag=null,bookNew=false,eSel=0,eK=4,eRot=0,eGhost=0,resetArm=false,resetT=0,albArm=false,albT=0;
-const TABS=['studio','coll','def','book','look','album','set'];
+const TABS=['studio','coll','def','book','look','shop','album','set'];
 /* telefon dock'u: 5 bölüm; Stüdyo|Koleksiyon ve Albüm|Kitap bir düğmeyi paylaşır, dişli (t-set) Ayarlar'ı açar */
 /* v91: Albüm Savunma'nın alt sekmesi (dock: kalkan = Savunma·Albüm); plak düğmesi 3. adıma kadar yalnız Kitap */
 /* v92: dock dört düğme — Sahne · Savunma·Albüm · Müzik·Görünüm · Ayarlar. Koleksiyon, Kitap, Siparişler ana ekranda sayfa */
-const DOCK={stage:'stage',studio:'look',coll:'look',def:'def',album:'def',book:'stage',look:'look',set:'set'};
+const DOCK={stage:'stage',studio:'look',coll:'look',def:'def',album:'def',book:'stage',look:'look',shop:'shop',set:'set'};
 const dockLast={look:'studio'};let defSub='dalga';let prevTab='stage';const scrollMem={};
 /* Stüdyo bölümlerinin açılma sırası: her şey bir anda oyuncunun önüne gelmesin. run:1 olanlar bu dönemin geliştirmesine bağlı */
 /* v40 sadeleştirme: açılışlar ilk 10 dakikaya yayılır (sim: dalga ≈ 2,2/dk; eskiden ilk 2 dakikada 9 bölüm açılıyordu) */
@@ -50,14 +50,14 @@ function insRowC(x,th){const L=lvOf(x.id),col=insColor(x,th),on=S.slots.includes
 /* v53: dil değişince sayfa yenilenir; açık sekme korunur (Ayarlar'dayken Sahne/Stüdyo'ya atlıyordu) */
 function langReload(){save();try{sessionStorage.setItem('nb-tab',tab);sessionStorage.setItem('nb-play',playing?'1':'0')}catch(e){}location.reload()}
 function setTab(t){setTab0(t);if(isLand()){const b=$('t-'+t);if(b&&b.offsetParent)b.scrollIntoView({block:'nearest',inline:'nearest'})}}
-function setTab0(t){if(t==='coll'){collOpen();return}if(t==='book'){sheetOpen('bSheet');return}if(t==='album'){if(tabOn('album'))defSub='alb';t='def'}if(tabOn(t)&&!demoMode)(S.tabSeen=S.tabSeen||{})[t]=S.bestWave;if(t==='stage'&&!isPhone())t='studio';if(!tabOn(t)&&isPhone())t='stage';if(anlOn&&isPhone()&&t!=='stage')anlToggle(false);const rk=$('rack');if(tab==='studio'&&t!=='studio'&&Object.keys(secNew).length){secNew={};secVis()}if(t==='studio')$('studBadge').hidden=true;if(rk)scrollMem[tab]=rk.scrollTop;if(tab!=='set')prevTab=tab;tab=t;const g=DOCK[t];if(g&&dockLast[g])dockLast[g]=t;const lk=!tabOn(t);TABS.forEach(k=>{$('p-'+k).hidden=lk||k!==t;$('t-'+k).setAttribute('aria-selected',String(k===t))});{const pl=$('p-lock');if(pl)pl.hidden=!lk}$('t-stage').setAttribute('aria-selected',String(t==='stage'));$('app').dataset.tab=t;if(t==='book'){bookNew=false;$('bookBadge').hidden=true}if(t==='def')$('defBadge').hidden=true;if(t==='look'){const lb=$('lookBadge');if(lb)lb.hidden=true}if(t==='coll')$('collBadge').hidden=true;const tb=$('t-'+t);if(tb&&tb.scrollIntoView){try{tb.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}if(t==='stage'){window.scrollTo(0,0);renderPads()}if(t==='set')renderSet();if(rk)rk.scrollTop=scrollMem[t]||0;placeMsg();syncDock();if(t==='def'){renderDefSub();renderIstat(true)}}
+function setTab0(t){if(t==='coll'){collOpen();return}if(t==='book'){sheetOpen('bSheet');return}if(t==='album'){if(tabOn('album'))defSub='alb';t='def'}if(tabOn(t)&&!demoMode)(S.tabSeen=S.tabSeen||{})[t]=S.bestWave;if(t==='stage'&&!isPhone())t='studio';if(!tabOn(t)&&isPhone())t='stage';if(anlOn&&isPhone()&&t!=='stage')anlToggle(false);const rk=$('rack');if(tab==='studio'&&t!=='studio'&&Object.keys(secNew).length){secNew={};secVis()}if(t==='studio')$('studBadge').hidden=true;if(rk)scrollMem[tab]=rk.scrollTop;if(tab!=='set')prevTab=tab;tab=t;const g=DOCK[t];if(g&&dockLast[g])dockLast[g]=t;const lk=!tabOn(t);TABS.forEach(k=>{$('p-'+k).hidden=lk||k!==t;$('t-'+k).setAttribute('aria-selected',String(k===t))});{const pl=$('p-lock');if(pl)pl.hidden=!lk}$('t-stage').setAttribute('aria-selected',String(t==='stage'));$('app').dataset.tab=t;if(t==='book'){bookNew=false;$('bookBadge').hidden=true}if(t==='def')$('defBadge').hidden=true;if(t==='shop'){const lb=$('shopBadge');if(lb)lb.hidden=true}if(t==='coll')$('collBadge').hidden=true;const tb=$('t-'+t);if(tb&&tb.scrollIntoView){try{tb.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}if(t==='stage'){window.scrollTo(0,0);renderPads()}if(t==='set')renderSet();if(rk)rk.scrollTop=scrollMem[t]||0;placeMsg();syncDock();if(t==='def'){renderDefSub();renderIstat(true)}}
 /* telefon: mesaj satırı sahnenin altında yüzer, canvas zıplamaz; masaüstü: düğmelerin altında */
 /* v66: yatay telefonda da mesaj tuvalin üstüne biner (alttaki satır çemberi küçültüyordu) */
 const isLand=()=>matchMedia('(max-width:940px) and (max-height:520px) and (orientation:landscape)').matches;
 const isDeskFull=()=>matchMedia('(min-width:941px) and (min-height:521px)').matches;
 function placeMsg(){const m=$('msg'),cw=$('cvwrap');if(!m||!cw)return;if(isPhone()||isLand()||isDeskFull()){if(m.parentNode!==cw)cw.appendChild(m)}else{const st=cw.closest('.stage');if(st&&m.parentNode!==st)st.appendChild(m)}}
 function syncDock(){const g=DOCK[tab];document.querySelectorAll('.dk').forEach(b=>{const on=b.dataset.tab===g;if(on!==(b.getAttribute('aria-current')==='page')){if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')}});
- const bd={look:!$('studBadge').hidden||!$('lookBadge').hidden,def:!$('defBadge').hidden};{const cb=$('collBtn');if(cb)cb.classList.toggle('glow',!$('collBadge').hidden);const kb=$('bookBtn');if(kb)kb.classList.toggle('glow',!$('bookBadge').hidden);const ob=$('ordBtn');if(ob)ob.classList.toggle('glow',(S.orders||[]).some(o=>o&&o.tpl&&orderOk(o)))}Object.keys(bd).forEach(k=>{const d=$('d-'+k);const dot=d&&d.querySelector('.dot');if(dot&&dot.hidden===bd[k])dot.hidden=!bd[k]});
+ const bd={look:!$('studBadge').hidden,shop:!$('shopBadge').hidden,def:!$('defBadge').hidden};{const cb=$('collBtn');if(cb)cb.classList.toggle('glow',!$('collBadge').hidden);const kb=$('bookBtn');if(kb)kb.classList.toggle('glow',!$('bookBadge').hidden);const ob=$('ordBtn');if(ob)ob.classList.toggle('glow',(S.orders||[]).some(o=>o&&o.tpl&&orderOk(o)))}Object.keys(bd).forEach(k=>{const d=$('d-'+k);const dot=d&&d.querySelector('.dot');if(dot&&dot.hidden===bd[k])dot.hidden=!bd[k]});
  document.querySelectorAll('.subnav [data-bd]').forEach(b=>b.classList.toggle('has',!$(b.dataset.bd+'Badge').hidden));const dc=$('demoChip');if(dc&&dc.hidden===demoMode)dc.hidden=!demoMode;
  const sc=$('soloChip'),so=S.edit==='S'&&soloView()>=0;if(sc&&sc.hidden===so)sc.hidden=!so;
  /* 3D düğmesi: geliştirme alınmış, çember düzeni, solo sahnesi yokken */
@@ -207,7 +207,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v96 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v97 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -351,7 +351,7 @@ function asstPick(lim0){const lim=lim0==null?S.nota*ASST_B:lim0,ok=k=>k&&k.cost>
 /* v79: nota birikince Görünüm'de alınabilecek 3D sahne ya da temayı bir kez haber verir (oyuncu turu: Asistan görünüm almaz, ♪11 Mn yatıyordu; karar: Asistan zevk alımı yapmaz, oyuncuya söylenir) */
 function lookNudge(){if(demoMode||!S.unl||!S.unl.look||ovMain())return;const c=[];if(!d3Has())c.push({id:'d3',n:T('3D sahne'),cost:D3_COST});THEME_ORDER.forEach(id=>{const t=THEMES[id];if(t.c>0&&!themeOwned(id))c.push({id,n:T(t.n)+' '+T('teması'),cost:t.c})});
  const k=c.sort((a,b)=>a.cost-b.cost)[0];if(!k||S.nota<k.cost*2)return;S.lookTold=S.lookTold||{};if(S.lookTold[k.id])return;S.lookTold[k.id]=1;save();
- msg(T('Görünüm’de alınabilir')+': '+k.n+' · ♪ '+fmt(k.cost));if(tab!=='look'){const lb=$('lookBadge');if(lb)lb.hidden=false}}
+ msg(T('Mağaza’da alınabilir')+': '+k.n+' · ♪ '+fmt(k.cost));if(tab!=='shop'){const lb=$('shopBadge');if(lb)lb.hidden=false}}
 function autoTick(){if(demoMode||!S.mn)return;const now=Date.now();lookNudge();let ch=false;
  /* v54: bir turda tek alım yerine tur başındaki notanın %25'i bitene kadar (en çok 40 alım): büyük birikimde tek ucuz alım yetmiyordu (Idle: ♪442 B birikti) */
  if(asstOn()&&!ovMain()&&now-asstT>ASST_T){asstT=now;try{let left=S.nota*ASST_B,n=0,sum=0,last=null;for(let i=0;i<40;i++){const k=asstPick(left);if(!k)break;const n0=S.nota;rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':'',slot:k.slot?'1':''}});const sp=n0-S.nota;if(sp<=0)break;left-=sp;sum+=sp;n++;last=k}
@@ -450,7 +450,7 @@ const TUT_N=13;
 let tutPrep='',tutRect=null,tClicked=false;
 {const cb=document.getElementById('cheatBtn');if(cb)cb.hidden=!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)}
 /* v42 genel çalıştırıcı: ana öğretici (TUT) bitince her yeni açılan bölüm kendi kısa öğreticisini (MINI[k]) aynı katmanla oynatır; S.tipq sıra, S.tutm adım. Kart yerine spot ışığı. */
-const DGRP={stage:'stage',studio:'look',coll:'look',def:'def',album:'def',book:'stage',look:'look',set:'set'};
+const DGRP={stage:'stage',studio:'look',coll:'look',def:'def',album:'def',book:'stage',look:'look',shop:'shop',set:'set'};
 const tabTgt=t=>()=>{if(isPhone()){const g=DGRP[t];if(DGRP[tab]!==g||!tsel('.subnav [data-tab="'+t+'"]'))return tsel('#d-'+g);return tsel('#p-'+tab+' .subnav [data-tab="'+t+'"]','.subnav [data-tab="'+t+'"]')}return tsel('#t-'+t,'#p-'+tab+' .subnav [data-tab="'+t+'"]','.subnav [data-tab="'+t+'"]','#t-'+DGRP[t])};
 const stTab=(t,tt,p)=>t==='album'?{tab:'def',t:tt,p:p||'Parlayan simgeye dokun.',kind:'tap',tgt:tabTgt('def'),cond:()=>{if(tab!=='def')return false;if(defSub!=='alb')defSubSet('alb');return true}}:({tab:t,t:tt,p:p||'Parlayan simgeye dokun.',kind:'tap',tgt:tabTgt(t),cond:()=>tab===t||(t==='stage'&&!isPhone())});
 const stSc=(k,tt)=>({t:tt,p:'Bölüm çubuğunda parlayan düğmeye dokun.',kind:'tap',tgt:()=>tsel('#secBar [data-k='+k+']'),cond:()=>!isPhone()||stSec===k,prep:()=>{if(!isPhone())secGo(k)}});
@@ -464,7 +464,7 @@ const MINI={
  tap:[stTab('stage','Ritme vur','Zamanında dokunuş seri bonusu verir. Sahneye dön.'),{t:'Ritme vur',p:'İbre bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun: seri bonusu.',kind:'tap',rv:1,tgt:()=>tel('cv'),allow:e=>!orbHit(e),cond:()=>S.seri>=1,prep:()=>{S.seri=0}}],
  def:[stTab('def','Yeni: Savunma','Savunma’ya dokun: nabız, hasar ve menzil burada.'),stTap(['#defList .dtile.rec','#defList .dtile:not([disabled])'],'Savunma','Önerilen geliştirmeye dokun.'),stShow('#p-def .pulse, #p-def .dsl','Nabız','Düşman merkeze varırsa Nabız düşer; sıfırlanırsa bir dalga geri gidersin.')],
  rhy:[stTab('studio','Yeni: Tempo','Tempoyu ayarlayıp geliri artırabilirsin. Müzik’e dokun.'),stSc('rhy','Tempo'),stShow('#p-studio [data-sec=rhy]','Tempo','Temanın sevdiği tempoda çalmak geliri ×1,25 yapar; ritim geliştirmeleri de burada.')],
- look:[stTab('look','Yeni: Görünüm','Görünüm’e dokun: tema, düzen ve sahne katmanları.'),stShow('#p-look','Görünüm','Her sahne katmanı geliri ×1,1 yapar; temanın sevdiği tempo ×1,25.')],
+ look:[stTab('shop','Yeni: Mağaza','Mağaza’ya dokun: temalar, 3D sahne ve sahne katmanları.'),stShow('#p-shop','Mağaza','Her sahne katmanı geliri ×1,1 yapar; temanın sevdiği tempo ×1,25. Düzen ve efektler Görünüm’de.')],
  pat:[stTab('studio','Yeni: Ruh hâli','Gam ve ritim tipi seçimi açıldı. Müzik’e dokun.'),stSc('pat','Ruh hâli'),stShow('#p-studio [data-sec=pat]','Ruh hâli','Gamı (hüzünlü, neşeli…) ve ritim tipini buradan seçersin. Albümlerle yenileri açılır.')],
  anl:[stTab('stage','Yeni: Analiz','En verimli sonraki alımı gösteren panel açıldı. Sahneye dön.'),{t:'Analiz',p:'Üstteki bilgi çubuğuna dokun.',kind:'tap',tgt:()=>tel('stats'),cond:()=>anlOn},stShow('#anl','Analiz','Sıradaki en verimli adımı ve çarpanların dökümünü gösterir. Kapatmak için bilgi çubuğuna yine dokun.')],
  asst:[stTab('studio','Yeni: Asistan','Ücretsiz Asistan geliştirmeleri senin yerine alır. Müzik’e dokun.'),stSc('auto','Otomatik'),stShow('#autoBox [data-k=asst]','Asistan','Ücretsiz asistan notanın en çok dörtte birini en verimli geliştirmelere harcar. İstersen buradan kapatırsın; menajer gelince onun yerini alır.')],
@@ -564,13 +564,13 @@ const UNLK=[
  {k:'solo',c:()=>gateOn('solo')}
 ].concat(FAMS.slice(1).map(([f,n])=>({k:'fam_'+f,c:()=>famOpen(f)||famCanOpen(f)})));
 /* sekmeler: Sahne ve Ayarlar hep açık; diğerleri açılınca görünür */
-const TAB_UNL={studio:'studio',coll:'coll',def:'def',album:'album',book:'book',look:'look'};
+const TAB_UNL={studio:'studio',coll:'coll',def:'def',album:'album',book:'book',look:'look',shop:'look'};
 /* v95: Müzik'te Sahne listesi yok; açık bölüm yoksa Müzik de görünmez */const tabOn=t=>!TAB_UNL[t]||demoMode||!!S.unl[TAB_UNL[t]]&&(t!=='studio'||SECS.some(([k])=>secAvail(k)));
 function unlCheck(quiet){if(demoMode)return;let ch=false;for(const u of UNLK){if(S.unl[u.k])continue;let ok=false;try{ok=u.c()}catch(e){}if(!ok)continue;S.unl[u.k]=1;ch=true;if(!quiet){S.tipq.push(u.k);(S.tipw=S.tipw||{})[u.k]=S.bestWave}}
  if(ch){save();unlVis();renderAuto();if(!quiet)tutShow()}}
 function unlVis(){
  Object.keys(TAB_UNL).forEach(t=>{const on=tabOn(t),tb=$('t-'+t);if(tb&&tb.hidden===on)tb.hidden=!on;document.querySelectorAll('.subnav [data-tab="'+t+'"]').forEach(b=>{if(b.hidden===on)b.hidden=!on})});
- [['look',['studio','look']],['def',['def','album']]].forEach(([g,ts])=>{const d=$('d-'+g),on=ts.some(tabOn);if(d&&d.hidden===on)d.hidden=!on;if(!tabOn(dockLast[g]||g)){const f=ts.find(tabOn);if(f)dockLast[g]=f}});
+ {const d=$('d-shop'),on=tabOn('shop');if(d&&d.hidden===on)d.hidden=!on}[['look',['studio','look']],['def',['def','album']]].forEach(([g,ts])=>{const d=$('d-'+g),on=ts.some(tabOn);if(d&&d.hidden===on)d.hidden=!on;if(!tabOn(dockLast[g]||g)){const f=ts.find(tabOn);if(f)dockLast[g]=f}});
  /* v92: Sipariş ve Kitap sağ üstte, Koleksiyon şeridin üstünde (açılınca görünür) */{const cb=$('collBtn'),co=!!S.unl.coll||demoMode;if(cb&&cb.hidden===co)cb.hidden=!co;const ob=$('ordBtn'),oo=!!S.unl.ord||demoMode;if(ob&&ob.hidden===oo)ob.hidden=!oo;const bb=$('bookBtn'),bo=tabOn('book');if(bb&&bb.hidden===bo)bb.hidden=!bo}
  const st=$('stats'),al=!S.unl.anl&&!demoMode;if(st&&st.classList.contains('locked')!==al){st.classList.toggle('locked',al);{const lb=al?(S.lang==='en'?'Analysis · unlocks at wave '+UNL_W.anl:'Analiz · dalga '+UNL_W.anl+'’te açılır'):T('Analiz: sıradaki adım ve çarpanlar');st.setAttribute('aria-label',lb);st.title=lb}if(al&&anlOn)anlToggle(false)}
  const tp=$('tap'),to=!!S.unl.tap||demoMode;if(tp&&tp.hidden===to)tp.hidden=!to;
@@ -1005,7 +1005,7 @@ $('mute').addEventListener('click',()=>{S.muted=!S.muted;syncFx();$('mute').text
 const isField=el=>el&&/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&!isField(document.activeElement)){e.preventDefault();if(!e.repeat)tap()}});
 /* v86: klavye kısayolları — 1–7 sekmeler, 0 Ayarlar, 9 Analiz (oyuncu turu: panelden sekmeye ~9 Shift+Tab, Ayarlar/Analiz'e kısayol yoktu). Öğretici katmanı açıkken çalışmaz. Odak seçilen sekme düğmesine gelir, Tab oradan panele iner. */
-const KB_TABS=['stage','studio','coll','def','book','look','album'];
+const KB_TABS=['stage','studio','coll','def','book','look','album','shop'];
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat||!/^[0-9]$/.test(e.key)||isField(document.activeElement))return;if(ovMain())return;const d=e.key;{const L=$('tutL'),c=ovCur();if(c&&!c.main&&L&&!L.hidden)miniClose()}
  if(d==='9'){e.preventDefault();anlTry();$('stats').focus();return}
  const t=d==='0'?'set':KB_TABS[+d-1];if(!t)return;e.preventDefault();if(t==='coll'){if(!S.unl.coll&&!demoMode){msg(T('Bu bölüm henüz açılmadı'));return}cOpen?collClose():collOpen();return}if(t==='book'){if(!tabOn('book')){msg(T('Bu bölüm henüz açılmadı'));return}shOpen==='bSheet'?sheetClose():sheetOpen('bSheet');return}
