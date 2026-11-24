@@ -31,7 +31,7 @@ with sync_playwright() as pw:
     # 2) bayat kısa öğretici düşer
     r=p.evaluate("""()=>{const nb=window.__nb,S=nb.S,o=[];S.tipq=['def'];S.tutm=0;S.tipw={def:5};S.bestWave=12;o.push(!nb.ovCur()&&!S.tipq.length);
       S.tipq=['fam_tel'];S.famOpen.tel=1;o.push(!nb.ovCur()&&!S.tipq.length);
-      S.tipq=['look'];S.tipw={look:12};S.tabSeen={look:12};o.push(!nb.ovCur()&&!S.tipq.length);
+      S.tipq=['look'];S.tipw={look:12};S.tabSeen={shop:12};o.push(!nb.ovCur()&&!S.tipq.length);
       S.tipq=['album'];S.tipw={album:1};S.bestWave=30;const c=nb.ovCur();o.push(!!c&&c.k==='album');
       S.tipq=['def'];S.tipw={def:30};S.tabSeen={};const d=nb.ovCur();o.push(!!d&&d.k==='def');return o}""")
     check(r[0],'4+ dalga bekleyen kısa öğretici düşüyor')

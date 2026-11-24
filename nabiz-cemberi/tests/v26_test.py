@@ -50,7 +50,7 @@ with sync_playwright() as pw:
     check(p.evaluate("()=>window.__nb.S.tut.done") is True and p.is_hidden('#tutL'), 'Atla ile öğretici kapandı')
     # örnek şarkıda her şey görünür, çıkınca geri gizlenir
     p.evaluate("()=>{const d=document.getElementById('d-set');(d&&d.offsetParent?d:document.getElementById('t-set')).click()}"); p.click('#p-set [data-act=demoGo][data-k="0"]'); p.wait_for_timeout(300)
-    check(len(dock()) == 4, 'örnek şarkıda bütün sekmeler görünüyor')
+    check(len(dock()) == 5, 'örnek şarkıda bütün sekmeler görünüyor')
     p.click('#demoChip'); p.wait_for_timeout(200)
     check(dock() == ['stage', 'set'], 'örnek şarkıdan çıkınca yine yalnız Sahne (%s)' % dock())
     check(p.evaluate("()=>document.getElementById('app').dataset.tab") == 'set', 'v67: örnek şarkıdan girildiği sekmeye (Ayarlar) dönüldü')
@@ -94,11 +94,11 @@ with sync_playwright() as pw:
     drop(); p.wait_for_timeout(200)
     found = p.evaluate("()=>Object.keys(window.__nb.S.found).length")
     p.evaluate("()=>window.__nb.setTab('stage')"); p.wait_for_timeout(100); p.tap('#bookBtn'); p.wait_for_timeout(150)
-    check(dock() == ['stage', 'def', 'look', 'set'] and found > 0 and p.is_visible('#bSheet') and p.is_visible('#ordBtn'), 'Görünüm ve Albüm açıldı; kalıp bulunduğu için Kitap Albüm’le geldi (%s)' % dock())
+    check(dock() == ['stage', 'def', 'look', 'shop', 'set'] and found > 0 and p.is_visible('#bSheet') and p.is_visible('#ordBtn'), 'Görünüm ve Albüm açıldı; kalıp bulunduğu için Kitap Albüm’le geldi (%s)' % dock())
     # kaydet, yeniden aç: açılanlar kalır
     p.evaluate("()=>{const S=window.__nb.S;S.tipq=['look'];S.tipw={look:S.bestWave};S.tabSeen={};localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
     p.reload(); p.wait_for_timeout(500)
-    check(dock() == ['stage', 'def', 'look', 'set'] and card() == 'Yeni: Görünüm', 'yeniden açınca açılanlar ve bekleyen öğretici yerinde (%s)' % card())
+    check(dock() == ['stage', 'def', 'look', 'shop', 'set'] and card() == 'Yeni: Mağaza', 'yeniden açınca açılanlar ve bekleyen öğretici yerinde (%s)' % card())
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     ctx.close()
 
@@ -125,7 +125,7 @@ with sync_playwright() as pw:
     p.goto(URL); p.wait_for_timeout(500)
     u = p.evaluate("()=>Object.keys(window.__nb.S.unl).sort()")
     check(all(k in u for k in ('studio', 'coll', 'syn', 'def', 'anl', 'ord', 'look', 'album', 'mn', 'book')) and 'plan' not in u, 'eski kayıtta ilerlemeye göre açık (%s)' % u)
-    check(len(dock()) == 4 and card() == '' and p.evaluate("()=>window.__nb.S.tipq.length") == 0, 'eski kayıtta kart yağmuru yok, dock tam')
+    check(len(dock()) == 5 and card() == '' and p.evaluate("()=>window.__nb.S.tipq.length") == 0, 'eski kayıtta kart yağmuru yok, dock tam')
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     ctx.close()
 

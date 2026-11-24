@@ -79,7 +79,7 @@ with sync_playwright() as pw:
         if w == 390:
             p.screenshot(path=os.path.join(OUT, 'v13_stage.png'))
             # dock: 5 buton, aynı renk; aktif olan kendi neonunda
-            n = p.locator('.dk').count(); check(n == 4, 'dock’ta 4 düğme (%d)' % n)  # v92: Sahne · Savunma·Albüm · Müzik·Görünüm · Ayarlar
+            n = p.locator('.dk').count(); check(n == 5, 'dock’ta 5 düğme (%d)' % n)  # v92: Sahne · Savunma·Albüm · Müzik·Görünüm · Ayarlar
             for k, tb, sub, sp in [('look', 'studio', 'look', 'studio'), ('def', 'def', None, None), ('set', 'set', None, None)]:  # v92: dock düğmesi → sekme → alt sekme
                 p.click('#d-' + k); p.wait_for_timeout(120)
                 st = p.evaluate("k=>({tab:document.getElementById('app').dataset.tab,cur:[...document.querySelectorAll('.dk')].filter(b=>b.getAttribute('aria-current')==='page').map(b=>b.id),col:[...document.querySelectorAll('.dk:not([aria-current])')].map(b=>getComputedStyle(b).color)})", k)
@@ -98,9 +98,9 @@ with sync_playwright() as pw:
             for k in ['look', 'def', 'set']:  # v92 dock
                 p.click('#d-' + k); p.wait_for_timeout(80)
                 check(p.evaluate("()=>document.scrollingElement.scrollHeight<=innerHeight"), 'sayfa gövdesi kaymıyor (%s)' % k)
-            p.evaluate("()=>window.__nb.setTab('look')"); p.wait_for_timeout(80); want = p.evaluate("()=>{const r=document.getElementById('rack');r.scrollTop=Math.min(800,r.scrollHeight-r.clientHeight);return r.scrollTop}"); p.click('#d-def'); p.wait_for_timeout(80)
+            p.evaluate("()=>window.__nb.setTab('shop')"); p.wait_for_timeout(80); want = p.evaluate("()=>{const r=document.getElementById('rack');r.scrollTop=Math.min(800,r.scrollHeight-r.clientHeight);return r.scrollTop}"); p.click('#d-def'); p.wait_for_timeout(80)
             st0 = p.evaluate("()=>document.getElementById('rack').scrollTop")
-            p.click('#d-look'); p.wait_for_timeout(80)  # v95: Müzik kısaldı, uzun Görünüm ile
+            p.click('#d-shop'); p.wait_for_timeout(80)  # v97: uzun Mağaza ile
             st1 = p.evaluate("()=>document.getElementById('rack').scrollTop")
             check(st0 == 0 and want > 0 and abs(st1 - want) < 2, 'sekme değişince üstten açılır, Stüdyo konumunu hatırlar (%d, %d / %d)' % (st0, st1, want))
             # v14 Stüdyo: yeni oyunda yalnız Sahne; koşullar sağlanınca bölümler sırayla açılır

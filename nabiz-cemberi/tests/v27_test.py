@@ -77,7 +77,7 @@ with sync_playwright() as pw:
     check(p.evaluate("()=>window.__nb.S.d3.on") == 1 and p.evaluate("()=>window.__nb.S.pat.A[0][2]") == 1, 'seçim ve vuruş kayıtta kalıyor')
 
     # Görünüm: 3D/2D ve merkez görünümleri
-    p.evaluate("()=>window.__nb.setTab('look')"); p.wait_for_timeout(200)  # v92: dock'ta Müzik·Görünüm önce Müzik'i açar
+    p.evaluate("()=>window.__nb.setTab('shop')"); p.wait_for_timeout(200)  # v97: 3D sahne Mağaza'da
     t = p.inner_text('#d3Box')
     check(all(k in t for k in ('3D', '2D', 'Kristal', 'Küre', 'Güneş', 'Plak', 'Kullanılıyor')) and '5 Mn' in t and '50 Mn' in t and '500 Mn' in t,
           'Görünüm’de 3D/2D ve merkezler (Küre ♪5 Mn, Güneş ♪50 Mn, Plak ♪500 Mn)')
@@ -105,7 +105,7 @@ with sync_playwright() as pw:
     # geliştirme yokken düğme gizli, Görünüm'de satın alma
     p.evaluate("()=>{const S=window.__nb.S;S.d3.own=0;window.__nb.renderPanels()}"); p.wait_for_timeout(250)
     check(not p.is_visible('#v3d') and not p.evaluate("()=>window.__nb.D3"), 'geliştirme yokken düğme gizli, sahne 2D')
-    p.click('#d-look'); p.wait_for_timeout(150)
+    p.click('#d-shop'); p.wait_for_timeout(150)
     check(p.is_visible('#d3Box [data-act=d3buy]') and '500.000' in p.inner_text('#d3Box'), 'Görünüm’de 3D sahne ♪ 500.000 ile satın alınır')
     p.evaluate("()=>{window.__nb.S.nota=1e6;window.__nb.renderPanels()}")
     p.click('#d3Box [data-act=d3buy]'); p.wait_for_timeout(150)
@@ -187,8 +187,8 @@ with sync_playwright() as pw:
     ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); p = ctx.new_page()
     p.goto(URL); p.wait_for_timeout(300)
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.lang='en';S.tut={s:0,done:true};nb.unlockAll();S.d3.own=1;localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
-    p.reload(); p.wait_for_timeout(400); p.click('#d-look'); p.wait_for_timeout(150)
-    t = p.inner_text('#p-look').lower()
+    p.reload(); p.wait_for_timeout(400); p.click('#d-shop'); p.wait_for_timeout(150)
+    t = p.inner_text('#p-shop').lower()
     check(all(k in t for k in ('3d stage', 'center', 'crystal', 'orb', 'sun', 'record', 'in use', 'tap beat')) and 'kristal' not in t and 'merkez' not in t, '3D bölümü İngilizce')
     check('tap: 2D' in (p.get_attribute('#v3d', 'title') or ''), 'düğme açıklaması İngilizce')
     ctx.close()
