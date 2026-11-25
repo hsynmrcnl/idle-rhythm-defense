@@ -28,13 +28,15 @@ module.exports = {
   /* idle oyuncu için zaman atlama (oyun saniyesi; yalnız Idle ve İlerleme takipçisi kullanır) */
   ilerle: "(sn) => { if (window.__nb && window.__nb.ff) window.__nb.ff(sn); }",
   hedefler: [
-    "İlk 5 dk: zorunlu öğreticiyi bitir (dört vuruş, ▶, ilk düşman, Ritme vur, Stüdyo, Yükselt, Yoğun, Trampet, Hepsini düzenle)",
-    "İlk 15 dk: dalga 10'u geç; açılan bölümlerin kısa öğreticilerini (Savunma, Tempo, Görünüm) bitir; bir savunma geliştirmesi al",
-    "İlk 30 dk: dalga 20'ye yaklaş, Ses masasını aç, şarkıyı paylaş bağlantısı üret; albüm eşiğini gör",
+    "İlk 5 dk: zorunlu öğreticiyi bitir (dört vuruş, ▶, ilk düşman, Ritme vur, Davul yeri, Yükselt, Otomatik ritim, Koleksiyon, Trampet, Müzik, Hepsini düzenle)",
+    "İlk 15 dk: dalga 10'u geç; açılan bölümlerin kısa öğreticilerini (Savunma, Tempo, Mağaza) bitir; bir savunma geliştirmesi al; boş bir yere enstrüman koy",
+    "İlk 30 dk: dalga 20'ye yaklaş, Mağaza'da bir şey al ya da almayı dene, Sipariş/Kitap köşe düğmelerini kullan; albüm eşiğini gör",
   ],
   sozluk: "Nota (♪) = para; vuruş = çemberdeki hücre (döngüde her vuruş nota kazandırır ve düşmana ateş eder); " +
     "Nabız = can (sıfırlanırsa bir dalga geri); ▶ = ortadaki başlat/durdur; Ritme vur = ibre vuruştayken sahneye dokunmak (seri bonusu); " +
-    "Stüdyo = enstrüman yükseltme ve ritim; Koleksiyon = yeni enstrümanlar; Sade/Hareketli/Yoğun = oyun ritmi senin yerine yazar; " +
-    "Hepsini düzenle = enstrümanları uydurur (uyum çarpanı); Şarj = kristal dolar, dokununca patlar; Albüm = prestij (oyun baştan, hayranlar kalıcı).",
+    "8 yer düğmesi (sahnenin altında, 4×2) = sahnedeki enstrümanlar; birine dokununca enstrüman paneli açılır (16 adım, Yükselt, Otomatik ritim, enstrüman değiştir, ×1/×10/Maks); " +
+    "Koleksiyon = 8 yerin sağ üstündeki düğme, yeni enstrüman açılır; Sipariş ve Kitap = sahnenin sağ üstündeki köşe düğmeleri (yanınca hazır/yeni); " +
+    "Alt çubuk (telefon): Sahne · Savunma·Albüm · Müzik·Görünüm · Mağaza · Ayarlar; Müzik = Otomatik, Uyum (Hepsini düzenle), Tempo vb.; " +
+    "Mağaza = temalar, 3D sahne, sahne katmanları; Şarj = kristal dolar, dokununca patlar; Albüm = prestij (oyun baştan, hayranlar kalıcı).",
   yasak: ["__nb", "unlockAll", "localStorage", "ff("],      /* test kancaları: personalar kullanmaz */
 };
