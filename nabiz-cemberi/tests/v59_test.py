@@ -42,7 +42,7 @@ with sync_playwright() as pw:
         p.evaluate("()=>document.querySelector('#collList [data-act=lv][data-id=trampet]').click()"); p.wait_for_timeout(300)
         check(p.evaluate("()=>window.__nb.S.lv.trampet") == 1 and p.evaluate("()=>window.__nb.S.nota") < n0, 'öğreticiden sonra Trampet satın alındı')
         # ekrandan uzun hedef: oyuncu kaydırabilir (her karede geri çekilmez)
-        p.evaluate("()=>{const nb=window.__nb,S=nb.S;nb.unlockAll();S.tipq=['look'];S.tutm=0;nb.unlVis();nb.tutTick()}"); p.wait_for_timeout(500)
+        p.evaluate("()=>{const nb=window.__nb,S=nb.S;nb.collClose();nb.unlockAll();S.tipq=['look'];S.tutm=0;nb.unlVis();nb.tutTick()}")  # v98: açık sayfanın üstüne yeni kısa öğretici gelmez
         for i in range(4):
             if p.is_visible('#tutLBtn'): break
             h = p.locator('#tutHole').bounding_box()
@@ -59,3 +59,4 @@ with sync_playwright() as pw:
 srv.shutdown()
 print('BAŞARISIZ: %d' % len(fails) if fails else 'v59 geçti')
 sys.exit(1 if fails else 0)
+
