@@ -55,5 +55,5 @@ for model in (sys.argv[2:] or ['pasif', 'tutumlu', 'hizli']):
     if ps:
         lo = sum(1 for x in ps if x < 0.6); band = sum(1 for x in ps if 0.6 <= x <= 0.95); hi = sum(1 for x in ps if x > 0.95)
         print('\nBant: kolay (<0,6) %d · hedef (0,6–0,95) %d · duvar/sınır (>0,95) %d · son dalga %d' % (lo, band, hi, rows[-1]['w']))
-json.dump(res, open(os.path.join(R, 'build', 'baski_olc.json'), 'w'), ensure_ascii=False, indent=1)
+json.dump(res, open(os.path.join(R, 'build', 'baski_olc_%s.json' % '_'.join(res)), 'w'), ensure_ascii=False, indent=1)
 srv.shutdown()
