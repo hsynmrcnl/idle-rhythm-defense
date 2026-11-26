@@ -18,6 +18,14 @@ def check(ok, what):
     if not ok: fails.append(what)
 ST = "()=>{const h=document.getElementById('tutHole').getBoundingClientRect();return {sy:Math.round(scrollY),rack:Math.round(document.getElementById('rack').scrollTop),hy:h.y,hh:h.height,vh:innerHeight,hid:document.getElementById('tutL').hidden}}"
 
+def hole_box(p):
+    """vurgu deliği yerine oturana kadar bekler (alt çubuk açılışlarla kayınca eski konuma dokunuluyordu)"""
+    last = None
+    for _ in range(20):
+        h = p.locator('#tutHole').bounding_box()
+        if h and last and abs(h['x'] - last['x']) < 1 and abs(h['y'] - last['y']) < 1: return h
+        last = h; p.wait_for_timeout(100)
+    return last
 with sync_playwright() as pw:
     exe = '/opt/pw-browsers/chromium'
     b = pw.chromium.launch(executable_path=exe) if os.path.exists(exe) else pw.chromium.launch()
@@ -29,7 +37,7 @@ with sync_playwright() as pw:
         p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;S.unl={studio:1,coll:1,syn:1,tap:1};S.nota=5000;S.total=9000;S.tipq=['coll'];S.tutm=0;nb.unlVis();nb.setTab(innerWidth<=700?'stage':'studio');nb.tutTick()}"); p.wait_for_timeout(500)
         for i in range(4):
             if p.evaluate("()=>document.getElementById('tutLT').textContent") == 'Koleksiyon' and p.is_visible('#tutLBtn'): break
-            h = p.locator('#tutHole').bounding_box()
+            h = hole_box(p)
             (p.touchscreen.tap if mob else p.mouse.click)(h['x'] + h['width'] / 2, h['y'] + h['height'] / 2); p.wait_for_timeout(600)
         s = p.evaluate(ST)
         check(s['sy'] == 0 and s['rack'] == 0, 'Koleksiyon adımında sayfa ve liste kaymadı (sayfa %d, liste %d)' % (s['sy'], s['rack']))
@@ -45,7 +53,7 @@ with sync_playwright() as pw:
         p.evaluate("()=>{const nb=window.__nb,S=nb.S;nb.collClose();nb.unlockAll();S.tipq=['look'];S.tutm=0;nb.unlVis();nb.tutTick()}")  # v98: açık sayfanın üstüne yeni kısa öğretici gelmez
         for i in range(4):
             if p.is_visible('#tutLBtn'): break
-            h = p.locator('#tutHole').bounding_box()
+            h = hole_box(p)
             (p.touchscreen.tap if mob else p.mouse.click)(h['x'] + h['width'] / 2, h['y'] + h['height'] / 2); p.wait_for_timeout(600)
         sc = "()=>{const r=document.getElementById('rack');const el=(innerWidth<=700||r.scrollHeight>r.clientHeight+4)?r:document.scrollingElement;const a=el.scrollTop;el.scrollTop=a+160;return [a,el.scrollTop]}"
         a = p.evaluate(sc); p.wait_for_timeout(500)
