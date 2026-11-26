@@ -810,7 +810,7 @@ function frame(ms){
  /* üstteki nabız çubuğu davulla atar */
  {const kp=Math.round(kickP*10)/10;if(kp!==kpLast){kpLast=kp;$('stats').style.setProperty('--kp',kp)}}
  {const ta=(soloView()>=0&&S.edit==='S')?'none':'manipulation';const el=vis();if(el.style.touchAction!==ta)el.style.touchAction=ta}
- if(GLX&&!lowQ&&PH()&&clock>3){slowT=dt>0.034?slowT+dt:0;if(slowT>2){lowQ=true;msg('Telefon için hafif çizim moduna geçildi: iz ve parlama kapalı')}}
+ if(GLX&&!lowQ&&PH()&&clock>3){slowT=dt>0.034?slowT+dt:0;if(slowT>2){lowQ=true;msg('Akıcılık için hafif çizime geçildi: iz ve parlama kapalı')}}
  if(GLX){const th=dispTheme(),fx={};FXK.forEach(([k])=>fx[k]=fxVal(th,k));if(RM){fx.glitch=0;fx.trail=0}if(lowQ){fx.trail=0;fx.bloom=0;fx.glitch=0;fx.kaleid=0}try{GLX.render(scene,fx,clock,kickP,th)}catch(err){console.warn(err)}}
  requestAnimationFrame(frame);
 }
