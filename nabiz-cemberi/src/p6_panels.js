@@ -682,6 +682,7 @@ function rackAct(b){const act=b.dataset.act;
  else if(act==='scale'){if(setScale(b.dataset.v))return}
  else if(act==='alvl'){autoRows([+b.dataset.i],+b.dataset.v);return}
  else if(act==='autoAll'){autoRows(null,0);return}
+ else if(act==='synInfo'){msg(b.dataset.d);return}
  else if(act==='tipApply'){const tip=synTips()[0];if(!tip)return;const sis=tip[3];if(sis&&!sis.length)return;autoRows(sis,0);return}
  else if(act==='fillAuto'){fillAuto(b.dataset.v==='1');return}
  else if(act==='autoAlt'){const r0=rate();autoSeed=1+Math.floor(Math.random()*9999);autoRows(null,0);const r1=rate(),d=r0>0?Math.round((r1/r0-1)*100):0;msg((S.lang==='en'?'Another take · ♪ ':'Başka öneri · ♪ ')+fm(Math.round(r1*10)/10)+(S.lang==='en'?'/s':'/sn')+(d?' ('+(d>0?'+':'−')+'%'+Math.abs(d)+')':''));return}
@@ -817,8 +818,9 @@ function synTips(){const p=S.pat[S.edit],t=[],en=S.lang==='en',add=(v,ok,tr,eng,
  add(0.25,cb(7)&&S.slots.every(Boolean),'Sahnedeki her enstrüman en az bir kez çalsın','Every instrument on stage plays at least once','Tam kadro +%25',S.slots.map((id,si)=>si).filter(si=>S.slots[si]&&!STEPS(p,si).length));
  add(0.4,cb(8)&&hasB(),'Nakarat deseni kıtadan farklı olsun','Make the chorus pattern differ from the verse','Şarkı yapısı +%40',null);
  return t.sort((a,b)=>b[0]-a[0])}
-function synEasy(){const p=S.pat[S.edit],on=SYN.filter(y=>SYNON[S.edit][y.id]).map(y=>y.n+' ×'+fm(y.m)).concat(COMBOS.filter(c=>c.t(p)).map(c=>c.n+' '+pct(c.b))),pen=PEN.t(p),tip=synTips()[0];
- return '<p class="ezt"><span class="nm">Groove <b>×'+fm(Math.round((GC[S.edit]||1)*100)/100)+'</b></span><span class="ds">'+(on.length?on.length+' uyum tutuyor':'henüz uyum yok')+'</span></p>'+(on.length||pen?'<div class="chips" style="margin-top:6px">'+on.map(n=>'<span class="chip on">'+n+'</span>').join('')+(pen?'<span class="chip bad on">'+PEN.n+' ×'+fm(PEN.m)+' · bir adımda çok vuruş</span>':'')+'</div>':'')+
+/* v102: uyum çipleri dokununca ne olduğunu söyler (oyuncu turu: “Ofbit nefesi”, “Tam kadro” açıklamasız) */
+function synEasy(){const p=S.pat[S.edit],on=SYN.filter(y=>SYNON[S.edit][y.id]).map(y=>[y.n+' ×'+fm(y.m),T(y.w)+' · '+T(y.d)]).concat(COMBOS.filter(c=>c.t(p)).map(c=>[c.n+' '+pct(c.b),T(c.d)])),pen=PEN.t(p),tip=synTips()[0];
+ return '<p class="ezt"><span class="nm">Groove <b>×'+fm(Math.round((GC[S.edit]||1)*100)/100)+'</b></span><span class="ds">'+(on.length?on.length+' uyum tutuyor':'henüz uyum yok')+'</span></p>'+(on.length||pen?'<div class="chips" style="margin-top:6px">'+on.map(([n,d])=>'<button class="chip on" data-act="synInfo" title="'+d.replace(/"/g,'&quot;')+'" data-d="'+d.replace(/"/g,'&quot;')+'">'+n+'</button>').join('')+(pen?'<span class="chip bad on">'+PEN.n+' ×'+fm(PEN.m)+' · bir adımda çok vuruş</span>':'')+'</div>':'')+
  (tip?'<p class="tip"><b>Sıradaki: '+tip[1]+'</b> · '+tip[2]+' <button class="btn ghost" data-act="tipApply" style="min-height:32px;padding:4px 10px;margin-left:4px">Uygula</button></p>':'')}
 /* ---------- Akıllı desen (v19): rolüne göre ritim, nefes içinde, uyumlar kendiliğinden tutar. Aksan ve kitap kalıbı kullanmaz:
    elle uğraşan daha fazlasını bulur (hedef: elle kurulanın %85–90'ı). S.rowm['A0']: 1/2/3 otomatik seviye, 'm' elle düzenlendi. */

@@ -39,6 +39,16 @@ with sync_playwright() as pw:
     check(p.evaluate("()=>window.__nb.S.wave")==12 and 'Emin misin?' in p.text_content('#defNav'),'ilk dokunuş dalgayı değiştirmedi, onay istiyor')
     p.tap('#defNav [data-act=waveBack]');p.wait_for_timeout(200)
     check(p.evaluate("()=>window.__nb.S.wave")==7,'ikinci dokunuşla 5 dalga geri')
+    # uyum çipi dokununca açıklama
+    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.lv.trampet=1;S.lv.hihat=1;S.slots=['davul','trampet','hihat',null];nb.recalc();nb.setTab('studio');nb.renderPanels()}");p.wait_for_timeout(200)
+    p.evaluate("()=>{const b=document.querySelector('#secBar [data-k=syn]');b&&b.click()}");p.wait_for_timeout(200)
+    p.evaluate("()=>{const b=document.querySelector('[data-act=autoAll]');b&&b.click()}");p.wait_for_timeout(400)
+    n=p.locator('#synChips [data-act=synInfo]').count()
+    if n:
+        p.locator('#synChips [data-act=synInfo]').first.tap();p.wait_for_timeout(200)
+        check(len(p.text_content('#msg'))>15,'uyum çipine dokununca açıklama (“%s”)'%p.text_content('#msg')[:60])
+    else: check(False,'Hepsini düzenle sonrası uyum çipi yok')
+    check('FAZLA' in p.evaluate("()=>document.querySelector('.gloss').textContent"),'Terimler’de FAZLA var')
     check(not er,'sayfa hatası yok '+'; '.join(er[:2]))
     b.close()
 srv.shutdown()
