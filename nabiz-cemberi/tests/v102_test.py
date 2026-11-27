@@ -34,9 +34,9 @@ with sync_playwright() as pw:
     # köşe düğmeleri yazılı; 5 dalga geri iki dokunuş
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tipq=[];S.tutm=0;S.unl.ord=1;S.wave=12;S.bestWave=12;nb.unlVis();nb.setTab('stage');nb.renderPanels()}");p.wait_for_timeout(300)
     check(p.text_content('#ordBtn').strip()=='Sipariş','Sipariş düğmesinde yazı var')
-    p.evaluate("()=>window.__nb.setTab('def')");p.wait_for_timeout(300)
+    p.evaluate("()=>window.__nb.setTab('def')");p.wait_for_timeout(300);p.tap('#defSub [data-v=dalga]');p.wait_for_timeout(200)
     p.tap('#defNav [data-act=waveBack]');p.wait_for_timeout(200)
-    check(p.evaluate("()=>window.__nb.S.wave")==12 and 'Tekrar bas' in p.text_content('#defNav'),'ilk dokunuş dalgayı değiştirmedi, onay istiyor')
+    check(p.evaluate("()=>window.__nb.S.wave")==12 and 'Emin misin?' in p.text_content('#defNav'),'ilk dokunuş dalgayı değiştirmedi, onay istiyor')
     p.tap('#defNav [data-act=waveBack]');p.wait_for_timeout(200)
     check(p.evaluate("()=>window.__nb.S.wave")==7,'ikinci dokunuşla 5 dalga geri')
     check(not er,'sayfa hatası yok '+'; '.join(er[:2]))
@@ -44,3 +44,4 @@ with sync_playwright() as pw:
 srv.shutdown()
 print('BAŞARISIZ: %d'%len(fails) if fails else 'v102 geçti')
 sys.exit(1 if fails else 0)
+
