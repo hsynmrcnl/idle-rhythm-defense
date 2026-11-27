@@ -213,7 +213,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v104 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v105 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -434,15 +434,15 @@ const tsel=(...q)=>{for(const k of q){const el=[...document.querySelectorAll(k)]
 const tel=id=>{const el=$(id);return tvis(el)?{el}:null};
 /* telefonda hücre adımı alttaki pedi gösterir (büyük ve yazılı); ped yoksa halkadaki hücre */
 const tpad=(si,s)=>()=>((isPhone()||isLand())&&eSel===si&&tsel('[data-act=pad][data-s="'+s+'"]'))||tcell(si,s);
-const tcell=(si,s)=>({cv:()=>{const g=geom();const p=cellPos(si,s,g);return[p[0],p[1],Math.max(14,(g.t||g.rowH||20)*0.7)]}});
+const tcell=(si,s)=>({cv:()=>{const g=geom();const p=cellPos(si,s,g);return[p[0],p[1],Math.max(24,(g.t||g.rowH||20)*0.7)]}});/* v105: en az 48 px dokunma alanı (telefonda ~30 px hücreye 8 dokunuşta varılamadı) */
 const torb=()=>({cv:()=>{const o=orbAt();return[o.x,o.y,o.r0*1.1]}});
 const TUT=[
  {n:1,t:'Hoş geldin',p:'Sessizlik A.Ş. şehri susturmaya geliyor. Tek savunman kendi müziğin.',kind:'btn',btn:'Başla',prep:()=>{setTab(isPhone()?'stage':tab)},go:()=>{ensureAudio();if(!S.kills){S.pat.A[0].fill(0);recalc();renderPanels()}}},
- {n:2,t:'İlk vuruş',p:'Parlayan adıma dokun: davul vuruşu ekle.',kind:'tap',kb:()=>cellClick(0,0),tgt:tpad(0,0),prep:tNota,cond:()=>S.pat.A[0][0]>0},
- {n:3,t:'Ritmi kur',p:'Parlayan hücreye dokun: dörtlük ritim kuruluyor.',kind:'tap',kb:()=>cellClick(0,TSEQ()[0]),tgt:()=>tpad(0,TSEQ()[0])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[0]]>0},
- {n:3,t:'Ritmi kur',p:'Bir tane daha.',kind:'tap',kb:()=>cellClick(0,TSEQ()[1]),tgt:()=>tpad(0,TSEQ()[1])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[1]]>0},
- {n:3,t:'Ritmi kur',p:'Ve son vuruş.',kind:'tap',kb:()=>cellClick(0,TSEQ()[2]),tgt:()=>tpad(0,TSEQ()[2])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[2]]>0},
- {n:4,t:'Başlat',p:'Ortadaki ▶’ye dokun (ya da Enter). İbre döndükçe her vuruş çalar.',kind:'tap',kb:()=>{if(!playing){startStop();updUI()}},tgt:torb,cond:()=>playing},
+ {n:2,t:'İlk vuruş',p:'Parlayan adıma dokun: davul vuruşu ekle.',kind:'tap',cel:1,kb:()=>cellClick(0,0),tgt:tpad(0,0),prep:tNota,cond:()=>S.pat.A[0][0]>0},
+ {n:3,t:'Ritmi kur',p:'Parlayan hücreye dokun: dörtlük ritim kuruluyor.',kind:'tap',cel:1,kb:()=>cellClick(0,TSEQ()[0]),tgt:()=>tpad(0,TSEQ()[0])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[0]]>0},
+ {n:3,t:'Ritmi kur',p:'Bir tane daha.',kind:'tap',cel:1,kb:()=>cellClick(0,TSEQ()[1]),tgt:()=>tpad(0,TSEQ()[1])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[1]]>0},
+ {n:3,t:'Ritmi kur',p:'Ve son vuruş.',kind:'tap',cel:1,kb:()=>cellClick(0,TSEQ()[2]),tgt:()=>tpad(0,TSEQ()[2])(),prep:tNota,cond:()=>S.pat.A[0][TSEQ()[2]]>0},
+ {n:4,t:'Başlat',p:'Ortadaki ▶’ye dokun (ya da Enter). İbre döndükçe her vuruş çalar.',kind:'tap',alt:'#play',kb:()=>{if(!playing){startStop();updUI()}},tgt:torb,cond:()=>playing},
  {n:5,t:'Nota',p:'Her vuruş nota kazandırır. Notayla enstrümanlarını güçlendireceksin.',kind:'btn',btn:'Devam',tgt:()=>tel('stats')},
  {n:6,t:'İlk düşman',p:'Düşmanlar kenardan merkeze yürür; vuruşların onlara ateş eder. İzle…',kind:'auto',tgt:()=>tel('cv'),cond:()=>S.kills>=1},
  {n:7,t:'Ritme vur',p:'İbre bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun (ya da boşluk tuşu).',pt:'İbre parlak bir vuruşun üstünden geçerken sahnenin herhangi bir yerine dokun. Bir kez tam zamanında dokunman yeter.',kind:'tap',rv:1,tgt:()=>tel('cv'),allow:e=>!orbHit(e),cond:()=>S.seri>=1},
@@ -518,7 +518,7 @@ function tutTick(){const L=$('tutL');if(!L)return;const c=ovCur();const on=!!c;i
  bd.style.setProperty('--bt',(60/(S.bpm||100)).toFixed(3)+'s');
  const vh=innerHeight,vw=innerWidth,bh=bb.offsetHeight||120;let top=r?r.y+r.h+16:vh*0.3;if(top+bh>vh-12)top=Math.max(12,(r?r.y:vh*0.3)-bh-16);
  if(r&&vw>vh*1.3&&(vh<=520||top<r.y+r.h&&top+bh>r.y)){/* yatay ekran: balon hedefin yanına; v57: yatay telefonda her zaman hedefin karşı yarısına (halkanın geri kalanını örtüyordu) */const w=Math.min(380,vw*0.42);/* v88: hedef sağ kolondaysa (yatayda ped şeridi) balon sağ kolonda hedefin üstüne; sola koymak sahneyi örtüyordu */if(vh<=520&&r.x+r.w/2>vw/2&&r.y-bh-12>=8){const lx=Math.max(vw*0.5,vw-w-12);bb.style.left=lx+'px';bb.style.right='auto';bb.style.width=Math.min(w,vw-lx-12)+'px';bb.style.margin='0';top=r.y-bh-12}else{const lx=r.x+r.w/2<vw/2?Math.min(vw-w-12,Math.max(r.x+r.w+16,vw*0.52)):Math.max(12,Math.min(r.x-w-16,vw*0.48-w));bb.style.left=lx+'px';bb.style.right='auto';bb.style.width=w+'px';bb.style.margin='0';top=Math.min(Math.max(12,r.y+r.h/2-bh/2),vh-bh-12)}}
- else{bb.style.left='';bb.style.right='';bb.style.width='';bb.style.margin='';if(r&&top<r.y+r.h&&top+bh>r.y)top=Math.max(12,vh-bh-12)}
+ else{bb.style.left='';bb.style.right='';bb.style.width='';bb.style.margin='';if(r&&top<r.y+r.h&&top+bh>r.y)top=Math.max(12,vh-bh-12);/* v105: dikey ekranda halka hücresi adımlarında balon halkanın dışında: sahnenin altına (8 yer ve alt çubuk bu adımlarda gerekmez; halkayı örtüyordu) */if(r&&st.cel&&vh>vw){const cr=$('cv').getBoundingClientRect(),g=Math.min(cr.width,cr.height)/2,cy=cr.top+cr.height/2;top=Math.max(cy+g*0.92,Math.min(r.y+r.h+16,vh-bh-12));if(top+bh>vh-4)top=Math.max(12,vh-bh-4)}}
  bb.style.top=top+'px';
  const done=st.cond?st.cond():(st.kind==='tap'&&tClicked);if(done)ovAdvance()}
 function tutShowL(st,lab){$('tutLN').textContent=lab;$('tutLT').textContent=T(st.t);$('tutLP').textContent=T(isPhone()&&st.pt?st.pt:st.p);const b=$('tutLBtn');b.hidden=st.kind!=='btn';b.textContent=T(st.btn||'Devam');try{(b.hidden?$('tutBub'):b).focus({preventScroll:true})}catch(e){}}
@@ -534,6 +534,8 @@ function tutGuard(e){if(e.type==='click'&&performance.now()<tPassT){tPassT=0;ret
  const L=$('tutL');if(e.target&&L&&L.contains(e.target)&&e.target.closest('button'))return;const st=c.st;
  if(e.type==='keydown'){if(st.allow&&e.key===' ')return;e.preventDefault();e.stopPropagation();
   if(e.key==='Enter'&&!e.repeat){if(st.kind==='btn'){ovAdvance();return}if(st.kb){st.kb();tClicked=true;setTimeout(tutTick,30);return}const t=st.tgt&&st.tgt();if(t&&t.el){tLast=t.el.dataset.act||'';tClicked=true;tKey=true;try{t.el.click()}finally{tKey=false}setTimeout(tutTick,30)}}return}
+ /* v105: halka hücresi adımında deliğe her dokunuş doğru hücreyi koyar (yan hücreye denk gelince komşu hücre konuyor ya da siliniyordu) */if(c.main&&st.cel&&st.kb&&inRect(e,tutRect)&&e.target&&e.target.closest&&e.target.closest('#cv')){e.preventDefault();e.stopPropagation();if(e.type==='pointerdown'&&!(st.cond&&st.cond())){st.kb();tClicked=true;setTimeout(tutTick,30)}return}
+ /* v105: ▶ adımında alttaki Başlat da çalışır */if(st.alt&&e.type!=='keydown'&&e.target&&e.target.closest&&e.target.closest(st.alt))return;
  if(st.kind==='tap'&&inRect(e,tutRect)&&(!st.allow||st.allow(e))){if(e.type==='click'){const b=e.target.closest&&e.target.closest('[data-act]');tLast=b?b.dataset.act:'';tClicked=true;setTimeout(tutTick,30)}return}
  e.preventDefault();e.stopPropagation();if(e.type==='pointerdown')tutShake()}
 ['pointerdown','click','keydown'].forEach(k=>document.addEventListener(k,tutGuard,true));
