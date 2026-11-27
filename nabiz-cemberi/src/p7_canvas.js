@@ -562,7 +562,7 @@ function dangerDraw(dt,g,th){dangerAudio();const f=hpFrac(),on=tensOn()&&playing
  let pu=0;if(ac&&beats.length){const now=ac.currentTime;let lb=-9;for(const b of beats)if(b<=now&&b>lb)lb=b;pu=Math.exp(-(now-lb)*6)}
  if(dng>0){const a=(0.2+0.5*dng)*(0.55+0.45*pu),gr=ctx.createRadialGradient(c,c,0.38*L,c,c,0.8*L);gr.addColorStop(0,'rgba(255,20,60,0)');gr.addColorStop(1,'rgba(255,20,60,'+a.toFixed(3)+')');ctx.fillStyle=gr;ctx.fillRect(-OX,-OY,CW,CH)}
  const fs=n=>Math.round(n*L)+'px '+th.font.d;ctx.textAlign='center';ctx.textBaseline='middle';
- if(on&&f>0&&f<DNG_CRIT&&tapeGray<=0){ctx.globalAlpha=0.6+0.4*pu;ctx.fillStyle=th.cv.hot;ctx.font='700 '+fs(0.045);ctx.fillText(T('NABIZ KRİTİK'),c,0.13*L);ctx.globalAlpha=1}
+ if(on&&f>0&&f<DNG_CRIT&&tapeGray<=0){ctx.globalAlpha=0.6+0.4*pu;ctx.fillStyle=th.cv.hot;ctx.font='700 '+fs(0.045);ctx.fillText(T('NABIZ KRİTİK'),c,(waveFlash>0?(wave&&wave.boss?0.185:0.16):0.13)*L)/* v106: dalga başlığı (BASKIN · Dalga N) görünürken altına iner; üst üste biniyordu */;ctx.globalAlpha=1}
  if(tapeGray>0)tapeGray=Math.max(0,tapeGray-dt);
  goDraw(dt,th,fs,c);
  if(saveFx>0){saveFx=Math.max(0,saveFx-dt*1.4);const o=orbAt();ctx.fillStyle='rgba(255,255,255,'+(0.4*saveFx*saveFx).toFixed(3)+')';ctx.fillRect(-OX,-OY,CW,CH);ctx.strokeStyle=hexA(th.cv.acc,saveFx);ctx.lineWidth=4;ctx.beginPath();ctx.arc(o.x,o.y,o.r0+(1-saveFx)*0.45*L,0,TAU);ctx.stroke();ctx.globalAlpha=Math.min(1,saveFx*1.5);ctx.fillStyle=th.cv.acc;ctx.font='700 '+fs(0.05);ctx.fillText(T('Toparlandın'),c,0.84*L);ctx.globalAlpha=1}

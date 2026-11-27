@@ -1035,11 +1035,12 @@ const isField=el=>el&&/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&!isField(document.activeElement)){e.preventDefault();if(!e.repeat)tap()}});
 /* v86: klavye kısayolları — 1–7 sekmeler, 0 Ayarlar, 9 Analiz (oyuncu turu: panelden sekmeye ~9 Shift+Tab, Ayarlar/Analiz'e kısayol yoktu). Öğretici katmanı açıkken çalışmaz. Odak seçilen sekme düğmesine gelir, Tab oradan panele iner. */
 const KB_TABS=['stage','studio','coll','def','book','look','album','shop'];
+/* v106: kilitli kısayol ne zaman açılacağını söyler (oyuncu turu p7) */const lockWhen=t=>({studio:T('ikinci enstrüman sahneye girince'),coll:T('♪150 kazanınca'),def:T('dalga')+' '+UNL_W.def,look:T('dalga')+' '+UNL_W.look,shop:T('dalga')+' '+UNL_W.look,album:T('dalga')+' 25',book:T('ilk ritim kalıbı bulununca (Albüm açıkken)')})[t];const lockMsg=t=>{const w=lockWhen(t);msg(T('Bu bölüm henüz açılmadı')+(w?' · '+T('açılış')+': '+w:''))};
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat||!/^[0-9]$/.test(e.key)||isField(document.activeElement))return;if(ovMain())return;const d=e.key;{const L=$('tutL'),c=ovCur();if(c&&!c.main&&L&&!L.hidden)miniClose()}
  if(d==='9'){e.preventDefault();anlTry();$('stats').focus();return}
- const t=d==='0'?'set':KB_TABS[+d-1];if(!t)return;e.preventDefault();if(t==='coll'){if(!S.unl.coll&&!demoMode){msg(T('Bu bölüm henüz açılmadı'));return}cOpen?collClose():collOpen();return}if(t==='book'){if(!tabOn('book')){msg(T('Bu bölüm henüz açılmadı'));return}shOpen==='bSheet'?sheetClose():sheetOpen('bSheet');return}
+ const t=d==='0'?'set':KB_TABS[+d-1];if(!t)return;e.preventDefault();if(t==='coll'){if(!S.unl.coll&&!demoMode){lockMsg('coll');return}cOpen?collClose():collOpen();return}if(t==='book'){if(!tabOn('book')){lockMsg('book');return}shOpen==='bSheet'?sheetClose():sheetOpen('bSheet');return}
  if(t==='stage'&&!isPhone()){$('cv').focus();return}
- if(t!=='set'&&!tabOn(t)){msg(T('Bu bölüm henüz açılmadı'));return}
+ if(t!=='set'&&!tabOn(t)){lockMsg(t);return}
  setTab(t==='set'&&tab==='set'?backTab():t);const b=$(t==='set'?'t-set':'t-'+t);if(b&&b.offsetParent)b.focus()});
 document.addEventListener('keyup',e=>{if(e.code==='Space'&&!isField(document.activeElement))e.preventDefault()});
 

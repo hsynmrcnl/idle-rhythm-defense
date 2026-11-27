@@ -52,6 +52,14 @@ with sync_playwright() as pw:
         bad=[q for q in bx['p'] if q[0]-q[2]<bx['X0'] or q[0]+q[2]>bx['X1'] or q[1]-q[2]<bx['Y0'] or q[1]+q[2]>bx['Y1']]
         check(len(bx['p'])>3 and not bad,'%dx%d: dalga başındaki düşmanlar tuvalin içinde (%d düşman, taşan %d)'%(w,h,len(bx['p']),len(bad)))
         ctx.close()
+    # küçükler: erişilebilir ad, kilitli kısayol mesajı
+    ctx=b.new_context(viewport={'width':1366,'height':768});p=ctx.new_page();p.on('pageerror',lambda e:er.append(str(e)))
+    p.goto(URL);p.wait_for_timeout(700);p.evaluate("()=>{const S=window.__nb.S;S.tut.done=true;S.tipq=[]}")
+    check(p.get_attribute('#tap','aria-label')=='Ritme vur (Boşluk)','Ritme vur düğmesinin adı birleşik değil')
+    p.evaluate("()=>document.getElementById('cv').focus()");p.keyboard.press('4');p.wait_for_timeout(200)
+    m=p.text_content('#msg')
+    check('açılış' in m and 'dalga' in m,'kilitli kısayol ne zaman açılacağını söylüyor (“%s”)'%m)
+    ctx.close()
     check(not er,'sayfa hatası yok '+(er[0] if er else ''))
     b.close()
 srv.shutdown()
