@@ -372,7 +372,7 @@ function renderDef(){
  const el=$('defStatus');if(!el)return;
  /* v24: Kuşatma iki satır; dalga içeriği ve açıklama ⓘ'da */
  el.innerHTML='<div class="dsl"><span>Dalga <b id="dWave">'+S.wave+'</b><small title="En iyi dalga">/'+S.bestWave+'</small></span><span><b id="dEn">0</b> düşman</span><span><b id="dDps">0</b> hasar/sn</span></div><div class="hpbar thin"><span class="hp" id="dHpBar"></span><span class="sh" id="dShBar"></span></div><div class="dsl sm"><span>Nabız <span id="dHp"></span></span><span>Kalkan <span id="dSh"></span></span><span><b id="dKills">'+fmt(S.kills)+'</b> susturulan</span></div>';
- $('defNav').innerHTML='<span class="seg"><button data-act="waveBack" aria-label="5 dalga geri">−5</button><button data-act="waveFwd" aria-label="5 dalga ileri"'+(S.wave>=S.bestWave?' disabled':'')+'>+5</button></span>';$('dComp').textContent=T('Bu dalga: '+waveSummary(S.wave));
+ /* v102: −5/+5 ne yaptığını söylesin, geri gitme iki dokunuş (oyuncu turu: tek dokunuşla onaysız dalga 7→2) */$('defNav').innerHTML='<span class="seg"><button data-act="waveBack" aria-label="'+T('5 dalga geri')+'" title="'+T('5 dalga geri git: ücretsiz, en iyi dalga korunur')+'">'+(Date.now()<wbArm?T('Tekrar bas'):'« '+T('5 dalga'))+'</button><button data-act="waveFwd" aria-label="'+T('5 dalga ileri')+'"'+(S.wave>=S.bestWave?' disabled':'')+'>'+T('5 dalga')+' »</button></span>';$('dComp').textContent=T('Bu dalga: '+waveSummary(S.wave));
  const rec=defRec();$('defList').innerHTML=DUP.filter(dupOn).map(u=>{const L=S.def[u.id]||0,max=u.max&&L>=u.max,c=defCost(u);return '<button class="dtile'+(max?' max':'')+(u.id===rec?' rec':'')+'" data-act="def" data-id="'+u.id+'"'+(max?' disabled':' data-cost="'+c+'"')+' title="'+u.d+'"><span class="nm">'+u.n+(L?' <span class="lvl">'+L+'</span>':'')+'</span><span class="ds">'+(u.id==='menzil'?'şu an %'+Math.round(range()*100):u.s)+'</span><span class="cnt">'+(max?'Maksimum':'♪ '+fmt(c))+'</span>'+(u.id===rec?'<span class="rt">önerilen</span>':'')+'</button>'}).join('');
  $('inf-dup').innerHTML='<p>Savunma geliştirmeleri albüme kadar kalır; her seviye fiyatı artırır. Kutuya dokun: satın al.</p><p>'+DUP.map(u=>'<b style="color:var(--fg);font-weight:500">'+u.n+'</b>: '+u.d).join(' · ')+'</p>';
  ensureOrders();
@@ -543,6 +543,7 @@ function tutEnd(skip){ovTop();const sb=tutSand;S.tut.done=true;S.tutm=0;if(!skip
   save();msg(skip?'Öğretici kapatıldı · Ayarlar’dan yeniden başlatabilirsin':'Öğretici bitti. Yeni bölümler açıldıkça kısa öğreticiler gelecek.')}tutShow();tutTick()}
 const ovTop=()=>{if(!isPhone())try{window.scrollTo({top:0})}catch(e){}};
 /* v102: geçilen ya da bayatlayıp düşen kısa öğretici sessiz kalmaz, açılan yer tek satırda duyurulur (oyuncu turu 20261125-1543: Atla sonrası Mağaza/Analiz sessiz açılıyordu, 5 persona) */
+let wbArm=0;
 const ANN={studio:['Enstrüman paneli','8 yer düğmesine dokun'],coll:['Koleksiyon','8 yerin üstündeki düğme'],syn:['Uyum','Müzik'],def:['Savunma','Savunma·Albüm'],rhy:['Tempo','Müzik'],look:['Mağaza ve Görünüm','alt çubuk'],pat:['Ruh hâli','Müzik'],anl:['Analiz','üst bilgiye dokun'],asst:['Asistan','Müzik › Otomatik'],ord:['Siparişler','sahnenin sağ üstü'],desk:['Ses masası','Müzik'],plan:['Şarkı planı','Müzik'],solo:['Solo','enstrüman paneli'],album:['Albüm','Savunma › Albüm'],book:['Kalıp kitabı','sahnenin sağ üstü']};
 const annOf=k=>{const a=ANN[k]||(/^fam_/.test(k)?['Yeni aile','Koleksiyon']:null);if(!a)return null;let w=a[1];if(!isPhone()){if(w==='alt çubuk')w='üstteki sekmeler';else if(w==='Savunma·Albüm')w='Savunma sekmesi'}return T(a[0])+' ('+T(w)+')'};
 function annList(ks){const l=[...new Set(ks.map(annOf).filter(Boolean))];if(l.length)msgP(T('Açıldı')+': '+l.join(' · '),8000)}
@@ -712,7 +713,7 @@ function rackAct(b){const act=b.dataset.act;
   if(albArm){albArm=false;clearTimeout(albT);releaseAlbum();return}
   /* v89 (A): düğme yerinde kalır (uzun metin onu kaydırıp ikinci tıkı ıskalatıyordu), uyarı altta ayrı satırda */albArm=true;const o=b.textContent;b.style.minWidth=b.offsetWidth+'px';b.textContent=T('Tekrar bas');const ar=b.closest('.arow');let w=$('aWarn');if(!w&&ar){w=document.createElement('p');w.id='aWarn';w.className='note warn';ar.after(w)}if(w)w.textContent=T('Oyun baştan başlar. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır.');albT=setTimeout(()=>{albArm=false;b.textContent=o;b.style.minWidth='';const x=$('aWarn');if(x)x.remove()},6000);return}
  else if(act==='fxreset'){delete S.fxo[dispTheme().id];renderPanels();return}
- else if(act==='waveBack'){setWave(S.wave-5);msg('Dalga '+S.wave+' · geri çekilmek ücretsiz');return}
+ else if(act==='waveBack'){if(Date.now()>=wbArm){wbArm=Date.now()+4000;msg(T('5 dalga geri gitmek için tekrar bas'));setTimeout(renderDef,4100);renderDef();return}wbArm=0;setWave(S.wave-5);msg('Dalga '+S.wave+' · geri çekilmek ücretsiz');return}
  else if(act==='waveFwd'){setWave(S.wave+5);msg('Dalga '+S.wave);return}
  else if(act==='deliver'){deliver(+b.dataset.k)}
  else if(act==='cheat'){const g=Math.max(1e4,rate()*600);earn(g);msg('Test: ♪ '+fmt(g)+' eklendi')}
