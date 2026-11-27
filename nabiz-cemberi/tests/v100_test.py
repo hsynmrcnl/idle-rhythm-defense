@@ -30,7 +30,7 @@ with sync_playwright() as pw:
     r1=p.evaluate("()=>[window.__nb.rate(),window.__nb.dps(),window.__nb.S.def.prova]")
     check(r1[2]==1 and abs(r1[0]/r0[0]-1.08)<0.005 and abs(r1[1]/r0[1]-1.08)<0.005,'Prova 1: gelir ve hasar ×1,08 (%s → %s)'%(r0,r1))
     c2=p.evaluate("()=>+document.querySelector('#defList [data-id=prova]').dataset.cost")
-    check(abs(c2-2e5*1.35)<2,'ikinci seviye ♪270.000 (%s)'%c2)
+    check(abs(c2-2e5*1.6)<2,'ikinci seviye ♪320.000 (%s)'%c2)
     p.evaluate("()=>{window.__nb.setTab('stage');document.getElementById('stats').click()}");p.wait_for_timeout(300)
     check('Prova 1' in p.inner_text('#anl'),'Analiz çarpan dökümünde Prova')
     p.keyboard.press('Escape')

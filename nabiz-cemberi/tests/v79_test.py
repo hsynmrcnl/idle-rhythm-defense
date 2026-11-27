@@ -24,7 +24,7 @@ with sync_playwright() as pw:
     p = b.new_page(viewport={'width': 1280, 'height': 800})
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(500)
-    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.tutm=0;S.d3.own=0;S.nota=5e5;nb.setTab('studio');nb.autoTick()}")
+    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.tutm=0;S.d3.own=0;['core','wall','wave','beams','tunnel','tower','mirror','stars'].forEach(k=>S.stage[k]=1);S.nota=5e5;nb.setTab('studio');nb.autoTick()}")
     check('3D' not in p.inner_text('#msg'), 'nota fiyatın 2 katına ulaşmadan haber yok')
     p.evaluate("()=>{const nb=window.__nb;nb.S.nota=1.2e6;nb.autoTick()}"); p.wait_for_timeout(100)
     check('3D sahne' in p.inner_text('#msg') and p.is_visible('#shopBadge'), 'nota birikince 3D sahne haber verildi, Görünüm’de rozet (“%s”)' % p.inner_text('#msg'))

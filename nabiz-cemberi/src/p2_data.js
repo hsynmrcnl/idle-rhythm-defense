@@ -297,7 +297,7 @@ const DUP=[
  {id:'ganimet',n:'Ganimet',s:'+%25 ödül',d:'Düşman ödülü +%25',c:8000,g:2.4},
  {id:'yavas',n:'Yavaşlat',s:'+%10 etki',d:'Yavaşlatıcı etkisi +%10',c:1e4,g:2.6,max:4},
  /* v100 Prova (değerlendirme raporu: d45'te ♪14 Mn harcanmadan duruyordu, katlanan fiyatlar notayı güce çeviremiyordu): ucuz büyüyen, sınırsız, gelir ve hasar ×1,04; dalga 30'da görünür, albümde sıfırlanır */
- {id:'prova',n:'Prova',s:'gelir ve hasar ×1,08',d:'Grup prova yapar: gelir ve bütün hasar kalıcı ×1,08 (albüme kadar)',c:2e5,g:1.35,gate:30}
+ {id:'prova',n:'Prova',s:'gelir ve hasar ×1,08',d:'Grup prova yapar: gelir ve bütün hasar kalıcı ×1,08 (albüme kadar)',c:2e5,g:1.6,gate:30}
 ];
 const dupOn=u=>!u.gate||S.bestWave>=u.gate||(S.def[u.id]||0)>0;
 const ETYPES={
