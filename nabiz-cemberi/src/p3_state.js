@@ -249,11 +249,13 @@ function recalc(){
  GC={A:groove('A'),B:groove('B'),S:1};const a=barRaw('A'),b=barRaw('B'),c=barRaw('S');BR={A:a[0],B:b[0],S:c[0]};DR={A:a[1],B:b[1],S:c[1]};
 }
 function groove(pk){const p=S.pat[pk];let m=1;for(const c of COMBOS)if(c.t(p))m+=c.b;if(PEN.t(p))m*=PEN.m;return m}
-const provaM=()=>Math.pow(1.04,S.def.prova||0);
+const provaM=()=>Math.pow(1.08,S.def.prova||0);
 const hasarM=()=>Math.pow(1.12,S.def.hasar||0)*(S.up.fill?1.1:1)*provaM();
 const supM=(pk,s)=>Math.min(2,1+0.5*((SUPS[pk]||[])[s]||0));
 const noteVal=(si,v)=>{const x=slotIns(si);if(!x)return 0;const L=lvOf(x.id);return x.b*L*msMult(L)*(v===2?2:1)*(x.role==='gelir'?3:1)};
-const dmgOf=(si,v)=>{const x=slotIns(si);if(!x)return 0;const L=lvOf(x.id);return x.dmg*L*msMult(L)*(v===2?2:1)*hasarM()};
+/* v104 (oyuncu turu 20261127-1719: 10/10 Davul baskın): Davul'un hasarı Sv12'ye kadar aynı, sonra her seviye 0,4 sayılır (geliri aynı; erken dalgalar ve öğreticinin Yükselt anı ona dayanıyor) */
+const DV_K=12,DV_T=0.4,dvL=L=>L<=DV_K?L:DV_K+(L-DV_K)*DV_T;
+const dmgOf=(si,v)=>{const x=slotIns(si);if(!x)return 0;const L=lvOf(x.id);return x.dmg*(x.id==='davul'?dvL(L):L)*msMult(L)*(v===2?2:1)*hasarM()};
 const hitNota=(pk,si,v)=>noteVal(si,v)*(NF[pk][si]||1)*(ROWM[pk][si]||1)*BK[pk].nota;
 const hitDmg=(pk,si,s,v)=>dmgOf(si,v)*(NF[pk][si]||1)*(ROWM[pk][si]||1)*habF((RUN[pk][si]||[])[s]||1)*supM(pk,s)*BK[pk].dmg;
 function barRaw(pk){const p=S.pat[pk];let g=0,d=0;BRS[pk]=S.slots.map(()=>0);DRS[pk]=S.slots.map(()=>0);for(let i=0;i<S.slots.length;i++){const x=slotIns(i);if(!x)continue;let gi=0,di=0;
