@@ -269,7 +269,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
  .padhead{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px}
  .padhead .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;flex:1}
  .padhead .btn{min-width:44px;padding-inline:8px}
- .pad{min-height:44px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-family:var(--f-m);font-size:11px;padding:0;cursor:pointer;position:relative}
+ .pad{min-height:44px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-family:var(--f-m);font-size:12.5px;padding:0;cursor:pointer;position:relative}
  .pad.g{border-left:2px solid var(--muted)}
  .pad[data-v="1"]{background:var(--c);border-color:var(--c);color:var(--bg)}
  .pad[data-v="2"]{background:var(--c);border-color:#fff;box-shadow:inset 0 0 0 2px #fff;color:var(--bg);font-weight:600}
@@ -479,7 +479,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .hintchip{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:8px;max-width:calc(100% - 24px);font:600 13px var(--f-m);padding:9px 14px;min-height:42px;border-radius:12px;border:1px solid var(--acc);background:color-mix(in srgb,var(--panel) 90%,transparent);color:var(--fg);cursor:pointer;box-shadow:0 0 18px color-mix(in srgb,var(--acc) 45%,transparent);animation:hintp 1.6s ease-in-out infinite;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hintchip b{color:var(--acc);font-weight:700}
 /* v101 erken çağır (kule savunma: güçlü oyuncuya iş, atlanan süreye göre bonus) */.callchip{position:absolute;left:10px;top:8px;z-index:3;display:inline-flex;align-items:center;gap:6px;font:600 12.5px var(--f-m);padding:8px 12px;min-height:40px;border-radius:12px;border:1px solid var(--acc);background:color-mix(in srgb,var(--panel) 90%,transparent);color:var(--fg);cursor:pointer}.callchip b{color:var(--acc)}.callchip[hidden]{display:none}
-/* v101 seçili yer yalnız renkle değil: alt çizgi + kalın ad; dokunma hedefleri ≥32 px */.sbt.sel{border-width:2px;padding-bottom:7px}.odone{font:600 13px var(--f-m);color:var(--acc);padding:6px 2px}.oreq{margin:4px 0 0}.lockl{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}.lockl li{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:6px}.lockl li b{color:var(--fg);font-weight:600}.lockl li.ok b{color:var(--acc)}button.chip{font:inherit;cursor:help;min-height:32px}.sbt.sel .nm{font-weight:700}.sbt.sel::after{content:'';position:absolute;left:22%;right:22%;bottom:2px;height:3px;border-radius:2px;background:var(--c,var(--acc))}
+/* v101 seçili yer yalnız renkle değil: alt çizgi + kalın ad; dokunma hedefleri ≥32 px */.sbt.sel{border-width:2px;padding-bottom:7px}.ptitle{font-family:var(--f-d,inherit);font-size:18px;margin:2px 0 10px;color:var(--fg);letter-spacing:.02em}.odone{font:600 13px var(--f-m);color:var(--acc);padding:6px 2px}.oreq{margin:4px 0 0}.lockl{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}.lockl li{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:6px}.lockl li b{color:var(--fg);font-weight:600}.lockl li.ok b{color:var(--acc)}button.chip{font:inherit;cursor:help;min-height:32px}.sbt.sel .nm{font-weight:700}.sbt.sel::after{content:'';position:absolute;left:22%;right:22%;bottom:2px;height:3px;border-radius:2px;background:var(--c,var(--acc))}
 .seg>button{min-height:32px}.ib{min-width:32px;min-height:32px}.swi{min-height:32px}#langBtn,[data-act=clearRow]{min-width:32px;min-height:32px}.btn{min-height:32px}
 @keyframes hintp{50%{box-shadow:0 0 30px color-mix(in srgb,var(--acc) 70%,transparent)}}
 @media (prefers-reduced-motion: reduce){.hintchip{animation:none}}
@@ -682,12 +682,12 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 /* v90: ana ekranda 8 sahne yeri şeridi + enstrüman paneli + Koleksiyon sayfası (lab https://claude.ai/artifact/LbjvM4HxaPDPDv4oNvJe6n) */
 .slotbar{padding:6px 0 4px}
 .sbh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
-.sbn{font-family:var(--f-m);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbn{font-family:var(--f-m);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .collb{min-height:32px!important;padding:3px 10px!important;font-size:12px!important;border-color:var(--acc)!important;color:var(--acc)!important}
 .sb8{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
 .sbt{height:44px;min-width:0;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-family:var(--f-b,inherit);font-size:11px;padding:2px 4px;position:relative}
 .sbt .nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sbt .lv{font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.sbt .lv{font-family:var(--f-m);font-size:11px;color:var(--muted)}
 .sbt.sel{border-color:var(--c,var(--acc));box-shadow:inset 0 0 0 1px var(--c,var(--acc))}
 .sbt.empty,.sbt.lock{border-style:dashed;color:var(--muted)}
 .sbt svg{width:15px;height:15px;color:var(--dim)}
@@ -704,7 +704,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .isheet .padhead .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .isheet .padhead .btn{min-width:38px;min-height:36px;padding:2px 8px}
 .isheet .padlv{grid-column:1/-1}
-.isheet .pad{min-height:38px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-family:var(--f-m);font-size:11px;padding:0;cursor:pointer;position:relative}
+.isheet .pad{min-height:38px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-family:var(--f-m);font-size:12.5px;padding:0;cursor:pointer;position:relative}
 .isheet .pad.g{border-left:2px solid var(--muted)}
 .isheet .pad[data-v="1"]{background:var(--c);border-color:var(--c);color:var(--bg)}
 .isheet .pad[data-v="2"]{background:var(--c);border-color:#fff;box-shadow:inset 0 0 0 2px #fff;color:var(--bg);font-weight:600}
@@ -835,6 +835,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         <section class="block" data-sec="fx"><h2>Efekt laboratuvarı</h2><div id="fxBox"></div></section>
       </div>
       <div id="p-shop" role="tabpanel" hidden>
+        <h2 class="ptitle">Mağaza</h2>
         <section class="block"><h2>3D sahne</h2><p class="note">Ritimler zeminden yükselen sütunlar olur, saldırılar merkezden ışın olarak çıkar. Vurgulu adımlar ve Alan rolü merkezi şarj eder; dolunca merkez patlar, tüm sahneye 10 saniyelik hasar vurur (patronlara yarısı). 3D’de sahneye dokunmak Ritme vur olur; ritim yerleştirmek için 2D’ye geç.</p><div id="d3Box"></div></section>
         <section class="block"><h2>Temalar</h2><p class="note">Tema görüntüyü, ses rengini ve düşman çizimini değiştirir. Temanın sevdiği tempoda çalarsan gelir ×1,25.</p><div class="themes" id="themeList"></div></section>
         <section class="block"><h2>Sahne katmanları</h2><p class="note">Albümden sonra da kalır, her biri gelire ×1,1 ekler ve her düzende farklı çizilir.</p><div id="stageList"></div></section>
