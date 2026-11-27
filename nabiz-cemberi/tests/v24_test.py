@@ -45,9 +45,9 @@ with sync_playwright() as pw:
           return {ov:s.scrollWidth-s.clientWidth,h:s.getBoundingClientRect().height,nota:f('#sNota'),rate:f('#sRate'),bar:document.getElementById('stNabiz').getBoundingClientRect().height}}""")
         check(st['ov'] <= 0 and st['h'] < 56, 'üst bilgi tek satır, kaymıyor (yükseklik %dpx)' % st['h'])
         check(st['nota'] > st['rate'] * 1.4 and st['bar'] <= 4, 'önem sırası: Nota büyük, gelir küçük; nabız %dpx çubuk' % st['bar'])
-        p.evaluate("()=>{const nb=window.__nb;nb.core.hp=nb.core.hp/2;nb.core.sh=0}"); p.wait_for_timeout(500)
+        p.evaluate("()=>{const nb=window.__nb;nb.core.hp=nb.core.hp/2;nb.core.sh=0}"); p.wait_for_timeout(900)  # v100: dalgalar dolu, nabız düşmeye devam eder; çubuk CSS geçişiyle izler
         fr = p.evaluate("()=>[document.getElementById('sHpBar').getBoundingClientRect().width/document.getElementById('stNabiz').getBoundingClientRect().width,parseInt(document.getElementById('sHp').textContent)/100]")
-        check(fr[1] < 0.9 and abs(fr[0] - fr[1]) < 0.03, 'nabız çubuğu Nabız’la kısalıyor (%.2f / %.2f)' % tuple(fr))
+        check(fr[1] < 0.9 and abs(fr[0] - fr[1]) < 0.07, 'nabız çubuğu Nabız’la kısalıyor (%.2f / %.2f)' % tuple(fr))
         p.tap('#stats'); p.wait_for_timeout(150)
         check(p.evaluate("()=>window.__nb.anlOn"), 'üst bilgiye dokununca Analiz açılıyor')
         p.tap('#stats'); p.wait_for_timeout(100)
