@@ -213,7 +213,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v105 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v106 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -1035,11 +1035,12 @@ const isField=el=>el&&/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&!isField(document.activeElement)){e.preventDefault();if(!e.repeat)tap()}});
 /* v86: klavye kısayolları — 1–7 sekmeler, 0 Ayarlar, 9 Analiz (oyuncu turu: panelden sekmeye ~9 Shift+Tab, Ayarlar/Analiz'e kısayol yoktu). Öğretici katmanı açıkken çalışmaz. Odak seçilen sekme düğmesine gelir, Tab oradan panele iner. */
 const KB_TABS=['stage','studio','coll','def','book','look','album','shop'];
+/* v106: kilitli kısayol ne zaman açılacağını söyler (oyuncu turu p7) */const lockWhen=t=>({studio:T('ikinci enstrüman sahneye girince'),coll:T('♪150 kazanınca'),def:T('dalga')+' '+UNL_W.def,look:T('dalga')+' '+UNL_W.look,shop:T('dalga')+' '+UNL_W.look,album:T('dalga')+' 25',book:T('ilk ritim kalıbı bulununca (Albüm açıkken)')})[t];const lockMsg=t=>{const w=lockWhen(t);msg(T('Bu bölüm henüz açılmadı')+(w?' · '+T('açılış')+': '+w:''))};
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat||!/^[0-9]$/.test(e.key)||isField(document.activeElement))return;if(ovMain())return;const d=e.key;{const L=$('tutL'),c=ovCur();if(c&&!c.main&&L&&!L.hidden)miniClose()}
  if(d==='9'){e.preventDefault();anlTry();$('stats').focus();return}
- const t=d==='0'?'set':KB_TABS[+d-1];if(!t)return;e.preventDefault();if(t==='coll'){if(!S.unl.coll&&!demoMode){msg(T('Bu bölüm henüz açılmadı'));return}cOpen?collClose():collOpen();return}if(t==='book'){if(!tabOn('book')){msg(T('Bu bölüm henüz açılmadı'));return}shOpen==='bSheet'?sheetClose():sheetOpen('bSheet');return}
+ const t=d==='0'?'set':KB_TABS[+d-1];if(!t)return;e.preventDefault();if(t==='coll'){if(!S.unl.coll&&!demoMode){lockMsg('coll');return}cOpen?collClose():collOpen();return}if(t==='book'){if(!tabOn('book')){lockMsg('book');return}shOpen==='bSheet'?sheetClose():sheetOpen('bSheet');return}
  if(t==='stage'&&!isPhone()){$('cv').focus();return}
- if(t!=='set'&&!tabOn(t)){msg(T('Bu bölüm henüz açılmadı'));return}
+ if(t!=='set'&&!tabOn(t)){lockMsg(t);return}
  setTab(t==='set'&&tab==='set'?backTab():t);const b=$(t==='set'?'t-set':'t-'+t);if(b&&b.offsetParent)b.focus()});
 document.addEventListener('keyup',e=>{if(e.code==='Space'&&!isField(document.activeElement))e.preventDefault()});
 

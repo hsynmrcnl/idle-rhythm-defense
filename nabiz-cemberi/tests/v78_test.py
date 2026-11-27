@@ -24,7 +24,7 @@ with sync_playwright() as pw:
     p = b.new_page(viewport={'width': 1280, 'height': 800})
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(500)
-    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.tutm=0;S.nota=1e5;S.slots=['davul','trampet',null,null];S.lv.trampet=1;S.pat.A[1]=S.pat.A[1].map(()=>0);nb.recalc();nb.renderPanels()}")
+    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.unl.look=0;S.tipq=[];S.tutm=0;S.nota=1e5;S.slots=['davul','trampet',null,null];S.lv.trampet=1;S.pat.A[1]=S.pat.A[1].map(()=>0);nb.recalc();nb.renderPanels()}")
     check(p.evaluate("()=>document.getElementById('cv').tabIndex") == 0, 'sahne Tab ile odaklanabilir')
     p.focus('#cv'); p.wait_for_timeout(100)
     m0 = p.inner_text('#msg')

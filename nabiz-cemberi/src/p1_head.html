@@ -777,7 +777,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       <p class="hint" id="hint"></p>
       <div class="controls">
         <button class="btn primary" id="play">Başlat</button>
-        <button class="btn" id="tap">Ritme vur<kbd>Space</kbd></button>
+        <button class="btn" id="tap" aria-label="Ritme vur (Boşluk)">Ritme vur<kbd aria-hidden="true">Space</kbd></button>
         <button class="btn" id="mute">Ses açık</button>
         <button class="btn ghost" id="demo">Örnek şarkıyı dinle</button>
         <button class="btn ghost" id="demo2" hidden>Diğer örnek şarkı</button>
@@ -789,8 +789,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       <div class="tabs" role="tablist">
         <button class="tab mob" role="tab" id="t-stage" aria-selected="false" data-act="tab" data-tab="stage">Sahne</button>
         <button class="tab" role="tab" id="t-studio" aria-selected="true" data-act="tab" data-tab="studio">Müzik<span class="bd" id="studBadge" hidden aria-hidden="true"> yeni</span></button>
-        <button class="tab" role="tab" id="t-coll" aria-selected="false" data-act="tab" data-tab="coll">Koleksiyon<span class="bd" id="collBadge" hidden>!</span></button>
-        <button class="tab" role="tab" id="t-def" aria-selected="false" data-act="tab" data-tab="def">Savunma<span class="bd" id="defBadge" hidden>!</span></button>
+        <button class="tab" role="tab" id="t-coll" aria-selected="false" data-act="tab" data-tab="coll">Koleksiyon<span class="bd" id="collBadge" hidden aria-hidden="true">!</span></button>
+        <button class="tab" role="tab" id="t-def" aria-selected="false" data-act="tab" data-tab="def">Savunma<span class="bd" id="defBadge" hidden aria-hidden="true">!</span></button>
         <button class="tab" role="tab" id="t-book" aria-selected="false" data-act="tab" data-tab="book">Kitap<span class="bd" id="bookBadge" hidden aria-hidden="true"> yeni</span></button>
         <button class="tab" role="tab" id="t-look" aria-selected="false" data-act="tab" data-tab="look">Görünüm<span class="bd" id="lookBadge" aria-hidden="true" hidden>!</span></button>
         <button class="tab" role="tab" id="t-shop" aria-selected="false" data-act="tab" data-tab="shop" hidden>Mağaza<span class="bd" id="shopBadge" aria-hidden="true" hidden>!</span></button>
