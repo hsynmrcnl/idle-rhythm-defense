@@ -213,7 +213,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v101 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v102 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -498,7 +498,7 @@ function ovCur(){if(tutActive()){const st=TUT[S.tut.s];return{st,key:'t'+S.tut.s
  if(demoMode||tutSand||!S.tut||!S.tut.done||!S.tipq)return null;
  /* v72: bir kısa öğretici bitince sıradaki MINI_GAP sonra gelir (oyuncu turu: dalga 5–18'de 4–6 balon art arda, 5 persona) */
  if(Date.now()<miniGapT)return null;
- while(S.tipq.length&&(!miniOf(S.tipq[0])||(S.tipq[0]!==miniShown&&!(S.tutm|0)&&miniStale(S.tipq[0]))))S.tipq.shift();if(!S.tipq.length)return null;
+ {const dr=[];while(S.tipq.length&&(!miniOf(S.tipq[0])||(S.tipq[0]!==miniShown&&!(S.tutm|0)&&miniStale(S.tipq[0]))))dr.push(S.tipq.shift());/* v102: bayat düşen açılış duyurulur (yalnız kendisi açmadıysa; famlar ve sekmesine girdikleri duyurulmaz) */const an=dr.filter(k=>{if(/^fam_/.test(k))return false;const L=miniOf(k),t=L&&L[0]&&L[0].tab;return !(t&&S.tabSeen&&S.tabSeen[t]>=((S.tipw||{})[k]||1e9))});if(an.length)annList(an)}if(!S.tipq.length)return null;
  const k=S.tipq[0],L=miniOf(k),i=S.tutm|0;if(i>=L.length){S.tipq.shift();S.tutm=0;save();return ovCur()}
  /* v98: yeni kısa öğretici açık bir sayfanın üstüne gelmez (Koleksiyon açıkken Ritme vur balonu listeyi bozuyordu); sayfa kapanınca gelir */if(k!==miniShown&&!i&&(iOpen||cOpen||shOpen))return null;
  miniShown=k;return{st:L[i],key:k+':'+i,k,lab:T('Yeni')}}
@@ -542,7 +542,11 @@ function tutEnd(skip){ovTop();const sb=tutSand;S.tut.done=true;S.tutm=0;if(!skip
   /* v76: 3. adımda Atla ile 1–2 vuruş kalıyordu: 4'ten azsa dörtlük kurulur */if(skip&&S.slots[0]&&S.pat.A[0].filter(Boolean).length<4){[0].concat(TSEQ()).forEach(st=>{S.pat.A[0][st]=1});undoReset();recalc();renderPanels()}
   save();msg(skip?'Öğretici kapatıldı · Ayarlar’dan yeniden başlatabilirsin':'Öğretici bitti. Yeni bölümler açıldıkça kısa öğreticiler gelecek.')}tutShow();tutTick()}
 const ovTop=()=>{if(!isPhone())try{window.scrollTo({top:0})}catch(e){}};
-function ovSkip(){const c=ovCur();if(!c)return;if(c.main){tutEnd(true);return}S.tipq=[];S.tutm=0;tutT0=0;save();ovTop();tutTick();msg(T('Bekleyen kısa öğreticiler geçildi; yeni bir bölüm açılınca yenisi gelir'))}
+/* v102: geçilen ya da bayatlayıp düşen kısa öğretici sessiz kalmaz, açılan yer tek satırda duyurulur (oyuncu turu 20261125-1543: Atla sonrası Mağaza/Analiz sessiz açılıyordu, 5 persona) */
+const ANN={studio:['Enstrüman paneli','8 yer düğmesine dokun'],coll:['Koleksiyon','8 yerin üstündeki düğme'],syn:['Uyum','Müzik'],def:['Savunma','Savunma·Albüm'],rhy:['Tempo','Müzik'],look:['Mağaza ve Görünüm','alt çubuk'],pat:['Ruh hâli','Müzik'],anl:['Analiz','üst bilgiye dokun'],asst:['Asistan','Müzik › Otomatik'],ord:['Siparişler','sahnenin sağ üstü'],desk:['Ses masası','Müzik'],plan:['Şarkı planı','Müzik'],solo:['Solo','enstrüman paneli'],album:['Albüm','Savunma › Albüm'],book:['Kalıp kitabı','sahnenin sağ üstü']};
+const annOf=k=>{const a=ANN[k]||(/^fam_/.test(k)?['Yeni aile','Koleksiyon']:null);if(!a)return null;let w=a[1];if(!isPhone()){if(w==='alt çubuk')w='üstteki sekmeler';else if(w==='Savunma·Albüm')w='Savunma sekmesi'}return T(a[0])+' ('+T(w)+')'};
+function annList(ks){const l=[...new Set(ks.map(annOf).filter(Boolean))];if(l.length)msgP(T('Açıldı')+': '+l.join(' · '),8000)}
+function ovSkip(){const c=ovCur();if(!c)return;if(c.main){tutEnd(true);return}const ks=S.tipq.slice(1);S.tipq=[];S.tutm=0;tutT0=0;save();ovTop();tutTick();if(ks.length)annList(ks);else msg(T('Bekleyen kısa öğreticiler geçildi; yeni bir bölüm açılınca yenisi gelir'))}
 /* v59: hedef ekran dışındaysa adım başına BİR kez kaydırılır (her karede kaydırınca ekrandan uzun hedefte sayfa kilitleniyor, oyuncu kaydıramıyordu); ekrandan uzun hedef üstten hizalanır, delik ekrana kırpılır */
 let tutScrK='';
 function tutTarget(st){if(!st.tgt)return null;const t=st.tgt();if(!t)return null;if(t.el){let b=t.el.getBoundingClientRect();if((b.top<0||b.bottom>innerHeight)&&tutScrK!==tutPrep){tutScrK=tutPrep;t.el.scrollIntoView({block:b.height>innerHeight*0.8?'start':'center'});b=t.el.getBoundingClientRect()}
