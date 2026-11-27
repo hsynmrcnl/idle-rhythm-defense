@@ -81,7 +81,7 @@ function renderSoloPads(el,th){const si=soloEdSlot,x=slotIns(si),col=insColor(x,
 function slotHome(){const el=$('slotBar'),rk=$('rack'),land=isLand();if(!el)return;if(land&&el.parentNode!==rk)rk.appendChild(el);else if(!land&&el.parentNode===rk)$('cvwrap').after(el)}
 let sbSel=0,iOpen=false,cOpen=false,cHome=null;
 const LOCK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
-function renderSlotBar(){slotHome();const el=$('sb8');if(!el)return;const th=dispTheme();let h='';
+function renderSlotBar(){slotHome();const el=$('sb8');if(!el)return;{const sb=$('slotBar');if(sb&&isLand()){const h=sb.offsetHeight;if(h)document.documentElement.style.setProperty('--sbh',(h+4)+'px')}}const th=dispTheme();let h='';
  for(let i=0;i<MAXSLOTS;i++){if(i<S.slots.length){const x=slotIns(i);h+=x?'<button class="sbt'+(i===eSel?' sel':'')+'" data-act="slotOpen" data-i="'+i+'" style="--c:'+insColor(x,th)+'" aria-label="'+T('Yer')+' '+(i+1)+' · '+x.n+' · Sv '+lvOf(x.id)+'"><span class="nm">'+x.n+'</span><span class="lv">Sv '+lvOf(x.id)+'</span></button>':'<button class="sbt empty'+(i===eSel?' sel':'')+'" data-act="slotOpen" data-i="'+i+'" aria-label="'+T('Yer')+' '+(i+1)+' · '+T('boş')+'"><span class="nm">'+T('boş')+'</span><span class="lv">'+(i+1)+'</span></button>'}
   else h+='<button class="sbt lock" data-act="slotOpen" data-i="'+i+'" data-slotnext="'+(i===S.slots.length?1:0)+'" aria-label="'+T('Yer')+' '+(i+1)+' · '+T('kapalı')+'">'+LOCK_SVG+'<span class="lv">'+(i+1)+'</span></button>'}
  el.innerHTML=h;slotCan();const x=slotIns(eSel);$('sbName').textContent=T('Yer')+' '+(eSel+1)+(x?' · '+x.n:'')+' · '+T('seçili');renderISheet()}
@@ -590,7 +590,9 @@ function unlVis(){
  /* v92: Sipariş ve Kitap sağ üstte, Koleksiyon şeridin üstünde (açılınca görünür) */{const cb=$('collBtn'),co=!!S.unl.coll||demoMode;if(cb&&cb.hidden===co)cb.hidden=!co;const ob=$('ordBtn'),oo=!!S.unl.ord||demoMode;if(ob&&ob.hidden===oo)ob.hidden=!oo;const bb=$('bookBtn'),bo=tabOn('book');if(bb&&bb.hidden===bo)bb.hidden=!bo}
  const st=$('stats'),al=!S.unl.anl&&!demoMode;if(st&&st.classList.contains('locked')!==al){st.classList.toggle('locked',al);{const lb=al?(S.lang==='en'?'Analysis · unlocks at wave '+UNL_W.anl:'Analiz · dalga '+UNL_W.anl+'’te açılır'):T('Analiz: sıradaki adım ve çarpanlar');st.setAttribute('aria-label',lb);st.title=lb}if(al&&anlOn)anlToggle(false)}
  const tp=$('tap'),to=!!S.unl.tap||demoMode;if(tp&&tp.hidden===to)tp.hidden=!to;
- if(!tabOn(tab)||($('p-lock')&&!$('p-lock').hidden))setTab(tab)}
+ if(!tabOn(tab)||($('p-lock')&&!$('p-lock').hidden))setTab(tab);lockList()}
+/* v102: kilit notunda sıradaki açılışlar (oyuncu turu: yeni oyunda sağ kolonda yalnız “Henüz açılmadı”) */
+function lockList(){const el=$('lockList');if(!el)return;const rows=[[T('Müzik'),tabOn('studio'),T('ikinci enstrüman sahneye girince')],[T('Savunma'),tabOn('def'),T('dalga')+' '+UNL_W.def],[T('Mağaza ve Görünüm'),tabOn('look'),T('dalga')+' '+UNL_W.look],[T('Analiz'),!!S.unl.anl,T('dalga')+' '+UNL_W.anl]];const h=rows.map(([n,on,w])=>'<li'+(on?' class="ok"':'')+'><b>'+n+'</b><span>'+(on?T('açık'):w)+'</span></li>').join('');if(el.innerHTML!==h)el.innerHTML=h}
 /* kart sırası: önce baştaki öğretici, sonra açılış kartları */
 const tutActive=()=>!!(S.tut&&!S.tut.done&&!demoMode&&S.tut.s<TUT.length);
 function tutShow(){tutTick()}
