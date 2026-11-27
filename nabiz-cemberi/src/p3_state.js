@@ -207,7 +207,7 @@ const grooveCount=(p=S.pat[S.edit])=>COMBOS.filter(c=>c.t(p)).length;
 const SYN=[
  {id:'kilit',n:'Kilit',d:'Delici ya da Titreşim vuruşlarının hepsi bir Darbe ile aynı adımda (2+)',w:'Bas ile kick aynı yere basınca groove oturur',m:1.3,
   t:p=>{const dr=slotsRole('darbe'),out={};[...slotsRole('delici'),...slotsRole('titresim')].forEach(si=>{const a=STEPS(p,si);if(a.length>=2&&a.every(s=>dr.some(dj=>ON(p,dj,s)))){out[si]=1;dr.forEach(dj=>{if(a.some(s=>ON(p,dj,s)))out[dj]=1})}});return out}},
- {id:'katman',n:'Katman',d:'Bir Destek, bir Keskin’in tüm adımlarında onunla birlikte vuruyor (2+)',w:'Alkış ya da shaker trampetin üstüne katman olur',m:1.3,
+ {id:'katman',n:'Katman',d:'Bir Destek, bir Keskin’in tüm adımlarında onunla birlikte vuruyor (2+)',w:'El çırpma ya da shaker trampetin üstüne katman olur',m:1.3,
   t:p=>{const out={};slotsRole('destek').forEach(ds=>{slotsRole('keskin').forEach(ks=>{const a=STEPS(p,ks);if(a.length>=2&&a.every(s=>ON(p,ds,s))){out[ds]=1;out[ks]=1}})});return out}},
  {id:'ofbit',n:'Ofbit nefesi',d:'Bir Seri yalnız Darbe’nin olmadığı adımlarda vuruyor (4+)',w:'Hi-hat davulun arasını doldurur, üstüne binmez',m:1.2,
   t:p=>{const dr=slotsRole('darbe'),out={};if(!dr.length)return out;slotsRole('seri').forEach(si=>{const a=STEPS(p,si);if(a.length>=4&&a.every(s=>!dr.some(dj=>ON(p,dj,s)))){out[si]=1;dr.forEach(dj=>{if(STEPS(p,dj).length)out[dj]=1})}});return out}},

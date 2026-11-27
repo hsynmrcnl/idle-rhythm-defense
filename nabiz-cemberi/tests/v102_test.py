@@ -35,9 +35,9 @@ with sync_playwright() as pw:
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tipq=[];S.tutm=0;S.unl.ord=1;S.wave=12;S.bestWave=12;nb.unlVis();nb.setTab('stage');nb.renderPanels()}");p.wait_for_timeout(300)
     check(p.text_content('#ordBtn').strip()=='Sipariş','Sipariş düğmesinde yazı var')
     p.evaluate("()=>window.__nb.setTab('def')");p.wait_for_timeout(300);p.tap('#defSub [data-v=dalga]');p.wait_for_timeout(200)
-    p.tap('#defNav [data-act=waveBack]');p.wait_for_timeout(200)
-    check(p.evaluate("()=>window.__nb.S.wave")==12 and 'Emin misin?' in p.text_content('#defNav'),'ilk dokunuş dalgayı değiştirmedi, onay istiyor')
-    p.tap('#defNav [data-act=waveBack]');p.wait_for_timeout(200)
+    p.tap('[data-act=waveBack]');p.wait_for_timeout(200)
+    check(p.evaluate("()=>window.__nb.S.wave")==12 and 'Emin misin?' in p.text_content('#defStatus'),'ilk dokunuş dalgayı değiştirmedi, onay istiyor')
+    p.tap('[data-act=waveBack]');p.wait_for_timeout(200)
     check(p.evaluate("()=>window.__nb.S.wave")==7,'ikinci dokunuşla 5 dalga geri')
     # uyum çipi dokununca açıklama
     p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.lv.trampet=1;S.lv.hihat=1;S.slots=['davul','trampet','hihat',null];nb.recalc();nb.setTab('studio');nb.renderPanels()}");p.wait_for_timeout(200)

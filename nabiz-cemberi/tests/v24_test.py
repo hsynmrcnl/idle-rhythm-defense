@@ -193,7 +193,7 @@ with sync_playwright() as pw:
     check('Percussion' in t and 'Sahnede' not in t, 'Koleksiyon İngilizce')
     p.click('#d-def'); p.wait_for_timeout(100)
     t = p.inner_text('#defStatus')
-    check('enemies' in t and 'dmg/s' in t and 'düşman' not in t, 'Kuşatma İngilizce: ' + t.replace('\n', ' '))
+    check('enemies' in t and 'power/s' in t and 'düşman' not in t, 'Kuşatma İngilizce: ' + t.replace('\n', ' '))
     check(not errs, 'sayfa hatası yok ' + '; '.join(errs))
     b.close()
 srv.shutdown()
