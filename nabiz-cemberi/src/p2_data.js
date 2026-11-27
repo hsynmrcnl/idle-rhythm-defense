@@ -295,8 +295,11 @@ const DUP=[
  {id:'kalkan',n:'Kalkan',s:'+50 sınır',d:'Kalkan üst sınırı +50',c:2500,g:1.9},
  {id:'tamir',n:'Tamir',s:'+1 / sn',d:'Saniyede +1 nabız yenilenir',c:6000,g:2.2},
  {id:'ganimet',n:'Ganimet',s:'+%25 ödül',d:'Düşman ödülü +%25',c:8000,g:2.4},
- {id:'yavas',n:'Yavaşlat',s:'+%10 etki',d:'Yavaşlatıcı etkisi +%10',c:1e4,g:2.6,max:4}
+ {id:'yavas',n:'Yavaşlat',s:'+%10 etki',d:'Yavaşlatıcı etkisi +%10',c:1e4,g:2.6,max:4},
+ /* v100 Prova (değerlendirme raporu: d45'te ♪14 Mn harcanmadan duruyordu, katlanan fiyatlar notayı güce çeviremiyordu): ucuz büyüyen, sınırsız, gelir ve hasar ×1,04; dalga 30'da görünür, albümde sıfırlanır */
+ {id:'prova',n:'Prova',s:'gelir ve hasar ×1,04',d:'Grup prova yapar: gelir ve bütün hasar kalıcı ×1,04 (albüme kadar)',c:2e5,g:1.35,gate:30}
 ];
+const dupOn=u=>!u.gate||S.bestWave>=u.gate||(S.def[u.id]||0)>0;
 const ETYPES={
  memur:{n:'Memur',hp:1,sp:0.045,dmg:10,b:1,r:1,shape:'circle',d:'Yürür, dosya taşır'},
  kurye:{n:'Kurye',hp:0.5,sp:0.1,dmg:6,b:1.2,r:0.8,shape:'tri',d:'Hızlı, kırılgan'},

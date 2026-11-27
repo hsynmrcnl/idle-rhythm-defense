@@ -249,7 +249,8 @@ function recalc(){
  GC={A:groove('A'),B:groove('B'),S:1};const a=barRaw('A'),b=barRaw('B'),c=barRaw('S');BR={A:a[0],B:b[0],S:c[0]};DR={A:a[1],B:b[1],S:c[1]};
 }
 function groove(pk){const p=S.pat[pk];let m=1;for(const c of COMBOS)if(c.t(p))m+=c.b;if(PEN.t(p))m*=PEN.m;return m}
-const hasarM=()=>Math.pow(1.12,S.def.hasar||0)*(S.up.fill?1.1:1);
+const provaM=()=>Math.pow(1.04,S.def.prova||0);
+const hasarM=()=>Math.pow(1.12,S.def.hasar||0)*(S.up.fill?1.1:1)*provaM();
 const supM=(pk,s)=>Math.min(2,1+0.5*((SUPS[pk]||[])[s]||0));
 const noteVal=(si,v)=>{const x=slotIns(si);if(!x)return 0;const L=lvOf(x.id);return x.b*L*msMult(L)*(v===2?2:1)*(x.role==='gelir'?3:1)};
 const dmgOf=(si,v)=>{const x=slotIns(si);if(!x)return 0;const L=lvOf(x.id);return x.dmg*L*msMult(L)*(v===2?2:1)*hasarM()};
@@ -280,7 +281,7 @@ const tourGain=()=>Math.max(1,Math.round(2*Math.sqrt(S.hayran)+albumsN()));
 const canTour=()=>albumsN()>=TOUR_AL;
 /* sahne katmanları (Görünüm): albümden sonra da kalır, her biri gelire ×1,1 */
 const stageM=()=>Math.pow(1.1,SUP.filter(u=>S.stage[u.id]).length);
-const globalM=()=>seriM()*tapM()*upM()*fanM()*bookM()*fitM()*meterM()*scaleM()*waveM()*tourM()*cityM()*stageM();
+const globalM=()=>seriM()*tapM()*upM()*fanM()*bookM()*fitM()*meterM()*scaleM()*waveM()*tourM()*cityM()*stageM()*provaM();
 const curBpm=b=>S.bpm*tempoMulAt(b||0);
 const barDur=()=>60/S.bpm*MI.N/4;
 function rate(){return planAvg('n')*globalM()*planBonus()*(S.bpm*4/60)/MI.N}

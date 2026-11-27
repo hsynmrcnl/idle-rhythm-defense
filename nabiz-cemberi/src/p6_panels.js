@@ -213,7 +213,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v99 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v100 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -373,7 +373,7 @@ function renderDef(){
  /* v24: Kuşatma iki satır; dalga içeriği ve açıklama ⓘ'da */
  el.innerHTML='<div class="dsl"><span>Dalga <b id="dWave">'+S.wave+'</b><small title="En iyi dalga">/'+S.bestWave+'</small></span><span><b id="dEn">0</b> düşman</span><span><b id="dDps">0</b> hasar/sn</span></div><div class="hpbar thin"><span class="hp" id="dHpBar"></span><span class="sh" id="dShBar"></span></div><div class="dsl sm"><span>Nabız <span id="dHp"></span></span><span>Kalkan <span id="dSh"></span></span><span><b id="dKills">'+fmt(S.kills)+'</b> susturulan</span></div>';
  $('defNav').innerHTML='<span class="seg"><button data-act="waveBack" aria-label="5 dalga geri">−5</button><button data-act="waveFwd" aria-label="5 dalga ileri"'+(S.wave>=S.bestWave?' disabled':'')+'>+5</button></span>';$('dComp').textContent=T('Bu dalga: '+waveSummary(S.wave));
- const rec=defRec();$('defList').innerHTML=DUP.map(u=>{const L=S.def[u.id]||0,max=u.max&&L>=u.max,c=defCost(u);return '<button class="dtile'+(max?' max':'')+(u.id===rec?' rec':'')+'" data-act="def" data-id="'+u.id+'"'+(max?' disabled':' data-cost="'+c+'"')+' title="'+u.d+'"><span class="nm">'+u.n+(L?' <span class="lvl">'+L+'</span>':'')+'</span><span class="ds">'+(u.id==='menzil'?'şu an %'+Math.round(range()*100):u.s)+'</span><span class="cnt">'+(max?'Maksimum':'♪ '+fmt(c))+'</span>'+(u.id===rec?'<span class="rt">önerilen</span>':'')+'</button>'}).join('');
+ const rec=defRec();$('defList').innerHTML=DUP.filter(dupOn).map(u=>{const L=S.def[u.id]||0,max=u.max&&L>=u.max,c=defCost(u);return '<button class="dtile'+(max?' max':'')+(u.id===rec?' rec':'')+'" data-act="def" data-id="'+u.id+'"'+(max?' disabled':' data-cost="'+c+'"')+' title="'+u.d+'"><span class="nm">'+u.n+(L?' <span class="lvl">'+L+'</span>':'')+'</span><span class="ds">'+(u.id==='menzil'?'şu an %'+Math.round(range()*100):u.s)+'</span><span class="cnt">'+(max?'Maksimum':'♪ '+fmt(c))+'</span>'+(u.id===rec?'<span class="rt">önerilen</span>':'')+'</button>'}).join('');
  $('inf-dup').innerHTML='<p>Savunma geliştirmeleri albüme kadar kalır; her seviye fiyatı artırır. Kutuya dokun: satın al.</p><p>'+DUP.map(u=>'<b style="color:var(--fg);font-weight:500">'+u.n+'</b>: '+u.d).join(' · ')+'</p>';
  ensureOrders();
  {const _ol=$('orderList');setTimeout(()=>i18n(_ol),0)}$('orderList').innerHTML=S.orders.map((o,k)=>{if(!o.tpl){const left=Math.max(0,Math.ceil((o.ready-Date.now())/1000));return '<div class="ord"><div class="orow"><span class="nm">Yeni sipariş<small>Şehir yeni bir istek hazırlıyor.</small></span><span class="oc">'+Math.floor(left/60)+':'+String(left%60).padStart(2,'0')+'</span></div></div>'}const t=OTPL.find(x=>x.id===o.tpl);const rq=t.req(o);return '<div class="ord" id="ord'+k+'"><div class="orow" data-act="ordx" data-t="'+t.id+'" title="'+t.who+'"><span class="nm">'+t.t+'<small>'+Math.round(t.secs/60)+' dk gelir · +'+t.fans+' hayran</small></span><span class="oc" id="oc'+k+'">0/'+rq.length+'</span><button class="btn" data-act="deliver" data-k="'+k+'" id="odb'+k+'">Teslim et</button></div><ul'+(ordOpen.has(t.id)?'':' hidden')+'>'+rq.map((r,j)=>'<li id="oq'+k+'_'+j+'">'+r.t+'</li>').join('')+'</ul></div>'}).join('');
@@ -912,7 +912,7 @@ function anlCands(){const c=[];
  if(S.up.solo)SOLO_TREE.forEach(u=>{if(!S.up[u.id]&&(!u.req||S.up[u.req]))c.push({act:'srup',id:u.id,n:u.n,cost:u.c,ap:()=>{S.up[u.id]=1;return()=>{delete S.up[u.id]}}})});
  if(S.bpm<180){const b0=S.bpm,m0=S.bmax,free=b0<m0,to=free?Math.min(b0+10,m0):Math.min(180,m0+10);c.push({act:'tempo',n:'Tempo '+b0+' → '+to+' BPM',cost:free?0:tempoCost(),ap:()=>{S.bpm=to;S.bmax=Math.max(m0,to);return()=>{S.bpm=b0;S.bmax=m0}}})}
  SUP.forEach(u=>{if(!S.stage[u.id])c.push({act:'stage',id:u.id,n:u.n,cost:u.c,ap:()=>{S.stage[u.id]=1;return()=>{delete S.stage[u.id]}}})});
- DUP.forEach(u=>{const L=S.def[u.id]||0;if(u.max&&L>=u.max)return;c.push({act:'def',id:u.id,n:u.n+' '+(L+1),cost:defCost(u),ap:()=>{S.def[u.id]=L+1;return()=>{if(L)S.def[u.id]=L;else delete S.def[u.id]}}})});
+ DUP.forEach(u=>{const L=S.def[u.id]||0;if(u.max&&L>=u.max||!dupOn(u))return;c.push({act:'def',id:u.id,n:u.n+' '+(L+1),cost:defCost(u),ap:()=>{S.def[u.id]=L+1;return()=>{if(L)S.def[u.id]=L;else delete S.def[u.id]}}})});
  return c}
 /* gelir: kendini en kısa sürede ödeyen; savunma: ♪ başına en çok hasar/sn */
 /* v71: lim verilirse yalnız o bütçeye sığan adaylar (Asistan: en verimli alım bütçeyi aşınca hiçbir şey almadan bekliyordu) */
@@ -933,6 +933,7 @@ function anlMultRows(){const th=ownTheme(),rows=[
  ['Ritim serisi '+effSeri(),seriM(),'Ritme vur: her tam vuruş +%4, en çok 12',1],
  ['Ritme vur akışı',tapM(),'Üst üste tam dokunuş; bırakınca söner · ×2,0 tavan',1],
  ['Ritim geliştirmeleri',upM(),'Swing, Eko, Sidechain, Filtre: her biri ×1,15',1],
+ ['Prova '+(S.def.prova||0),provaM(),'Savunma › Geliştirme: her seviye gelir ve hasar ×1,04',(S.def.prova||0)>0],
  ['Hayran '+fmt(S.hayran),fanM(),'Albüm çıkar: her hayran +%5',1],
  ['Kalıp kitabı',bookM(),'Bulunan her kalıp +%5',1],
  ['Tema temposu',fitM(),th.n+' '+th.bpm[0]+'–'+th.bpm[1]+' BPM sever: ×1,25',1],
