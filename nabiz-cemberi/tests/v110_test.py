@@ -40,6 +40,12 @@ with sync_playwright() as pw:
     bb=p.locator('#tutBub').bounding_box();sb=p.locator('#slotBar').bounding_box()
     check(bb['y']+bb['height']<sb['y'],'Ritme vur kısa öğreticisinin balonu 8 yer şeridini örtmüyor')
     ctx.close()
+    # tempo tuzağı: otomatik alım tempoyu temanın aralığından çıkarmaz
+    ctx=b.new_context();p=ctx.new_page();p.on('pageerror',lambda e:er.append(str(e)))
+    p.goto(URL);p.wait_for_timeout(600)
+    bpm=p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.bpm=130;S.bmax=130;S.nota=1e4;S.lv.trampet=3;S.slots=['davul','trampet',null,null];nb.recalc();for(let i=0;i<30;i++){const k=nb.asstPick(1e9);if(!k)break;nb.hintApplyK(k)}return S.bpm}")
+    check(bpm<=130,'Asistan/Toplu al tempoyu Neon aralığının (90–130) dışına itmiyor (%s)'%bpm)
+    ctx.close()
     check(not er,'sayfa hatası yok '+(er[0] if er else ''))
     b.close()
 srv.shutdown()

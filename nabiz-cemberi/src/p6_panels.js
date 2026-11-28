@@ -947,7 +947,7 @@ function anlCands(){const c=[];
 function anlRank(f,lim){const r0=rate(),d0=dps(),all=[];
  for(const k of anlCands()){if(f&&!f(k))continue;if(lim!=null&&!(k.cost>0&&k.cost<=lim))continue;const undo=k.ap();try{recalc();k.dr=rate()-r0;k.dd=dps()-d0}finally{undo()}all.push(k)}
  recalc();
- const best=(key,base)=>all.filter(k=>k[key]>Math.max(1e-9,base*1e-4)).sort((a,b)=>a.cost/a[key]-b.cost/b[key])[0]||null;
+ /* v110 tempo tuzağı: savunma (hasar/sn) adayı geliri düşürmesin — tempo temanın aralığından çıkınca hasar +%7 ama gelir −%20 (×1,25 kaybı); Asistan/Toplu al bunu savunma diye alıyordu (oyuncu turu 20261128-1511) */const best=(key,base)=>all.filter(k=>k[key]>Math.max(1e-9,base*1e-4)&&(key!=='dd'||!(k.dr<-Math.max(1e-9,r0*1e-3)))).sort((a,b)=>a.cost/a[key]-b.cost/b[key])[0]||null;
  return{r0,d0,inc:best('dr',r0),def:best('dd',d0)}}
 function anlSugHtml(k,lab,key,base,i){
  if(!k)return '<div class="sg none"><span class="k">'+lab+'</span><span class="tx">Şu an satın alınacak bir artış yok</span></div>';
