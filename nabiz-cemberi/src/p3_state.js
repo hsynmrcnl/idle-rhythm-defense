@@ -331,7 +331,7 @@ const OTPL=[
  {id:'yayin',t:'Canlı yayın',who:'Yayıncı',secs:240,fans:1,req:()=>[{t:'Tempo 100–120',ok:()=>S.bpm>=100&&S.bpm<=120},{t:'Bir sahne katmanı kurulu',ok:()=>Object.values(S.stage).some(Boolean)},{t:'Seri sıfır değil',ok:()=>effSeri()>0}]},
  {id:'festival',t:'Festival ana sahne',who:'Organizatör',secs:600,fans:4,req:()=>[{t:'6+ enstrüman çalıyor',ok:()=>playingSlots()>=6},{t:'3+ aile',ok:()=>famCount()>=3},{t:'2+ uyum tutuyor',ok:()=>Object.keys(SYNON[S.edit]).length>=2}]},
  {id:'medit',t:'Meditasyon uygulaması',who:'Uygulama',secs:300,fans:2,req:()=>[{t:'Tempo 80 ya da altı',ok:()=>S.bpm<=80},{t:'Kalkan ya da Yavaşlatıcı çalıyor',ok:()=>hasRolePlaying('kalkan')||hasRolePlaying('yavas')},{t:'Kakofoni yok',ok:()=>!PEN.t(S.pat[S.edit])}]},
- {id:'dalga',t:'Sahne savunması',who:'Belediye',secs:400,fans:3,req:o=>[{t:'Dalga '+o.p.target+' ya da ötesine ulaş',ok:()=>S.wave>=o.p.target}]},
+ {id:'dalga',t:'Sahne savunması',who:'Belediye',secs:400,fans:3,req:o=>[{t:T('Şu anki dalga en az')+' '+o.p.target,ok:()=>S.wave>=o.p.target}]},
  {id:'kitap',t:'Ritim dersi',who:'Konservatuvar',secs:300,fans:2,req:()=>[{t:'Kitaptan bir kalıp sahnede çalıyor',ok:()=>Object.keys(BOOKON[S.edit]).length>=1},{t:'Bir uyum tutuyor',ok:()=>Object.keys(SYNON[S.edit]).length>=1}]}
 ];
 function newOrder(seedExtra){const used=S.orders.map(o=>o.tpl);const r=rng((Date.now()+seedExtra*7919)>>>0);let pool=OTPL.filter(t=>!used.includes(t.id));if(!pool.length)pool=OTPL;const t=pool[Math.floor(r()*pool.length)];return{tpl:t.id,p:{target:S.bestWave+3},ready:0}}

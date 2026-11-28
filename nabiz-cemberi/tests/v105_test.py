@@ -48,7 +48,7 @@ with sync_playwright() as pw:
         ctx=b.new_context(viewport={'width':w,'height':h});p=ctx.new_page();p.on('pageerror',lambda e:er.append(str(e)))
         p.goto(URL);p.wait_for_timeout(700)
         p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;nb.unlockAll();S.tipq=[];S.bestWave=40;nb.recalc();nb.renderPanels();nb.startStop();nb.startWave(10,nb.nowT())}");p.wait_for_timeout(3000)
-        bx=p.evaluate("()=>{const E=window.__nb.enemies;E.forEach((e,i)=>{e.a=i/Math.max(1,E.length);e.d=1});if(E[0])E[0].boss=true;return window.__nb.enemyBox()}")
+        bx=p.evaluate("()=>{const E=window.__nb.enemies;E.forEach((e,i)=>{e.a=i/Math.max(1,E.length);e.d=1+(i%4)*0.03});if(E[0])E[0].boss=true;return window.__nb.enemyBox()}")
         bad=[q for q in bx['p'] if q[0]-q[2]<bx['X0'] or q[0]+q[2]>bx['X1'] or q[1]-q[2]<bx['Y0'] or q[1]+q[2]>bx['Y1']]
         check(len(bx['p'])>3 and not bad,'%dx%d: dalga başındaki düşmanlar tuvalin içinde (%d düşman, taşan %d)'%(w,h,len(bx['p']),len(bad)))
         ctx.close()
