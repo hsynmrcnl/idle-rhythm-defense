@@ -8,7 +8,7 @@ const DOCK={stage:'stage',studio:'look',coll:'look',def:'def',album:'def',book:'
 const dockLast={look:'studio'};let defSub='dalga';let prevTab='stage';const scrollMem={};
 /* Stüdyo bölümlerinin açılma sırası: her şey bir anda oyuncunun önüne gelmesin. run:1 olanlar bu dönemin geliştirmesine bağlı */
 /* v40 sadeleştirme: açılışlar ilk 10 dakikaya yayılır (sim: dalga ≈ 2,2/dk; eskiden ilk 2 dakikada 9 bölüm açılıyordu) */
-const UNL_W={def:6,rhy:8,look:10,pat:12,anl:14,asst:15,ord:18,desk:20};
+const UNL_W={def:6,rhy:8,look:10,pat:12,anl:14,asst:15,ord:18,desk:20,asstSyn:1};
 const SEC_GATE={desk:'desk',syn:'syn',groove:'syn',auto:'syn',rhy:'rhy',pat:'pat',plan:'plan',solo:'solo',tree:'solo'};
 const GATES={syn:{c:()=>S.slots.filter(Boolean).length>=2,n:'Uyum ve Otomatik'},rhy:{c:()=>S.bestWave>=UNL_W.rhy,n:'Ritim stüdyosu'},pat:{c:()=>S.bestWave>=UNL_W.pat,n:'Desen, ölçü ve gam'},plan:{c:()=>!!S.up.sef,n:'Şarkı planı',run:1},solo:{c:()=>!!S.up.solo,n:'Solo editörü ve Solo dalı',run:1},desk:{c:()=>S.bestWave>=UNL_W.desk,n:'Ses masası'}};
 let secNew={};const ordOpen=new Set();
@@ -213,7 +213,7 @@ function renderPanels0(){
  $('albumBox').innerHTML=(S.ui!=='detay'?'<p class="note">Albüm çıkar: oyun baştan başlar ama hayran kazanırsın. Her hayran geliri kalıcı olarak %5 artırır.</p>':'<p class="note">Albüm çıkarınca döngü, sahne, seviyeler, savunma geliştirmeleri ve dalga sıfırlanır. Hayranlar, bulunan kalıplar, açılan aileler, temalar ve sahne katmanları kalır. Her hayran gelire kalıcı %5 ekler.</p>')+'<div class="prog"><span id="aBar"></span></div><div class="arow"><span class="cnt" id="aTxt"></span><button class="btn" id="aBtn" data-act="album">Albüm çıkar</button></div><ol class="ladder">'+LADDER.map(x=>'<li class="'+(albUnl()>=x.a?'done':'')+'"><b>Albüm '+x.a+'</b><span>'+x.t+'</span></li>').join('')+'</ol>'+(S.albums.length?'<ol class="disco">'+S.albums.map(a=>'<li><span class="an">'+a.n+'</span><span class="cnt">+'+a.f+' hayran · '+a.b+' BPM · dalga '+(a.w||1)+'</span></li>').join('')+'</ol>':'');
  renderMn();renderTour();
  $('mute').textContent=T(S.muted?'Ses kapalı':'Ses açık');
- $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v108 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
+ $('tag').textContent=T((demoMode?'örnek şarkı '+(demoIdx+1)+' · ':'v109 · ')+(S.tours||Object.keys(S.cities||{}).length?cityOf().n+' · ':'')+th.n+' · '+(S.layout==='strip'?'şerit':'çember')+' · '+METERS[S.meter].n.split(' ')[0]+(previewId&&performance.now()<previewUntil?' · önizleme':''));
  renderSet();secVis();detLinks();
  if(S.lang==='en'){i18n($('rack'));i18n($('pads'))}
  updUI();
@@ -332,8 +332,9 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
  /* v62: albüm eşiği dolmuş ve ilerleme 2 dk durmuşsa öneri çipi albümü gösterir (Asistan açıkken de); dokununca Albüm sekmesi (albüm oyunu sıfırladığı için kendisi çıkarmaz) */
  if(playing&&!demoMode&&!ovMain()&&S.tut&&S.tut.done&&S.unl&&S.unl.album&&S.runEarned>=albumTh()&&(now-stallT>HINT_STALL||S.runEarned>=albumTh()*3)&&!(S.mn&&S.mn.alb&&S.auto.alb===true)){hintK={alb:1};el.innerHTML=T('Albüm hazır')+': <b>+'+fansFor()+' '+T('hayran')+'</b>';el.title=T('İlerleme durdu: albüm çıkar, oyun baştan başlar ama hayranlar kalıcı gelir verir');if(el.hidden)el.hidden=false;return}
  let k=null;
- if(playing&&!demoMode&&!ovMain()&&S.tut&&S.tut.done&&S.unl&&S.unl.studio&&!auto&&(now-stallT>HINT_STALL||now-retT<HINT_RET))k=hintPick();
+ if(playing&&!demoMode&&!ovMain()&&S.tut&&S.tut.done&&S.unl&&S.unl.studio&&!auto){if(now-stallT>HINT_STALL||now-retT<HINT_RET)k=hintPick();else{/* v109: ilerleme sürse de nota önerinin 10 katı birikmişse toplu alım çipi */const q=hintPick();if(q&&S.nota>=q.cost*10)k=q}}
  hintK=k;if(!k){if(!el.hidden)el.hidden=true;return}
+ /* v109: tek önerinin 10 katı nota birikmişse çip toplu alım önerir */if(S.nota>=k.cost*10){hintK={bulk:1,cost:0};el.innerHTML=T('Toplu al')+': <b>♪ '+fmt(S.nota*BULK_F)+'</b>';el.title=T('Nota birikti: dokun, notanın %90’ına kadar en verimli alımları yap');if(el.hidden)el.hidden=false;return}
  el.innerHTML=T('Öneri')+': <b>'+T(k.n)+'</b> · ♪ '+fmt(k.cost);el.title=T('Nota birikti ama ilerleme durdu: dokun, en verimli adımı al');if(el.hidden)el.hidden=false}
 /* öneri: nabız düşükse en ucuz hayatta kalma (nabız/kalkan/tamir), değilse Analiz'in gelir önerisi; elde ≥3 katı nota yoksa yok */
 /* v53: boş sahne yeri varken en ucuz açılabilir enstrüman (öneri çipi ve Asistan; Idle oyuncu 2. enstrümanı 25 dk açmadı, Uyum ve Asistan ona bağlı) */
@@ -341,7 +342,9 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
 function newInsCand(){const full=!S.slots.includes(null);if(full&&S.slots.length>=MAXSLOTS)return null;const x=INS.filter(x=>!lvOf(x.id)&&famOpen(x.fam)).sort((a,b)=>a.u-b.u)[0];if(!x)return null;const en=S.lang==='en';return full?{act:'lv',id:x.id,slot:1,n:(en?'New: ':'Yeni: ')+x.n+(en?' + stage slot':' + sahne yeri'),cost:x.u+slotCost()}:{act:'lv',id:x.id,n:(en?'New: ':'Yeni: ')+x.n,cost:x.u}}
 function hintPick(){try{const low=core.hp/hpMax()<0.6&&S.unl.def;let c=null;if(!low){const ni=newInsCand();if(ni&&S.nota>=ni.cost*3)return ni}if(low)c=anlCands().filter(x=>x.act==='def'&&['nabiz','kalkan','tamir'].includes(x.id)).sort((x,y)=>x.cost-y.cost)[0]||null;if(!c){const r=anlRank(x=>x.act!=='stage'&&(S.unl.def||x.act!=='def'));c=r.inc||r.def}return c&&c.cost>0&&S.nota>=c.cost*3?c:null}catch(e){return null}}
 const hintApply=k=>rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':'',slot:k.slot?'1':''}});
-function hintBuy(){const k=hintK;if(k&&k.alb){setTab('album');$('hintChip').hidden=true;hintK=null;return}if(!k||S.nota<k.cost)return;hintApply(k);msg(T('Alındı')+': '+T(k.n)+' · ♪ '+fmt(k.cost));hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300)}
+/* v109 toplu al (oyuncu turu 20261128-1311: nota birikiyor, Davul baskın; ölçüm: her 30 sn %90 toplu alım d12 Davul payı %86–100 → %50–63, bekleyen nota 67–349 → 18–40 sn): notanın %90'ına kadar Asistan'ın seçtiği en verimli alımlar (yeni enstrüman/yer, seviye, savunma) */
+const BULK_F=0.9;function bulkBuy(f){const n0=S.nota,r0=rate();let left=S.nota*(f||BULK_F),cnt=0;for(let i=0;i<60;i++){const k=asstPick(left);if(!k)break;const a=S.nota;hintApply(k);const sp=a-S.nota;if(sp<=0)break;left-=sp;cnt++}recalc();renderPanels();if(anlOn)renderAnl();msgP(cnt?T('Toplu alım')+': '+cnt+' '+T('alım')+' · ♪ '+fmt(n0-S.nota)+' · '+T('gelir')+' ×'+fm(Math.round(rate()/Math.max(1e-9,r0)*100)/100):T('Şu an alınacak verimli bir şey yok'),4000);return cnt}
+function hintBuy(){const k=hintK;if(k&&k.alb){setTab('album');$('hintChip').hidden=true;hintK=null;return}if(k&&k.bulk){bulkBuy();hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300);return}if(!k||S.nota<k.cost)return;hintApply(k);msg(T('Alındı')+': '+T(k.n)+' · ♪ '+fmt(k.cost));hintK=null;$('hintChip').hidden=true;setTimeout(hintCheck,300)}
 /* v49 Asistan (docs/denge_d15.md seçenek 2): dalga 15'te ücretsiz açılır; menajerin otomatik geliştirmesi alınana kadar 20 sn'de bir notanın en çok %25'iyle en verimli geliştirmeyi alır. Nabız %60 altındaysa önce hayatta kalma, değilse gelir ve savunma sırayla (Analiz sıralaması). */
 const ASST_T=20000,ASST_B=0.25,ASST_CHEAP=0.02;let asstT=Date.now(),asstFlip=false,asstSurv=false;
 const asstOn=own=>!!(S.unl&&S.unl.asst&&!(S.mn&&S.mn.lv)&&(own||S.auto&&S.auto.asst!==false));
@@ -571,7 +574,7 @@ const UNLK=[
  {k:'anl',c:()=>S.bestWave>=UNL_W.anl},
  {k:'pat',c:()=>gateOn('pat')},
  /* v73: dalga 6'dan sonra 3 kez geri çekilen (takılan) oyuncuya da gelir, ikinci enstrüman şartı olmadan (ölçüm: hiç almayan oyuncu dalga 12'de 40 dk takılıyordu, tools/acilis_olc.py) */
- {k:'asst',c:()=>!(S.mn&&S.mn.lv)&&(S.bestWave>=UNL_W.asst&&!!S.unl.syn||retreatCount>=3&&S.bestWave>=6)},
+ {k:'asst',c:()=>!(S.mn&&S.mn.lv)&&(S.bestWave>=UNL_W.asst&&(!UNL_W.asstSyn||!!S.unl.syn)||retreatCount>=3&&S.bestWave>=6)},
  {k:'ord',c:()=>S.bestWave>=UNL_W.ord},
  {k:'look',c:()=>S.bestWave>=UNL_W.look},
  /* v73: dalga 25'te de (yavaş kazananda sekme dalga 41'e kalıyordu; hedef erken görünsün) */
@@ -971,7 +974,7 @@ function anlMultRows(){const th=ownTheme(),rows=[
  return '<h4>Çarpan <span>×'+fm(Math.round((GC[S.edit]||1)*globalM()*100)/100)+'</span></h4>'+rows.map(row).join('')+(song.length?'<h4>Şarkı planı</h4>'+song.map(row).join(''):'')}
 function renderAnl(){const el=$('anl');if(!el||!anlOn)return;/* v98: yeniden çizimde odak aynı düğmede kalsın */const fa=document.activeElement,fk=fa&&el.contains(fa)&&fa.dataset&&fa.dataset.a?'#anl [data-a="'+fa.dataset.a+'"]':null;renderAnl0();if(fk&&!el.contains(document.activeElement)){const f=el.querySelector(fk);if(f)try{f.focus({preventScroll:true})}catch(e){}}}
 function renderAnl0(){const el=$('anl');const R=anlRank();anlSug=[R.inc,R.def];
- el.innerHTML='<div class="ah"><b>Analiz</b><button class="x" data-a="close" aria-label="Kapat">×</button></div><h4>Sıradaki en verimli adım</h4>'+anlSugHtml(R.inc,'Gelir','dr',R.r0,0)+anlSugHtml(R.def,'Savunma','dd',R.d0,1)+anlMultRows();
+ el.innerHTML='<div class="ah"><b>Analiz</b><button class="x" data-a="close" aria-label="Kapat">×</button></div><h4>Sıradaki en verimli adım</h4>'+anlSugHtml(R.inc,'Gelir','dr',R.r0,0)+anlSugHtml(R.def,'Savunma','dd',R.d0,1)+'<div class="sg"><span class="k">'+T('Toplu')+'</span><span class="tx"><span class="nm">'+T('Toplu al')+'</span><span class="ds">'+T('Notanın %90’ına kadar en verimli alımlar: yeni enstrüman, seviye, savunma')+'</span></span><button class="btn ready" data-a="bulk">♪ '+fmt(S.nota*BULK_F)+'</button></div>'+anlMultRows();
  if(S.lang==='en')i18n(el)}
 function anlToggle(on){anlOn=on==null?!anlOn:!!on;const el=$('anl'),st=$('stats');if(!el)return;el.hidden=!anlOn;st.setAttribute('aria-expanded',String(anlOn));if(anlOn){/* v98: Analiz sayfaların üstüne açılmasın (panel başlığı altında kalıp tıklanamıyordu) */sheetsClose();el.style.setProperty('--anlTop',(st.offsetTop+st.offsetHeight+6)+'px');renderAnl();shFocus('anl')}}
 /* v75: kilitliyken ne zaman açılacağı ve ne işe yaradığı */
@@ -979,6 +982,7 @@ const anlTry=()=>{if(!anlOn)shFrom0();if($('stats').classList.contains('locked')
 $('stats').addEventListener('click',anlTry);
 $('stats').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();anlTry()}});
 $('anl').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;if(b.dataset.a==='close'){anlToggle(false);shBack();return}
+ if(b.dataset.a==='bulk'){bulkBuy();return}
  if(b.dataset.a==='buy'){const k=anlSug[+b.dataset.i];if(!k)return;rackAct({dataset:{act:k.act,id:k.id||'',one:k.one?'1':'',slot:k.slot?'1':''}});renderAnl()}});
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(shOpen){sheetClose();shBack();return}if(cOpen){collClose();shBack();return}if(iOpen){slotClose();renderSlotBar();shBack();return}if(anlOn){anlToggle(false);shBack();return}if(demoMode&&!isField(document.activeElement)){exitDemo();return}if(S.edit==='S'&&soloView()>=0&&!isField(document.activeElement)){soloExit();return}
  /* v67: Escape açık bilgi kutusunu, sonra Ayarlar'ı kapatır (oyuncu turu: Ayarlar'dan çıkış yalnız dişliydi) */

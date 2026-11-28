@@ -24,6 +24,7 @@ def run(model):
         p = b.new_page(); p.goto('http://127.0.0.1:%d/' % srv.server_address[1]); p.wait_for_timeout(400); p.evaluate(BASE)
         if DVK: p.evaluate('v=>{window.__nb.dvK=v}', int(DVK))
         if ASSTW: p.evaluate('v=>{window.__nb.UNL_W.asst=v}', int(ASSTW))
+        if os.environ.get('ASSTSYN') == '0': p.evaluate('()=>{window.__nb.UNL_W.asstSyn=0}')
         if model == 'hizli': p.evaluate("()=>{const S=window.__nb.S;S.mn={lv:1,ins:1};S.auto={lv:true,ord:false,ins:true,alb:false,asst:false};S.am.k={lv:1,rup:1,srup:1,tempo:1,def:1};S.am.b=0.5}")
         asst = False; waves = {}; cur = None; best = 0
         for t in range(2, MIN * 60 + 1, 2):
