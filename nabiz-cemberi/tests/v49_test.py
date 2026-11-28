@@ -27,13 +27,13 @@ with sync_playwright() as pw:
         p.on('pageerror', lambda e: errs.append(str(e)))
         p.goto(URL); p.wait_for_timeout(500)
         # dalga 14: asistan yok
-        p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;S.tipq=[];S.wave=14;S.bestWave=14;S.kills=50;S.total=1e4;S.nota=1e5;S.lv.trampet=1;S.slots[1]='trampet';nb.unlCheck(true);S.tipq=[];localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
+        p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;S.tipq=[];S.wave=7;S.bestWave=7;S.kills=50;S.total=1e4;S.nota=1e5;S.lv.trampet=1;S.slots[1]='trampet';nb.unlCheck(true);S.tipq=[];localStorage.setItem('nabiz-cemberi-v3',JSON.stringify(S))}")
         p.reload(); p.wait_for_timeout(500)
-        check(not p.evaluate("()=>!!window.__nb.S.unl.asst"), 'dalga 14: asistan kilitli')
+        check(not p.evaluate("()=>!!window.__nb.S.unl.asst"), 'dalga 7: asistan kilitli')
         # dalga 15: açılır, kısa öğretici
-        p.evaluate("()=>{const S=window.__nb.S;S.wave=15;S.bestWave=15;window.__nb.unlCheck()}")
+        p.evaluate("()=>{const S=window.__nb.S;S.wave=8;S.bestWave=8;window.__nb.unlCheck()}")
         p.wait_for_timeout(300)
-        check(p.evaluate("()=>!!window.__nb.S.unl.asst&&window.__nb.S.tipq.includes('asst')"), 'dalga 15: asistan açıldı, kısa öğretici sırada')
+        check(p.evaluate("()=>!!window.__nb.S.unl.asst&&window.__nb.S.tipq.includes('asst')"), 'dalga 8: asistan açıldı, kısa öğretici sırada')
         # kısa öğreticiyi baştan sona oyna (önceki sıradakiler Atla ile değil, yalnız asst bıraktır)
         p.evaluate("()=>{const S=window.__nb.S;S.tipq=['asst'];S.tutm=0;window.__nb.tutTick()}"); p.wait_for_timeout(400)
         seen = []

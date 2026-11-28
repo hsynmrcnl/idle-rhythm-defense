@@ -24,7 +24,7 @@ with sync_playwright() as pw:
     p = b.new_page(viewport={'width': 1280, 'height': 800})
     p.on('pageerror', lambda e: errs.append(str(e)))
     p.goto(URL); p.wait_for_timeout(500)
-    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;S.unl={studio:1,coll:1,tap:1};S.tipq=[];S.tutm=0;S.bestWave=8;nb.setWave(8)}")
+    p.evaluate("()=>{const nb=window.__nb,S=nb.S;S.tut.done=true;S.unl={studio:1,coll:1,tap:1};S.tipq=[];S.tutm=0;S.bestWave=7;nb.setWave(7);nb.UNL_W.asst=8}")
     p.evaluate("()=>{const nb=window.__nb;nb.retreatNow();nb.retreatNow();nb.unlCheck()}")
     check(not p.evaluate("()=>!!window.__nb.S.unl.asst"), '2 geri çekilmede Asistan yok')
     p.evaluate("()=>{const nb=window.__nb;nb.retreatNow();nb.unlCheck();nb.S.tipq=nb.S.tipq.filter(k=>k==='asst');nb.S.tutm=0}"); p.wait_for_timeout(500)

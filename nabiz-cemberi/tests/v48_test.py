@@ -31,9 +31,9 @@ with sync_playwright() as pw:
         cv = p.locator('#cv').bounding_box(); p.mouse.click(cv['x'] + cv['width'] / 2, cv['y'] + cv['height'] / 2)
         p.wait_for_function("()=>window.__nb.playing", timeout=3000)
         p.evaluate("()=>window.__nb.hintCheck()")
-        check(p.is_hidden('#hintChip'), 'ilerleme sürerken öneri yok')
+        check(p.is_hidden('#hintChip') or 'Toplu al' in p.text_content('#hintChip'), 'ilerleme sürerken tek öneri yok (v109: çok nota birikince yalnız Toplu al)')
         p.evaluate("()=>{window.__nb.hintStall();window.__nb.hintCheck()}")
-        check(p.is_visible('#hintChip') and 'Öneri' in p.text_content('#hintChip'), 'ilerleme durup nota birikince öneri çipi çıktı (%s)' % p.text_content('#hintChip'))
+        check(p.is_visible('#hintChip') and ('Öneri' in p.text_content('#hintChip') or 'Toplu al' in p.text_content('#hintChip')), 'ilerleme durup nota birikince öneri çipi çıktı (%s)' % p.text_content('#hintChip'))
         k = p.evaluate("()=>window.__nb.hintK&&{act:window.__nb.hintK.act,cost:window.__nb.hintK.cost}")
         sig = "()=>JSON.stringify([window.__nb.S.lv,window.__nb.S.up,window.__nb.S.def,window.__nb.S.bmax,window.__nb.S.slots])"
         n0 = p.evaluate(sig)
