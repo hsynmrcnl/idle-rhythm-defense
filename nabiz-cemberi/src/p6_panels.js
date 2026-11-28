@@ -8,7 +8,7 @@ const DOCK={stage:'stage',studio:'look',coll:'look',def:'def',album:'def',book:'
 const dockLast={look:'studio'};let defSub='dalga';let prevTab='stage';const scrollMem={};
 /* Stüdyo bölümlerinin açılma sırası: her şey bir anda oyuncunun önüne gelmesin. run:1 olanlar bu dönemin geliştirmesine bağlı */
 /* v40 sadeleştirme: açılışlar ilk 10 dakikaya yayılır (sim: dalga ≈ 2,2/dk; eskiden ilk 2 dakikada 9 bölüm açılıyordu) */
-const UNL_W={def:6,rhy:8,look:10,pat:12,anl:14,asst:15,ord:18,desk:20,asstSyn:1};
+const UNL_W={def:6,rhy:8,look:10,pat:12,anl:14,asst:8,ord:18,desk:20,asstSyn:0};/* v109: Asistan dalga 8'de, ikinci enstrüman şartı olmadan (ölçüm: pasif oyuncu d10'da tek enstrümanla 351 sn gelir biriktiriyordu → 39 sn, 4 enstrüman; dalga 20'ye 13,8 → 9,0 dk) */
 const SEC_GATE={desk:'desk',syn:'syn',groove:'syn',auto:'syn',rhy:'rhy',pat:'pat',plan:'plan',solo:'solo',tree:'solo'};
 const GATES={syn:{c:()=>S.slots.filter(Boolean).length>=2,n:'Uyum ve Otomatik'},rhy:{c:()=>S.bestWave>=UNL_W.rhy,n:'Ritim stüdyosu'},pat:{c:()=>S.bestWave>=UNL_W.pat,n:'Desen, ölçü ve gam'},plan:{c:()=>!!S.up.sef,n:'Şarkı planı',run:1},solo:{c:()=>!!S.up.solo,n:'Solo editörü ve Solo dalı',run:1},desk:{c:()=>S.bestWave>=UNL_W.desk,n:'Ses masası'}};
 let secNew={};const ordOpen=new Set();
@@ -332,9 +332,9 @@ function hintCheck(){const el=$('hintChip');if(!el)return;const now=Date.now();
  /* v62: albüm eşiği dolmuş ve ilerleme 2 dk durmuşsa öneri çipi albümü gösterir (Asistan açıkken de); dokununca Albüm sekmesi (albüm oyunu sıfırladığı için kendisi çıkarmaz) */
  if(playing&&!demoMode&&!ovMain()&&S.tut&&S.tut.done&&S.unl&&S.unl.album&&S.runEarned>=albumTh()&&(now-stallT>HINT_STALL||S.runEarned>=albumTh()*3)&&!(S.mn&&S.mn.alb&&S.auto.alb===true)){hintK={alb:1};el.innerHTML=T('Albüm hazır')+': <b>+'+fansFor()+' '+T('hayran')+'</b>';el.title=T('İlerleme durdu: albüm çıkar, oyun baştan başlar ama hayranlar kalıcı gelir verir');if(el.hidden)el.hidden=false;return}
  let k=null;
- if(playing&&!demoMode&&!ovMain()&&S.tut&&S.tut.done&&S.unl&&S.unl.studio&&!auto){if(now-stallT>HINT_STALL||now-retT<HINT_RET)k=hintPick();else{/* v109: ilerleme sürse de nota önerinin 10 katı birikmişse toplu alım çipi */const q=hintPick();if(q&&S.nota>=q.cost*10)k=q}}
+ if(playing&&!demoMode&&!ovMain()&&S.tut&&S.tut.done&&S.unl&&S.unl.studio&&!auto){if(now-stallT>HINT_STALL||now-retT<HINT_RET)k=hintPick();else{/* v109: ilerleme sürse de nota önerinin 10 katı birikmişse toplu alım çipi */const q=hintPick();if(q&&q.act!=='def'&&S.nota>=q.cost*10)k=q}}
  hintK=k;if(!k){if(!el.hidden)el.hidden=true;return}
- /* v109: tek önerinin 10 katı nota birikmişse çip toplu alım önerir */if(S.nota>=k.cost*10){hintK={bulk:1,cost:0};el.innerHTML=T('Toplu al')+': <b>♪ '+fmt(S.nota*BULK_F)+'</b>';el.title=T('Nota birikti: dokun, notanın %90’ına kadar en verimli alımları yap');if(el.hidden)el.hidden=false;return}
+ /* v109: tek önerinin 10 katı nota birikmişse çip toplu alım önerir */if(S.nota>=k.cost*10&&k.act!=='def'){hintK={bulk:1,cost:0};el.innerHTML=T('Toplu al')+': <b>♪ '+fmt(S.nota*BULK_F)+'</b>';el.title=T('Nota birikti: dokun, notanın %90’ına kadar en verimli alımları yap');if(el.hidden)el.hidden=false;return}
  el.innerHTML=T('Öneri')+': <b>'+T(k.n)+'</b> · ♪ '+fmt(k.cost);el.title=T('Nota birikti ama ilerleme durdu: dokun, en verimli adımı al');if(el.hidden)el.hidden=false}
 /* öneri: nabız düşükse en ucuz hayatta kalma (nabız/kalkan/tamir), değilse Analiz'in gelir önerisi; elde ≥3 katı nota yoksa yok */
 /* v53: boş sahne yeri varken en ucuz açılabilir enstrüman (öneri çipi ve Asistan; Idle oyuncu 2. enstrümanı 25 dk açmadı, Uyum ve Asistan ona bağlı) */
