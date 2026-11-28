@@ -254,7 +254,7 @@ const hasarM=()=>Math.pow(1.12,S.def.hasar||0)*(S.up.fill?1.1:1)*provaM();
 const supM=(pk,s)=>Math.min(2,1+0.5*((SUPS[pk]||[])[s]||0));
 const noteVal=(si,v)=>{const x=slotIns(si);if(!x)return 0;const L=lvOf(x.id);return x.b*L*msMult(L)*(v===2?2:1)*(x.role==='gelir'?3:1)};
 /* v104 (oyuncu turu 20261127-1719: 10/10 Davul baskın): Davul'un hasarı Sv12'ye kadar aynı, sonra her seviye 0,4 sayılır (geliri aynı; erken dalgalar ve öğreticinin Yükselt anı ona dayanıyor) */
-const DV_K=12,DV_T=0.4,dvL=L=>L<=DV_K?L:DV_K+(L-DV_K)*DV_T;
+let DV_K=12;const DV_T=0.4,dvL=L=>L<=DV_K?L:DV_K+(L-DV_K)*DV_T;
 const dmgOf=(si,v)=>{const x=slotIns(si);if(!x)return 0;const L=lvOf(x.id);return x.dmg*(x.id==='davul'?dvL(L):L)*msMult(L)*(v===2?2:1)*hasarM()};
 const hitNota=(pk,si,v)=>noteVal(si,v)*(NF[pk][si]||1)*(ROWM[pk][si]||1)*BK[pk].nota;
 const hitDmg=(pk,si,s,v)=>dmgOf(si,v)*(NF[pk][si]||1)*(ROWM[pk][si]||1)*habF((RUN[pk][si]||[])[s]||1)*supM(pk,s)*BK[pk].dmg;

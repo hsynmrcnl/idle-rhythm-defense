@@ -10,6 +10,8 @@ import os, sys, threading, functools, http.server, socketserver, json
 from playwright.sync_api import sync_playwright
 R = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); DIST = os.path.join(R, 'dist')
 MIN = int(sys.argv[1]) if len(sys.argv) > 1 else 40
+# deney anahtarları (ortam değişkeni): DVK=Davul yavaşlama eşiği, ASSTW=Asistan açılış dalgası, BULK=her 30 sn notanın bu kesrini en verimli alımlara harca (toplu harca)
+DVK = os.environ.get('DVK'); ASSTW = os.environ.get('ASSTW'); BULK = float(os.environ.get('BULK', '0')); TAG = os.environ.get('TAG', '')
 class Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
 srv = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(Q, directory=DIST)); threading.Thread(target=srv.serve_forever, daemon=True).start()
@@ -20,6 +22,8 @@ def run(model):
     with sync_playwright() as pw:
         b = pw.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         p = b.new_page(); p.goto('http://127.0.0.1:%d/' % srv.server_address[1]); p.wait_for_timeout(400); p.evaluate(BASE)
+        if DVK: p.evaluate('v=>{window.__nb.dvK=v}', int(DVK))
+        if ASSTW: p.evaluate('v=>{window.__nb.UNL_W.asst=v}', int(ASSTW))
         if model == 'hizli': p.evaluate("()=>{const S=window.__nb.S;S.mn={lv:1,ins:1};S.auto={lv:true,ord:false,ins:true,alb:false,asst:false};S.am.k={lv:1,rup:1,srup:1,tempo:1,def:1};S.am.b=0.5}")
         asst = False; waves = {}; cur = None; best = 0
         for t in range(2, MIN * 60 + 1, 2):
@@ -31,6 +35,7 @@ def run(model):
             if model == 'tutumlu' and t % 20 == 0:
                 p.evaluate("()=>{const nb=window.__nb,S=nb.S;let left=S.nota*0.25;for(let i=0;i<40;i++){const k=nb.asstPick(left);if(!k)break;const n0=S.nota;nb.hintApplyK(k);const sp=n0-S.nota;if(sp<=0)break;left-=sp}}")
             if (model != 'hizli' or asst) and t % 20 == 0 and model != 'tutumlu': p.evaluate("()=>{const nb=window.__nb;if(nb.asstOn()){nb.asstReset();nb.autoTick()}}")
+            if BULK and t % 30 == 0: p.evaluate("f=>{const nb=window.__nb,S=nb.S;let left=S.nota*f;for(let i=0;i<60;i++){const k=nb.asstPick(left);if(!k)break;const n0=S.nota;nb.hintApplyK(k);const sp=n0-S.nota;if(sp<=0)break;left-=sp}}", BULK)
             w = s['w']
             if cur and w != cur['w']:
                 cur['dur'] = t - cur['t0']; cur['hp'] = float(s['whp'].get(str(cur['w']), 0)); waves.setdefault(cur['w'], cur); cur = None
@@ -55,5 +60,5 @@ for model in (sys.argv[2:] or ['pasif', 'tutumlu', 'hizli']):
     if ps:
         lo = sum(1 for x in ps if x < 0.6); band = sum(1 for x in ps if 0.6 <= x <= 0.95); hi = sum(1 for x in ps if x > 0.95)
         print('\nBant: kolay (<0,6) %d · hedef (0,6–0,95) %d · duvar/sınır (>0,95) %d · son dalga %d' % (lo, band, hi, rows[-1]['w']))
-json.dump(res, open(os.path.join(R, 'build', 'baski_olc_%s.json' % '_'.join(res)), 'w'), ensure_ascii=False, indent=1)
+json.dump(res, open(os.path.join(R, 'build', 'baski_olc_%s%s.json' % ('_'.join(res), TAG)), 'w'), ensure_ascii=False, indent=1)
 srv.shutdown()
