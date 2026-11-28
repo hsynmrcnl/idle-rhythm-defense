@@ -199,8 +199,8 @@ function sched(){
 function songRewind(){step=0;bar=0;NS[1].step=0;NS[2].step=0}
 function startStop(){
  ensureAudio();
- if(playing){playing=false;clearInterval(timer);queue=[];msg('Durdu: müzik ve kuşatma bekliyor · ortadaki ▶ ile devam')}
- else{playing=true;const now=ac.currentTime;nextT=now+0.06;step=step%MI.N;queue=[];grid=[];beats=[];lastLogic=now;NS[1].nextT=now+0.06;NS[1].grid=[];NS[2].nextT=now+0.06;NS[2].grid=[];if(!wave||wave.n!==S.wave||wave.stale)startWave(S.wave,now);else{const pa=wave.pausedAt||now,sh=now-pa;wave.startT+=sh;if(wave.done)wave.nextAt+=sh;enemies.forEach(e=>{if(e.lastSp)e.lastSp+=sh})}timer=setInterval(sched,25);sched()}
+ if(playing){playing=false;clearInterval(timer);queue=[];msg(isPhone()?'Durdu: müzik ve kuşatma bekliyor · ortadaki ▶ ile devam':'Durdu: müzik ve kuşatma bekliyor · ortadaki ▶ ya da P ile devam')}
+ else{playing=true;/* v110: başlayınca bayat “Durdu” mesajı silinir (P ile başlatınca kalıyordu) */{const m=$('msg');if(m&&/^(Durdu|Paused)/.test(m.textContent))m.textContent=''}const now=ac.currentTime;nextT=now+0.06;step=step%MI.N;queue=[];grid=[];beats=[];lastLogic=now;NS[1].nextT=now+0.06;NS[1].grid=[];NS[2].nextT=now+0.06;NS[2].grid=[];if(!wave||wave.n!==S.wave||wave.stale)startWave(S.wave,now);else{const pa=wave.pausedAt||now,sh=now-pa;wave.startT+=sh;if(wave.done)wave.nextAt+=sh;enemies.forEach(e=>{if(e.lastSp)e.lastSp+=sh})}timer=setInterval(sched,25);sched()}
  if(!playing&&wave){wave.pausedAt=ac.currentTime}
  $('play').textContent=T(playing?'Durdur':'Başlat');
 }

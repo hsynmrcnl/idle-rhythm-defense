@@ -52,7 +52,7 @@ with sync_playwright() as pw:
         x, y, w = hole(p); cx = x + w * 0.42; cy = y - w * 0.42 if ph else y - w * 0.42
         for k in range(40):
             if n() != 7: break
-            p.mouse.click(x - w * 0.45, y - w * 0.45); p.wait_for_timeout(137)
+            p.mouse.click(x - w * 0.3, y + w * 0.3); p.wait_for_timeout(137)
         check(n() >= 8 and p.evaluate("()=>window.__nb.playing"), 'Ritme vur tutturuldu, müzik durmadı')
         for want in range(10):
             if n() == 13: break
