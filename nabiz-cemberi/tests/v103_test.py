@@ -31,7 +31,7 @@ with sync_playwright() as pw:
     # dalga gezinmesi yazılı, kartı genişletmiyor
     p.evaluate("()=>window.__nb.setTab('def')");p.wait_for_timeout(200);p.tap('#defSub [data-v=dalga]');p.wait_for_timeout(300)
     t=p.text_content('.wnav')
-    check('Dalga' in t and '‹ 5' in t and '5 ›' in t,'dalga gezinmesi “Dalga ‹ 5 … 5 ›” (%s)'%t.strip())
+    check('Dalga' in t and '−5' in t and '+5' in t,'dalga gezinmesi “Dalga −5 … +5” (%s)'%t.strip())
     # üstteki güç/sn adı
     check('güç/sn' in p.text_content('[data-sec=siege]'),'Dalga durumu “güç/sn” diyor')
     # sekme değiştiren bayat kısa öğretici: kullanılan özelliğin öğreticisi düşer
